@@ -1,0 +1,40 @@
+# PowerPoint temporary files
+~$*.ppt*
+*.tmp
+
+# Office temporary files
+~$*.doc*
+~$*.xls*
+
+# Backup files
+*.bak
+*~
+
+# macOS
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Linux
+.directory
+
+# Temporary folders
+tmp/
+temp/
+
+# Build outputs
+*.aux
+*.log
+*.out
+*.toc
+
+# Editor specific
+.vscode/
+.idea/
+*.swp
+*.swo
