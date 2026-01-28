@@ -1,0 +1,145 @@
+% 第7章 约束满足与规划
+\chapter{约束满足与规划}
+\label{chap:csp}
+
+本章介绍约束满足问题及其在规划中的应用。
+
+\section{约束满足问题}
+
+\subsection{CSP形式化}
+
+\begin{definition}[约束满足问题]
+    \keyterm{约束满足问题}（Constraint Satisfaction Problem，CSP）定义为三元组 $\langle X, D, C \rangle$：
+    \begin{itemize}
+        \item $X = \{x_1, x_2, \ldots, x_n\}$ 是变量集合
+        \item $D = \{D_1, D_2, \ldots, D_n\}$ 是值域集合，$D_i$ 是 $x_i$ 的可能取值
+        \item $C = \{c_1, c_2, \ldots, c_m\}$ 是约束集合
+    \end{itemize}
+\end{definition}
+
+\subsection{约束传播}
+
+\keyterm{约束传播}（Constraint Propagation）通过推理减少变量的值域。常用技术包括：
+\begin{itemize}
+    \item \textbf{节点一致性}：确保每个变量的值域满足一元约束
+    \item \textbf{弧一致性}：确保每对变量满足二元约束
+    \item \textbf{路径一致性}：确保任意三个变量的组合一致
+\end{itemize}
+
+\subsection{回溯搜索}
+
+\begin{algorithm}[H]
+    \caption{CSP回溯搜索}
+    \label{alg:csp-backtrack}
+    \KwIn{CSP问题 $\langle X, D, C \rangle$，部分赋值 $\sigma$}
+    \KwOut{完整解或失败}
+
+    \If{$\sigma$ 是完整赋值}{
+        \KwRet{$\sigma$}
+    }
+    选择一个未赋值变量 $x$\;
+    \ForEach{$v \in D_x$ 按某种顺序}{
+        \If{$\sigma \cup \{x = v\}$ 满足所有约束}{
+            $\text{result} \gets \text{Backtrack}(\sigma \cup \{x = v\})$\;
+            \If{$\text{result} \neq$ 失败}{
+                \KwRet{$\text{result}$}
+            }
+        }
+    }
+    \KwRet{失败}
+\end{algorithm}
+
+\section{规划问题的SAT编码}
+
+\subsection{命题逻辑基础}
+
+命题逻辑的基本概念：
+\begin{itemize}
+    \item \textbf{命题变量}：取值为真或假的变量
+    \item \textbf{文字}：命题变量或其否定
+    \item \textbf{子句}：文字的析取
+    \item \textbf{CNF}：子句的合取
+\end{itemize}
+
+\subsection{规划到SAT的转换}
+
+将规划问题编码为SAT的关键思想是引入时间步：
+\begin{itemize}
+    \item $p_t$：命题$p$在时刻$t$为真
+    \item $a_t$：动作$a$在时刻$t$执行
+\end{itemize}
+
+\textbf{编码规则}：
+\begin{enumerate}
+    \item 初始状态：$\bigwedge_{p \in s_0} p_0 \land \bigwedge_{p \notin s_0} \neg p_0$
+    \item 目标状态：$\bigwedge_{p \in g} p_T$
+    \item 动作前提：$a_t \rightarrow \bigwedge_{p \in \text{Pre}(a)} p_t$
+    \item 动作效果：$a_t \rightarrow \bigwedge_{p \in \text{Add}(a)} p_{t+1}$
+    \item 帧公理：$(p_t \land \neg p_{t+1}) \rightarrow \bigvee_{a: p \in \text{Del}(a)} a_t$
+\end{enumerate}
+
+\subsection{SAT求解器应用}
+
+\begin{example}[布尔可满足性规划]
+\label{ex:sat-planning}
+    考虑一个简单的积木问题，初始状态A在桌上，B在A上；目标是B在桌上，A在B上。
+
+    \textbf{SAT编码}（假设最多2步）：
+
+    命题变量：
+    \begin{itemize}
+        \item $\text{on}(A,B)_t$, $\text{on}(B,A)_t$：积木位置
+        \item $\text{ontable}(A)_t$, $\text{ontable}(B)_t$：在桌上
+        \item $\text{unstack}(B,A)_t$, $\text{stack}(A,B)_t$, ...：动作
+    \end{itemize}
+
+    初始状态子句：
+    \begin{align}
+        &\text{ontable}(A)_0 \\
+        &\text{on}(B,A)_0 \\
+        &\neg\text{on}(A,B)_0 \\
+        &\neg\text{ontable}(B)_0
+    \end{align}
+
+    目标子句：
+    \begin{align}
+        &\text{ontable}(B)_2 \\
+        &\text{on}(A,B)_2
+    \end{align}
+
+    SAT求解器返回满足赋值，从中提取动作序列。
+\end{example}
+
+\section{规划问题的SMT编码}
+
+\subsection{SMT理论}
+
+\keyterm{SMT}（Satisfiability Modulo Theories）扩展了SAT，支持更丰富的理论：
+\begin{itemize}
+    \item 线性算术
+    \item 数组理论
+    \item 位向量
+    \item 非线性算术
+\end{itemize}
+
+\subsection{时态规划的SMT方法}
+
+SMT特别适合时态规划，因为可以直接处理连续时间变量和数值约束。
+
+\section*{本章小结}
+
+本章介绍了约束满足与规划的关系。CSP是一种强大的建模语言，规划问题可以编码为SAT或SMT问题。现代SAT/SMT求解器的强大能力使得这种方法在实践中非常有效。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 将八皇后问题建模为CSP，并用回溯搜索求解。
+
+    \item 为示例\ref{ex:sat-planning}中的积木问题写出完整的SAT编码。
+
+    \item 比较SAT规划和启发式搜索规划的优缺点。
+
+    \item 设计一个需要数值约束的规划问题，说明为什么SMT比SAT更适合。
+
+    \item 实现一个简单的SAT规划器，测试其在小规模问题上的性能。
+\end{enumerate}

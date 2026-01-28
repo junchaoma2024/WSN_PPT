@@ -1,0 +1,178 @@
+% 附录B 常用规划器安装与使用指南
+\chapter{常用规划器安装与使用指南}
+\label{app:planners}
+
+本附录介绍几种常用规划器的安装和使用方法。
+
+\section{Fast Downward}
+
+\subsection{简介}
+
+Fast Downward是最成功的现代规划系统之一，支持多种启发式和搜索算法。
+
+\subsection{安装}
+
+\textbf{Linux/macOS}：
+\begin{lstlisting}[language=bash]
+# 克隆仓库
+git clone https://github.com/aibasel/downward.git
+cd downward
+
+# 编译
+./build.py
+\end{lstlisting}
+
+\textbf{依赖}：
+\begin{itemize}
+    \item Python 3.6+
+    \item C++20编译器（GCC 10+或Clang 12+）
+    \item CMake 3.16+
+\end{itemize}
+
+\subsection{基本使用}
+
+\begin{lstlisting}[language=bash]
+# 使用A*搜索和LM-cut启发式
+./fast-downward.py domain.pddl problem.pddl \
+    --search "astar(lmcut())"
+
+# 使用贪婪最佳优先搜索和FF启发式
+./fast-downward.py domain.pddl problem.pddl \
+    --search "eager_greedy([ff()])"
+
+# LAMA配置
+./fast-downward.py domain.pddl problem.pddl --alias lama
+\end{lstlisting}
+
+\subsection{常用配置}
+
+\begin{table}[htbp]
+    \centering
+    \begin{tabular}{ll}
+        \toprule
+        配置 & 说明 \\
+        \midrule
+        \texttt{--alias lama} & LAMA配置，平衡质量和速度 \\
+        \texttt{--alias lama-first} & 快速找到第一个解 \\
+        \texttt{--alias seq-opt-lmcut} & 最优规划，使用LM-cut \\
+        \texttt{--alias seq-sat-lama} & 满足性规划，LAMA风格 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{PDDL4J}
+
+\subsection{简介}
+
+PDDL4J是一个Java库，提供PDDL解析和多种规划算法。
+
+\subsection{安装}
+
+\begin{lstlisting}[language=bash]
+# 使用Maven
+<dependency>
+    <groupId>fr.uga</groupId>
+    <artifactId>pddl4j</artifactId>
+    <version>4.0.0</version>
+</dependency>
+\end{lstlisting}
+
+\subsection{命令行使用}
+
+\begin{lstlisting}[language=bash]
+java -jar pddl4j.jar -o domain.pddl -f problem.pddl
+\end{lstlisting}
+
+\section{SHOP2}
+
+\subsection{简介}
+
+SHOP2是一个HTN规划系统，使用Lisp实现。
+
+\subsection{安装}
+
+\begin{lstlisting}[language=bash]
+# 下载SHOP2
+# 需要Common Lisp环境（如SBCL）
+
+# 在SBCL中加载
+(load "shop2.lisp")
+\end{lstlisting}
+
+\subsection{基本使用}
+
+\begin{lstlisting}[language=lisp]
+;; 定义领域
+(defdomain logistics
+  (:method (deliver ?pkg ?dest)
+    ((at ?pkg ?loc))
+    ((transport ?pkg ?loc ?dest)))
+  ...
+)
+
+;; 求解问题
+(find-plans 'logistics-problem :verbose t)
+\end{lstlisting}
+
+\section{Pyperplan}
+
+\subsection{简介}
+
+Pyperplan是一个教学用途的Python规划器，代码简洁易读。
+
+\subsection{安装}
+
+\begin{lstlisting}[language=bash]
+pip install pyperplan
+\end{lstlisting}
+
+\subsection{使用}
+
+\begin{lstlisting}[language=bash]
+# 命令行
+pyperplan domain.pddl problem.pddl
+
+# Python API
+from pyperplan import planner
+solution = planner.search(domain, problem, "astar", "hadd")
+\end{lstlisting}
+
+\section{在线规划工具}
+
+\subsection{Planning.Domains}
+
+网址：\url{http://planning.domains/}
+
+提供在线PDDL编辑器和多个规划器。
+
+\subsection{Web Planner}
+
+网址：\url{http://editor.planning.domains/}
+
+功能：
+\begin{itemize}
+    \item 在线编辑PDDL
+    \item 语法高亮和检查
+    \item 多规划器支持
+    \item 可视化执行
+\end{itemize}
+
+\section{调试技巧}
+
+\subsection{常见错误}
+
+\begin{enumerate}
+    \item \textbf{语法错误}：使用在线编辑器检查
+    \item \textbf{类型不匹配}：检查参数类型定义
+    \item \textbf{无解}：简化问题或检查目标可达性
+    \item \textbf{内存不足}：使用更高效的启发式
+\end{enumerate}
+
+\subsection{性能优化}
+
+\begin{itemize}
+    \item 选择合适的启发式函数
+    \item 使用类型系统减少搜索空间
+    \item 添加领域特定的约束
+    \item 考虑问题分解
+\end{itemize}

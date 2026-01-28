@@ -1,0 +1,205 @@
+% 第6章 层次任务网络规划
+\chapter{层次任务网络规划}
+\label{chap:htn}
+
+\keyterm{层次任务网络}（Hierarchical Task Network，HTN）规划是一种通过任务分解来求解规划问题的方法。
+
+\section{HTN基本概念}
+
+\subsection{任务与方法}
+
+\begin{definition}[任务]
+    在HTN规划中，\keyterm{任务}分为两类：
+    \begin{itemize}
+        \item \textbf{原子任务}（Primitive Task）：可以直接执行的动作
+        \item \textbf{复合任务}（Compound Task）：需要进一步分解的抽象任务
+    \end{itemize}
+\end{definition}
+
+\begin{definition}[方法]
+    \keyterm{方法}（Method）定义了如何将复合任务分解为子任务序列。一个方法$m$包含：
+    \begin{itemize}
+        \item 任务头：要分解的复合任务
+        \item 前提条件：方法适用的条件
+        \item 任务网络：分解后的子任务及其约束
+    \end{itemize}
+\end{definition}
+
+\subsection{任务分解}
+
+HTN规划的核心思想是递归分解：从初始任务网络开始，不断选择复合任务并应用方法进行分解，直到所有任务都是原子任务。
+
+\section{SHOP规划系统}
+
+\keyterm{SHOP}（Simple Hierarchical Ordered Planner）是一个广泛使用的HTN规划系统。
+
+\subsection{SHOP算法}
+
+\begin{algorithm}[H]
+    \caption{SHOP算法}
+    \label{alg:shop}
+    \KwIn{当前状态 $s$，任务列表 $T$}
+    \KwOut{规划 $\pi$ 或失败}
+
+    \If{$T$ 为空}{
+        \KwRet{空规划 $\langle\rangle$}
+    }
+    $t \gets T$ 的第一个任务\;
+    \eIf{$t$ 是原子任务}{
+        \If{$t$ 的前提条件在 $s$ 中满足}{
+            $s' \gets$ 执行 $t$ 后的状态\;
+            $\pi \gets \text{SHOP}(s', T \setminus \{t\})$\;
+            \If{$\pi \neq$ 失败}{
+                \KwRet{$\langle t \rangle \cdot \pi$}
+            }
+        }
+    }{
+        \ForEach{方法 $m$ 可以分解 $t$}{
+            \If{$m$ 的前提条件在 $s$ 中满足}{
+                $T' \gets$ 用 $m$ 的子任务替换 $T$ 中的 $t$\;
+                $\pi \gets \text{SHOP}(s, T')$\;
+                \If{$\pi \neq$ 失败}{
+                    \KwRet{$\pi$}
+                }
+            }
+        }
+    }
+    \KwRet{失败}
+\end{algorithm}
+
+\subsection{SHOP2扩展}
+
+SHOP2是SHOP的扩展版本，支持：
+\begin{itemize}
+    \item 偏序任务网络
+    \item 分支和循环
+    \item 数值计算
+    \item 外部函数调用
+\end{itemize}
+
+\section{HDDL表示语言}
+
+\keyterm{HDDL}（Hierarchical Domain Definition Language）是HTN规划的标准表示语言。
+
+\subsection{全序与偏序HTN}
+
+\begin{itemize}
+    \item \textbf{全序HTN}：子任务之间有严格的顺序约束
+    \item \textbf{偏序HTN}：子任务之间只有部分顺序约束
+\end{itemize}
+
+\subsection{HDDL语法}
+
+\begin{lstlisting}[language=PDDL]
+(:method deliver-package
+  :parameters (?p - package ?from ?to - location)
+  :task (deliver ?p ?to)
+  :precondition (at ?p ?from)
+  :ordered-subtasks (and
+    (pick-up ?p ?from)
+    (transport ?p ?from ?to)
+    (put-down ?p ?to)
+  )
+)
+\end{lstlisting}
+
+\section{HTN应用案例}
+
+\begin{example}[军事作战任务分解]
+\label{ex:military-htn}
+    考虑一个空中打击任务的层次分解：
+
+    \textbf{顶层任务}：执行空中打击任务
+
+    \textbf{分解方法}：
+    \begin{enumerate}
+        \item 任务规划阶段
+        \begin{itemize}
+            \item 情报收集与分析
+            \item 目标确认
+            \item 航线规划
+        \end{itemize}
+        \item 任务准备阶段
+        \begin{itemize}
+            \item 装备检查
+            \item 燃料加注
+            \item 弹药装载
+        \end{itemize}
+        \item 任务执行阶段
+        \begin{itemize}
+            \item 起飞
+            \item 航渡
+            \item 目标攻击
+            \item 返航
+        \end{itemize}
+        \item 任务评估阶段
+        \begin{itemize}
+            \item 战果评估
+            \item 任务总结
+        \end{itemize}
+    \end{enumerate}
+\end{example}
+
+\begin{example}[智能家居任务规划]
+\label{ex:smarthome-htn}
+    智能家居系统收到用户指令："准备晚餐派对"
+
+    \textbf{任务分解}：
+    \begin{enumerate}
+        \item 环境准备
+        \begin{itemize}
+            \item 调节室温至22度
+            \item 调暗灯光
+            \item 播放背景音乐
+        \end{itemize}
+        \item 餐饮准备
+        \begin{itemize}
+            \item 预热烤箱
+            \item 准备食材（通知用户）
+            \item 设置定时器
+        \end{itemize}
+        \item 安全检查
+        \begin{itemize}
+            \item 检查门锁状态
+            \item 启动访客模式
+        \end{itemize}
+    \end{enumerate}
+\end{example}
+
+\begin{example}[游戏AI行为规划]
+\label{ex:game-htn}
+    在策略游戏中，AI需要规划"建造军事基地"：
+
+    \textbf{方法1}（资源充足时）：
+    \begin{enumerate}
+        \item 选择建造地点
+        \item 派遣工人
+        \item 建造兵营
+        \item 建造防御塔
+        \item 训练士兵
+    \end{enumerate}
+
+    \textbf{方法2}（资源不足时）：
+    \begin{enumerate}
+        \item 采集资源
+        \item 递归调用"建造军事基地"
+    \end{enumerate}
+\end{example}
+
+\section*{本章小结}
+
+HTN规划通过任务分解的方式求解规划问题，更符合人类的规划思维方式。SHOP系列是最著名的HTN规划系统，HDDL是HTN规划的标准表示语言。HTN规划在军事、智能家居、游戏AI等领域有广泛应用。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 设计一个HTN领域，对"组织一次旅行"任务进行分解。
+
+    \item 比较HTN规划和经典规划的优缺点。
+
+    \item 用HDDL编写示例\ref{ex:smarthome-htn}中的智能家居任务规划领域。
+
+    \item 分析HTN规划的完备性：在什么条件下HTN规划能够找到解？
+
+    \item 设计一个HTN规划问题，使得全序和偏序分解产生不同的结果。
+\end{enumerate}

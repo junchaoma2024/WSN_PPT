@@ -1,0 +1,154 @@
+% 第15章 大语言模型与任务规划
+\chapter{大语言模型与任务规划 \grad}
+\label{chap:llm}
+
+本章介绍大语言模型在任务规划中的应用，属于研究生拓展内容。
+
+\section{LLM规划能力分析}
+
+\subsection{LLM的推理能力}
+
+大语言模型（如GPT-4、Claude等）展示了一定的推理和规划能力：
+\begin{itemize}
+    \item 常识推理
+    \item 多步骤问题求解
+    \item 代码生成和调试
+    \item 任务分解
+\end{itemize}
+
+\subsection{规划基准测试（PlanBench）}
+
+\begin{definition}[PlanBench]
+    \keyterm{PlanBench}是评估LLM规划能力的基准测试套件，包含基于国际规划竞赛领域的问题。
+\end{definition}
+
+PlanBench的测试类别：
+\begin{itemize}
+    \item 计划生成（零样本/少样本）
+    \item 计划验证
+    \item 目标识别
+    \item 代价优化
+\end{itemize}
+
+\subsection{LLM规划的局限性}
+
+研究发现LLM在规划任务上存在系统性不足：
+\begin{enumerate}
+    \item \textbf{长时域规划困难}：步数增加时性能显著下降
+    \item \textbf{计划有效性问题}：生成的计划可能违反约束
+    \item \textbf{缺乏形式化保证}：无法确保解的正确性
+    \item \textbf{结构化推理不足}：对复杂依赖关系的处理能力有限
+\end{enumerate}
+
+\section{LLM作为规划组件}
+
+鉴于LLM作为独立规划器的局限性，研究者探索将LLM作为规划系统的组件。
+
+\subsection{LLM+P：自然语言到PDDL}
+
+\begin{definition}[LLM+P]
+    \keyterm{LLM+P}框架使用LLM将自然语言问题描述翻译为PDDL格式，然后由经典规划器求解。
+\end{definition}
+
+工作流程：
+\begin{enumerate}
+    \item 用户用自然语言描述问题
+    \item LLM生成PDDL领域和问题文件
+    \item 经典规划器（如Fast Downward）求解
+    \item LLM将计划翻译回自然语言
+\end{enumerate}
+
+\subsection{LLM生成启发式函数}
+
+LLM可以为规划问题生成领域特定的启发式函数：
+\begin{itemize}
+    \item 输入：PDDL领域描述
+    \item 输出：Python实现的启发式函数
+    \item 优势：保持规划器的正确性保证
+\end{itemize}
+
+\subsection{LLM作为世界模型}
+
+LLM可以作为世界模型，预测动作的效果：
+\begin{itemize}
+    \item 处理开放领域问题
+    \item 利用常识知识
+    \item 但可能产生幻觉
+\end{itemize}
+
+\section{具身智能规划}
+
+\subsection{SayCan框架}
+
+\begin{definition}[SayCan]
+    \keyterm{SayCan}框架结合LLM的语言理解能力和机器人的可供性（affordance）函数：
+    \begin{equation}
+        \pi(a|s, i) \propto p_{\text{LLM}}(a|i) \cdot p_{\text{affordance}}(a|s)
+    \end{equation}
+    其中$i$是自然语言指令，$s$是当前状态。
+\end{definition}
+
+\subsection{SayPlan与3D场景图}
+
+\begin{definition}[SayPlan]
+    \keyterm{SayPlan}使用3D场景图（3DSG）来提供环境的结构化表示，使LLM能够在大规模环境中进行可扩展的任务规划。
+\end{definition}
+
+SayPlan的关键创新：
+\begin{itemize}
+    \item 场景图作为环境表示
+    \item 多层次抽象
+    \item 语义搜索缩小相关范围
+\end{itemize}
+
+\subsection{Inner Monologue}
+
+\begin{definition}[Inner Monologue]
+    \keyterm{Inner Monologue}通过环境反馈形成"内心独白"，包括：
+    \begin{itemize}
+        \item 被动场景描述
+        \item 主动场景描述
+        \item 成功检测反馈
+    \end{itemize}
+\end{definition}
+
+这种闭环反馈显著提升了机器人任务执行的成功率。
+
+\section{多智能体LLM系统}
+
+\subsection{LLM-MAS架构}
+
+多智能体LLM系统的典型架构：
+\begin{itemize}
+    \item 每个智能体由一个LLM驱动
+    \item 智能体具有不同的角色和专长
+    \item 通过对话进行协调
+    \item 共同完成复杂任务
+\end{itemize}
+
+\subsection{智能体协作框架}
+
+代表性框架：
+\begin{itemize}
+    \item \textbf{AutoGen}：微软的多智能体对话框架
+    \item \textbf{CAMEL}：角色扮演对话框架
+    \item \textbf{MetaGPT}：软件开发多智能体系统
+\end{itemize}
+
+\section*{本章小结}
+
+本章介绍了大语言模型与任务规划的结合。LLM展示了一定的规划能力，但存在系统性局限。将LLM作为规划系统的组件（如翻译器、启发式生成器）是更有效的方法。具身智能规划框架（SayCan、SayPlan）展示了LLM在机器人领域的应用。多智能体LLM系统是新兴的研究方向。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 分析LLM在长时域规划中性能下降的原因。
+
+    \item 用LLM将一个简单的规划问题翻译为PDDL，并验证翻译的正确性。
+
+    \item 比较LLM+P和纯LLM规划的优缺点。
+
+    \item 讨论SayCan中可供性函数的作用。
+
+    \item 阅读一篇多智能体LLM系统的论文，总结其协调机制。
+\end{enumerate}
