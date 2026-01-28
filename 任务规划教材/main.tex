@@ -10,7 +10,7 @@
 \usepackage{amsmath,amssymb,amsthm}
 \usepackage{algorithm2e}
 \usepackage{listings}
-\usepackage{xcolor}
+\usepackage[dvipsnames,svgnames,x11names]{xcolor}
 \usepackage{hyperref}
 \usepackage{booktabs}
 \usepackage{longtable}
@@ -116,7 +116,7 @@
 % ==================== 自定义命令 ====================
 \newcommand{\keyterm}[1]{\textbf{#1}}
 \newcommand{\englishterm}[1]{\textit{#1}}
-\newcommand{\grad}{\textcolor{blue!70!black}{$\bigstar$}} % 研究生拓展标记
+\newcommand{\grad}{\texorpdfstring{\textcolor{blue!70!black}{$\bigstar$}}{★}} % 研究生拓展标记
 
 % ==================== 文档信息 ====================
 \title{
