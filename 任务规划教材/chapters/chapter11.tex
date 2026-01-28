@@ -1,0 +1,186 @@
+% 第11章 交通运输规划
+\chapter{交通运输规划}
+\label{chap:transportation}
+
+本章介绍任务规划在交通运输领域的应用。
+
+\section{车辆路径问题（VRP）}
+
+\subsection{基本VRP模型}
+
+\begin{definition}[车辆路径问题]
+    \keyterm{车辆路径问题}（Vehicle Routing Problem，VRP）：给定一个配送中心和若干客户点，确定车辆的配送路线，使得所有客户的需求得到满足，同时优化某个目标（如总行驶距离最短）。
+\end{definition}
+
+VRP可以形式化为：
+\begin{align}
+    \min \quad & \sum_{i,j,k} c_{ij} x_{ijk} \\
+    \text{s.t.} \quad & \sum_{k} \sum_{j} x_{ijk} = 1, \quad \forall i \text{（每个客户恰好被访问一次）} \\
+    & \sum_{i} d_i \sum_{j} x_{ijk} \leq Q_k, \quad \forall k \text{（车辆容量约束）} \\
+    & x_{ijk} \in \{0,1\}
+\end{align}
+
+\subsection{带时间窗的VRP}
+
+\begin{definition}[VRPTW]
+    \keyterm{带时间窗的VRP}（VRP with Time Windows）要求车辆在客户指定的时间范围内到达并提供服务。
+\end{definition}
+
+\subsection{带容量约束的VRP}
+
+\keyterm{CVRP}（Capacitated VRP）考虑车辆的载重限制。
+
+\section{求解方法}
+
+\subsection{精确算法}
+
+\begin{itemize}
+    \item 分支定界法
+    \item 分支切割法
+    \item 列生成法
+\end{itemize}
+
+精确算法能够保证找到最优解，但对于大规模问题计算时间过长。
+
+\subsection{启发式与元启发式}
+
+\begin{itemize}
+    \item \textbf{构造启发式}：最近邻、节约算法、插入法
+    \item \textbf{改进启发式}：2-opt、3-opt、Or-opt
+    \item \textbf{元启发式}：遗传算法、模拟退火、禁忌搜索、蚁群优化
+\end{itemize}
+
+\subsection{混合智能方法}
+
+结合精确方法和启发式的优点，如：
+\begin{itemize}
+    \item 大规模邻域搜索（LNS）
+    \item 自适应大规模邻域搜索（ALNS）
+    \item 混合遗传算法
+\end{itemize}
+
+\begin{example}[快递配送路径优化]
+\label{ex:delivery}
+    某快递公司早班需要配送200个包裹到城区各处。
+
+    \textbf{已知条件}：
+    \begin{itemize}
+        \item 配送中心位置
+        \item 200个配送点的位置和包裹重量
+        \item 10辆配送车，每辆载重500kg
+        \item 部分配送点有时间要求
+    \end{itemize}
+
+    \textbf{优化目标}：最小化总行驶距离
+
+    \textbf{求解过程}：
+    \begin{enumerate}
+        \item 使用聚类算法初步划分区域
+        \item 为每个区域用节约算法构造初始路线
+        \item 使用ALNS进行改进
+        \item 检验时间窗约束，调整路线
+    \end{enumerate}
+
+    \textbf{优化结果}：相比人工规划，总行驶距离减少15\%，配送时间缩短20\%。
+\end{example}
+
+\begin{example}[公交线路规划]
+\label{ex:bus}
+    某城市需要设计新的公交线网。
+
+    \textbf{输入数据}：
+    \begin{itemize}
+        \item 城市道路网络
+        \item 居民出行OD矩阵
+        \item 现有公交站点
+        \item 车辆配置
+    \end{itemize}
+
+    \textbf{规划内容}：
+    \begin{enumerate}
+        \item 线路走向设计
+        \item 站点设置
+        \item 发车频率确定
+        \item 车辆调度计划
+    \end{enumerate}
+
+    \textbf{优化目标}：最大化乘客覆盖率，最小化总运营成本。
+\end{example}
+
+\section{动态路径规划}
+
+\subsection{实时重规划}
+
+在实际运营中，经常需要根据实时情况调整路线：
+\begin{itemize}
+    \item 新订单插入
+    \item 交通拥堵
+    \item 车辆故障
+    \item 客户取消
+\end{itemize}
+
+\subsection{交通流预测}
+
+利用历史数据和实时数据预测交通流，提前调整路线。
+
+\begin{example}[网约车调度系统]
+\label{ex:ridesharing}
+    网约车平台需要实时匹配乘客和司机。
+
+    \textbf{核心问题}：
+    \begin{itemize}
+        \item 订单分配：哪个司机接哪个乘客
+        \item 路径规划：如何到达乘客位置和目的地
+        \item 拼车匹配：多个乘客如何共乘
+        \item 供需调度：如何引导空闲车辆
+    \end{itemize}
+
+    \textbf{算法特点}：
+    \begin{itemize}
+        \item 毫秒级响应要求
+        \item 考虑未来需求预测
+        \item 平衡效率和公平性
+    \end{itemize}
+\end{example}
+
+\section{多式联运规划}
+
+\begin{example}[集装箱多式联运优化]
+\label{ex:intermodal}
+    某物流公司需要将货物从上海港运送到成都仓库。
+
+    \textbf{可选方式}：
+    \begin{itemize}
+        \item 全程公路运输（快但贵）
+        \item 铁路+公路（经济但慢）
+        \item 水运+铁路+公路（最经济但最慢）
+    \end{itemize}
+
+    \textbf{决策因素}：
+    \begin{itemize}
+        \item 货物时效性要求
+        \item 各环节成本
+        \item 转运时间和成本
+        \item 运力可用性
+    \end{itemize}
+
+    \textbf{优化模型}：多目标规划，平衡成本、时间和可靠性。
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了任务规划在交通运输领域的应用。VRP是物流配送的核心问题，有多种变体和求解方法。动态路径规划处理实时变化的情况。多式联运规划优化不同运输方式的组合。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 用节约算法为一个10客户的VRP问题构造初始解。
+
+    \item 实现2-opt改进算法，改进TSP问题的初始解。
+
+    \item 对于示例\ref{ex:delivery}，讨论如何处理配送过程中的新订单。
+
+    \item 比较遗传算法和禁忌搜索在VRP问题上的性能。
+
+    \item 设计一个简单的网约车匹配算法，考虑等待时间和绕路距离。
+\end{enumerate}

@@ -1,0 +1,227 @@
+% 第1章 绪论
+\chapter{绪论}
+\label{chap:introduction}
+
+\section{任务规划的基本概念}
+
+\keyterm{任务规划}（Task Planning）是人工智能领域的核心研究方向之一，它研究如何让智能系统自主地制定行动序列以实现特定目标。简单来说，任务规划回答的是"做什么"和"怎么做"的问题。
+
+\begin{definition}[任务规划问题]
+    一个任务规划问题可以形式化地定义为一个四元组 $\mathcal{P} = \langle S, A, I, G \rangle$，其中：
+    \begin{itemize}
+        \item $S$ 是状态空间，表示系统所有可能状态的集合；
+        \item $A$ 是动作集合，表示智能体可执行的所有动作；
+        \item $I \in S$ 是初始状态；
+        \item $G \subseteq S$ 是目标状态集合。
+    \end{itemize}
+    规划的任务是找到一个动作序列 $\pi = \langle a_1, a_2, \ldots, a_n \rangle$，使得从初始状态 $I$ 出发，依次执行这些动作后，系统能够到达某个目标状态 $g \in G$。
+\end{definition}
+
+任务规划与人类的日常决策密切相关。当我们计划一次旅行、安排一天的工作、或者思考如何完成一个复杂项目时，我们都在进行某种形式的规划。人工智能领域的任务规划研究旨在将这种能力赋予计算机系统。
+
+\section{任务规划的发展历程}
+
+任务规划的研究始于20世纪60年代末，至今已经历了半个多世纪的发展。
+
+\subsection{早期探索（1969--1980）}
+
+1969年，斯坦福研究院（Stanford Research Institute）的研究人员开发了\keyterm{STRIPS}（Stanford Research Institute Problem Solver）系统，这是第一个具有重要影响力的自动规划系统。STRIPS引入了用前提条件和效果来描述动作的方法，这一表示方法至今仍是规划领域的基础。
+
+同一时期，\keyterm{积木世界}（Blocks World）成为规划研究的标准测试问题。在这个问题中，机器人需要通过移动积木来实现特定的堆叠配置。
+
+\subsection{经典规划时期（1980--1995）}
+
+20世纪80年代至90年代中期，研究者们发展了多种规划方法：
+
+\begin{itemize}
+    \item \textbf{偏序规划}（Partial-Order Planning）：允许规划中的动作保持部分有序，提高了规划的灵活性。
+    \item \textbf{层次任务网络规划}（HTN Planning）：通过任务分解的方式，将复杂任务分解为简单子任务。
+    \item \textbf{规划图方法}：Blum和Furst于1995年提出的GraphPlan算法，通过构建规划图来加速规划过程。
+\end{itemize}
+
+\subsection{现代规划时期（1995--2015）}
+
+这一时期的重要进展包括：
+
+\begin{itemize}
+    \item \textbf{PDDL语言}：1998年，为了统一规划问题的描述，研究者们制定了\keyterm{规划领域定义语言}（PDDL），并成为国际规划竞赛的标准语言。
+    \item \textbf{启发式搜索规划}：FF规划器和Fast Downward系统的出现，使得规划器能够高效处理大规模问题。
+    \item \textbf{SAT规划}：将规划问题转换为布尔可满足性问题，利用SAT求解器的强大能力。
+\end{itemize}
+
+\subsection{智能时代（2015--至今）}
+
+近年来，深度学习和大语言模型的发展为任务规划带来了新的机遇：
+
+\begin{itemize}
+    \item \textbf{强化学习与规划}：AlphaGo等系统展示了学习与规划结合的强大能力。
+    \item \textbf{神经符号规划}：将神经网络的学习能力与符号规划的推理能力相结合。
+    \item \textbf{大语言模型规划}：探索利用GPT、Claude等大语言模型进行任务规划。
+\end{itemize}
+
+\section{任务规划的应用领域}
+
+任务规划技术已广泛应用于多个领域，本节通过三个典型示例来说明。
+
+\begin{example}[交通物流调度问题]
+\label{ex:logistics}
+    某快递公司需要为5辆配送车规划当日的配送路线。已知：
+    \begin{itemize}
+        \item 配送中心位于城市中心，坐标为$(0, 0)$；
+        \item 共有50个配送点，每个点有一定的货物需求量；
+        \item 每辆车的载重限制为2吨，行驶里程限制为200公里；
+        \item 部分配送点有时间窗要求（如"上午9点前送达"）。
+    \end{itemize}
+
+    这是一个典型的\keyterm{带时间窗的车辆路径问题}（VRPTW）。规划系统需要确定：
+    \begin{enumerate}
+        \item 每辆车访问哪些配送点（任务分配）；
+        \item 每辆车的访问顺序（路径规划）；
+        \item 何时到达每个配送点（调度）。
+    \end{enumerate}
+
+    目标是在满足所有约束的前提下，最小化总行驶距离或总配送时间。
+\end{example}
+
+\begin{example}[机器人任务执行]
+\label{ex:robot}
+    考虑一个家庭服务机器人，用户发出指令："把客厅桌上的杯子放到厨房水槽里。"
+
+    机器人需要规划以下动作序列：
+    \begin{enumerate}
+        \item 导航到客厅；
+        \item 定位桌子和杯子；
+        \item 移动到桌子前的合适位置；
+        \item 伸出机械臂抓取杯子；
+        \item 导航到厨房（同时保持杯子稳定）；
+        \item 定位水槽；
+        \item 将杯子放入水槽。
+    \end{enumerate}
+
+    这涉及到\keyterm{任务与运动规划}（TAMP）的结合：高层的任务规划决定"做什么"，底层的运动规划决定"怎么移动"。
+\end{example}
+
+\begin{example}[军事作战任务分配]
+\label{ex:military}
+    在一次无人机侦察任务中，指挥中心需要为10架无人机分配侦察任务。已知：
+    \begin{itemize}
+        \item 有20个需要侦察的目标区域；
+        \item 每架无人机的续航时间为4小时；
+        \item 不同目标区域的优先级不同；
+        \item 存在禁飞区和威胁区域；
+        \item 部分目标需要多架无人机协同侦察。
+    \end{itemize}
+
+    规划系统需要考虑：
+    \begin{enumerate}
+        \item 目标分配：哪些无人机负责哪些目标；
+        \item 航迹规划：每架无人机的飞行路线；
+        \item 时间协调：多机协同侦察的时间安排；
+        \item 应急处理：遇到突发情况时的重规划。
+    \end{enumerate}
+
+    这是\keyterm{多智能体任务规划}与\keyterm{路径规划}的综合问题。
+\end{example}
+
+\section{任务规划与相关学科的关系}
+
+任务规划是一个跨学科的研究领域，与多个学科密切相关：
+
+\begin{itemize}
+    \item \textbf{人工智能}：任务规划是AI的核心研究方向之一，与知识表示、推理、搜索等紧密相关。
+
+    \item \textbf{运筹学}：许多规划问题可以建模为优化问题，运筹学提供了丰富的求解方法。
+
+    \item \textbf{控制理论}：在机器人规划中，控制理论为运动执行提供了理论基础。
+
+    \item \textbf{计算机科学}：算法设计、复杂性理论为规划提供了分析工具。
+
+    \item \textbf{认知科学}：人类规划行为的研究为人工规划系统提供了启发。
+\end{itemize}
+
+图\ref{fig:planning-relations}展示了任务规划与相关学科的关系。
+
+\begin{figure}[htbp]
+    \centering
+    \begin{tikzpicture}[
+        box/.style={rectangle, draw, rounded corners, minimum width=2.5cm, minimum height=1cm, align=center},
+        arrow/.style={->, >=stealth, thick}
+    ]
+        \node[box, fill=blue!20] (planning) at (0,0) {任务规划};
+        \node[box, fill=green!20] (ai) at (-3,2) {人工智能};
+        \node[box, fill=green!20] (or) at (3,2) {运筹学};
+        \node[box, fill=yellow!20] (control) at (-3,-2) {控制理论};
+        \node[box, fill=yellow!20] (cs) at (3,-2) {计算机科学};
+        \node[box, fill=orange!20] (cognitive) at (0,3) {认知科学};
+
+        \draw[arrow, <->] (planning) -- (ai);
+        \draw[arrow, <->] (planning) -- (or);
+        \draw[arrow, <->] (planning) -- (control);
+        \draw[arrow, <->] (planning) -- (cs);
+        \draw[arrow, <->] (planning) -- (cognitive);
+    \end{tikzpicture}
+    \caption{任务规划与相关学科的关系}
+    \label{fig:planning-relations}
+\end{figure}
+
+\section{本书结构与学习指南}
+
+本书共分四篇十六章，内容安排如下：
+
+\subsection{内容结构}
+
+\begin{description}
+    \item[第一篇：基础篇（第1--6章）] 建立任务规划的理论基础，包括状态空间搜索、经典规划理论、启发式方法、时态规划和层次任务网络规划。这部分内容是后续学习的基础，建议按顺序学习。
+
+    \item[第二篇：方法篇（第7--10章）] 介绍进阶的规划方法，包括约束满足、不确定性规划、多智能体规划和运动规划。这些章节相对独立，可以根据兴趣选择性学习。
+
+    \item[第三篇：应用篇（第11--13章）] 通过三个应用领域展示任务规划技术的实际应用。建议在学完基础篇后，选择感兴趣的应用领域深入学习。
+
+    \item[第四篇：前沿篇（第14--16章）] 介绍最新的研究进展，适合研究生深入学习。这些章节标有\grad 符号。
+\end{description}
+
+\subsection{学习建议}
+
+\begin{enumerate}
+    \item \textbf{理论与实践结合}：在学习理论知识的同时，动手完成附录D中的编程实验。
+
+    \item \textbf{循序渐进}：先掌握基础篇的内容，再学习进阶内容。
+
+    \item \textbf{关注示例}：每章的示例都经过精心设计，建议仔细研读。
+
+    \item \textbf{完成习题}：每章末尾的习题有助于检验学习效果。
+
+    \item \textbf{查阅参考文献}：对感兴趣的主题，可以通过参考文献进一步深入学习。
+\end{enumerate}
+
+\section*{本章小结}
+
+本章介绍了任务规划的基本概念、发展历程、应用领域以及与相关学科的关系。任务规划研究如何让智能系统自主制定行动序列以实现目标，是人工智能领域的核心研究方向。从1969年的STRIPS系统到现代的大语言模型规划，任务规划技术不断发展，应用领域日益广泛。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 试用自己的语言解释什么是任务规划，并举出日常生活中的两个任务规划例子。
+
+    \item 对于示例\ref{ex:logistics}中的快递配送问题，讨论以下问题：
+    \begin{enumerate}
+        \item 如果取消时间窗约束，问题会变得更简单还是更复杂？为什么？
+        \item 如果允许配送点之间的货物中转，会对问题产生什么影响？
+    \end{enumerate}
+
+    \item 查阅资料，了解STRIPS系统的历史，回答：
+    \begin{enumerate}
+        \item STRIPS的名称是什么的缩写？
+        \item STRIPS最初用于什么应用场景？
+        \item STRIPS表示方法的核心思想是什么？
+    \end{enumerate}
+
+    \item 思考题：你认为任务规划与机器学习有什么区别和联系？
+
+    \item 编程练习：用你熟悉的编程语言，实现一个简单的"积木世界"问题的状态表示，包括：
+    \begin{enumerate}
+        \item 定义状态的数据结构；
+        \item 实现检查某个积木是否在另一个积木上方的函数；
+        \item 实现打印当前状态的函数。
+    \end{enumerate}
+\end{enumerate}

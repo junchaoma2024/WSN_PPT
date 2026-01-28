@@ -1,0 +1,141 @@
+% 第4章 启发式规划方法
+\chapter{启发式规划方法}
+\label{chap:heuristic}
+
+启发式方法是现代规划器成功的关键。本章介绍规划中常用的启发式函数设计方法。
+
+\section{松弛启发式}
+
+\keyterm{松弛}（Relaxation）是设计启发式的一种通用方法，通过简化原问题来获得代价的下界估计。
+
+\subsection{删除松弛}
+
+\begin{definition}[删除松弛]
+    \keyterm{删除松弛}（Delete Relaxation）是指忽略所有动作的删除效果。在删除松弛下，一旦某个命题变为真，它将永远保持为真。
+\end{definition}
+
+\subsection{$h^{add}$与$h^{max}$启发式}
+
+\begin{definition}[$h^{max}$启发式]
+    $h^{max}$启发式估计达到目标集合中"最难"达到的子目标的代价：
+    \begin{equation}
+        h^{max}(s) = \max_{p \in g} h^{max}_p(s)
+    \end{equation}
+    其中$h^{max}_p(s)$是从状态$s$达到命题$p$的估计代价。
+\end{definition}
+
+\begin{definition}[$h^{add}$启发式]
+    $h^{add}$启发式假设各子目标独立，将达到各子目标的代价相加：
+    \begin{equation}
+        h^{add}(s) = \sum_{p \in g} h^{add}_p(s)
+    \end{equation}
+\end{definition}
+
+$h^{max}$是可采纳的但信息量较少；$h^{add}$信息量丰富但通常高估真实代价。
+
+\subsection{$h^{FF}$启发式}
+
+\keyterm{FF启发式}由Hoffmann和Nebel提出，是最成功的规划启发式之一。它基于松弛规划图，计算从当前状态到目标的松弛计划长度。
+
+\begin{algorithm}[H]
+    \caption{FF启发式计算}
+    \label{alg:hff}
+    \KwIn{当前状态 $s$，目标 $g$}
+    \KwOut{启发式值 $h^{FF}(s)$}
+
+    构建松弛规划图直到$g$中所有命题出现\;
+    \If{$g$中存在命题从未出现}{
+        \KwRet{$\infty$}
+    }
+    从最后一层开始，使用贪心方法提取松弛计划\;
+    \KwRet{松弛计划中的动作数量}
+\end{algorithm}
+
+\section{抽象启发式}
+
+\keyterm{抽象}（Abstraction）通过将多个状态映射到同一抽象状态来简化问题。
+
+\subsection{模式数据库}
+
+\begin{definition}[模式数据库]
+    \keyterm{模式数据库}（Pattern Database，PDB）预先计算抽象空间中所有状态到目标的精确代价，然后在搜索时作为启发式查表使用。
+\end{definition}
+
+\subsection{合并与收缩}
+
+\keyterm{合并与收缩}（Merge-and-Shrink）是一种系统化构建抽象的方法，通过合并变量和收缩状态空间来控制抽象的大小。
+
+\section{地标启发式}
+
+\keyterm{地标}（Landmark）是在任何解中都必须在某个时刻为真的命题或必须执行的动作。
+
+\subsection{地标识别}
+
+识别地标的方法包括：
+\begin{itemize}
+    \item 基于松弛规划图的方法
+    \item 基于回归的方法
+    \item 基于SAT/CSP的方法
+\end{itemize}
+
+\subsection{地标计数启发式}
+
+\begin{definition}[地标计数启发式]
+    地标计数启发式$h^{LM}$估计从当前状态到目标还需要达成的地标数量：
+    \begin{equation}
+        h^{LM}(s) = |\{l \in L : l \text{ 在 } s \text{ 中未被满足且尚未达成}\}|
+    \end{equation}
+\end{definition}
+
+\section{现代规划器架构}
+
+\subsection{Fast Downward系统}
+
+\keyterm{Fast Downward}是最成功的现代规划系统之一，由Helmert于2006年提出。其主要特点包括：
+\begin{itemize}
+    \item 将PDDL转换为多值状态变量表示（SAS+）
+    \item 支持多种启发式函数
+    \item 支持多种搜索算法
+    \item 模块化设计，易于扩展
+\end{itemize}
+
+\subsection{LAMA规划器}
+
+\keyterm{LAMA}（Landmarks, Actions, and Multi-heuristics Anytime）规划器结合了地标启发式和FF启发式，在国际规划竞赛中表现优异。
+
+\begin{example}[国际规划竞赛问题求解]
+\label{ex:ipc}
+    国际规划竞赛（IPC）是规划领域的重要评测平台。以下是LAMA在IPC 2011物流领域问题上的表现：
+
+    \begin{center}
+    \begin{tabular}{lrrr}
+        \toprule
+        问题规模 & Fast Downward & LAMA & 最优规划器 \\
+        \midrule
+        小（<100状态） & 0.1s & 0.1s & 0.5s \\
+        中（<10000状态） & 2.3s & 1.8s & 超时 \\
+        大（>100000状态） & 45s & 32s & 超时 \\
+        \bottomrule
+    \end{tabular}
+    \end{center}
+
+    这说明启发式搜索规划器在大规模问题上具有显著优势。
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了规划中的启发式方法。松弛启发式通过简化问题获得代价估计，其中$h^{FF}$是最成功的启发式之一。抽象启发式通过状态聚合来简化问题。地标启发式利用问题的结构信息。现代规划器如Fast Downward和LAMA结合了多种技术，在实际问题中表现出色。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 对于积木世界问题，计算$h^{add}$和$h^{max}$启发式的值，并比较它们与真实代价的关系。
+
+    \item 证明$h^{max}$是可采纳的启发式。
+
+    \item 为八数码问题设计一个模式数据库，讨论如何选择模式以获得信息丰富的启发式。
+
+    \item 在一个物流问题中，识别可能的地标，并解释为什么它们必须在任何解中出现。
+
+    \item 下载并安装Fast Downward，使用不同的启发式配置求解IPC基准问题，比较性能差异。
+\end{enumerate}

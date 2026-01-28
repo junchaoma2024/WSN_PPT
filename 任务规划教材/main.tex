@@ -1,0 +1,290 @@
+% !TEX program = xelatex
+% 任务规划教材 - 主文件
+% 编译命令: xelatex main.tex && xelatex main.tex (需要编译两次以生成正确的目录)
+
+\documentclass[12pt,a4paper,openany]{ctexbook}
+
+% ==================== 宏包引入 ====================
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{algorithm2e}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{hyperref}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{enumitem}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{tocloft}
+\usepackage{float}
+\usepackage{subcaption}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc}
+
+% ==================== 页面设置 ====================
+\geometry{
+    left=2.5cm,
+    right=2.5cm,
+    top=3cm,
+    bottom=3cm,
+    headheight=15pt
+}
+
+% ==================== 中文设置 ====================
+\ctexset{
+    part/format = \Huge\bfseries\centering,
+    chapter/format = \LARGE\bfseries,
+    chapter/beforeskip = 20pt,
+    chapter/afterskip = 20pt,
+    section/format = \Large\bfseries,
+    subsection/format = \large\bfseries,
+    subsubsection/format = \normalsize\bfseries
+}
+
+% ==================== 页眉页脚 ====================
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE,RO]{\thepage}
+\fancyhead[LO]{\leftmark}
+\fancyhead[RE]{任务规划}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ==================== 定理环境 ====================
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{example}{示例}[chapter]
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+\newtheorem{corollary}{推论}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{remark}{注记}[chapter]
+\newtheorem{algorithm_box}{算法}[chapter]
+
+% ==================== 代码样式 ====================
+\lstset{
+    basicstyle=\small\ttfamily,
+    keywordstyle=\color{blue}\bfseries,
+    commentstyle=\color{green!60!black},
+    stringstyle=\color{orange},
+    numbers=left,
+    numberstyle=\tiny\color{gray},
+    numbersep=5pt,
+    breaklines=true,
+    frame=single,
+    backgroundcolor=\color{gray!10},
+    tabsize=4,
+    showspaces=false,
+    showstringspaces=false
+}
+
+% ==================== PDDL语言定义 ====================
+\lstdefinelanguage{PDDL}{
+    keywords={define, domain, problem, :requirements, :types, :constants, :predicates, :action, :parameters, :precondition, :effect, :objects, :init, :goal, and, or, not, when, forall, exists, either},
+    sensitive=false,
+    morecomment=[l]{;},
+    morestring=[b]",
+}
+
+% ==================== 超链接设置 ====================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!60!black,
+    urlcolor=blue!80!black,
+    bookmarksnumbered=true,
+    pdfstartview=FitH
+}
+
+% ==================== 算法设置 ====================
+\SetAlgorithmName{算法}{算法}{算法列表}
+\SetKwInput{KwIn}{输入}
+\SetKwInput{KwOut}{输出}
+\SetKwInput{KwData}{数据}
+\SetKwInput{KwResult}{结果}
+\SetKw{KwRet}{返回}
+\SetKw{KwTo}{到}
+\SetKwBlock{Begin}{开始}{结束}
+\SetKwFor{For}{for}{do}{end for}
+\SetKwFor{ForEach}{foreach}{do}{end foreach}
+\SetKwIF{If}{ElseIf}{Else}{if}{then}{else if}{else}{end if}
+\SetKwSwitch{Switch}{Case}{Other}{switch}{do}{case}{otherwise}{end case}{end switch}
+\SetKwRepeat{Repeat}{repeat}{until}
+\SetKwFor{While}{while}{do}{end while}
+
+% ==================== 自定义命令 ====================
+\newcommand{\keyterm}[1]{\textbf{#1}}
+\newcommand{\englishterm}[1]{\textit{#1}}
+\newcommand{\grad}{\textcolor{blue!70!black}{$\bigstar$}} % 研究生拓展标记
+
+% ==================== 文档信息 ====================
+\title{
+    \vspace{2cm}
+    {\Huge\bfseries 任务规划} \\[0.5cm]
+    {\Large Task Planning} \\[2cm]
+    {\large 理论、方法与应用}
+}
+\author{
+    \Large 编著者 \\[1cm]
+    \large （待填写）
+}
+\date{\today}
+
+% ==================== 正文开始 ====================
+\begin{document}
+
+% 封面
+\maketitle
+
+% 版权页
+\thispagestyle{empty}
+\vspace*{\fill}
+\begin{center}
+    \textbf{内部资料，仅供教学使用}\\[1cm]
+    版权所有 \copyright\ \the\year \\
+    未经许可，不得翻印
+\end{center}
+\vspace*{\fill}
+\clearpage
+
+% 前言
+\frontmatter
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+
+任务规划（Task Planning）是人工智能领域的核心研究方向之一，它研究如何让智能系统自主地制定行动序列以实现特定目标。从早期的STRIPS系统到现代的大语言模型驱动规划，任务规划理论与技术经历了半个多世纪的发展，已广泛应用于机器人、物流、交通、军事、游戏等众多领域。
+
+本书旨在为本科生和研究生提供一本系统、全面的任务规划教材。全书共分四篇十六章：
+
+\begin{itemize}
+    \item \textbf{第一篇：基础篇}（第1--6章）：介绍任务规划的基本概念、状态空间搜索、经典规划理论、启发式方法、时态规划和层次任务网络规划，构建扎实的理论基础。
+
+    \item \textbf{第二篇：方法篇}（第7--10章）：深入讨论约束满足与规划、不确定性规划、多智能体规划和运动规划等进阶方法。
+
+    \item \textbf{第三篇：应用篇}（第11--13章）：通过交通运输规划、通信与编码传输规划、军事任务规划三个应用领域，展示任务规划技术的实际应用。
+
+    \item \textbf{第四篇：前沿篇}（第14--16章，标注\grad）：介绍基于学习的规划方法、大语言模型与任务规划、规划系统的可解释性与安全性等前沿研究方向，适合研究生深入学习。
+\end{itemize}
+
+本书特色：
+\begin{enumerate}
+    \item \textbf{理论与实践并重}：既有严谨的数学定义和算法分析，又有丰富的应用示例。
+    \item \textbf{示例驱动}：每章包含多个来自交通、通信、军事等领域的详细示例。
+    \item \textbf{分层设计}：基础内容面向本科生，前沿内容（带\grad 标记）面向研究生。
+    \item \textbf{配套资源}：提供PDDL参考手册、规划器使用指南和编程实验指导。
+\end{enumerate}
+
+\vspace{1cm}
+\begin{flushright}
+    编者\\
+    \the\year 年
+\end{flushright}
+
+% 目录
+\tableofcontents
+
+% 正文
+\mainmatter
+
+% ==================== 第一篇：基础篇 ====================
+\part{基础篇}
+
+\input{chapters/chapter01}
+\input{chapters/chapter02}
+\input{chapters/chapter03}
+\input{chapters/chapter04}
+\input{chapters/chapter05}
+\input{chapters/chapter06}
+
+% ==================== 第二篇：方法篇 ====================
+\part{方法篇}
+
+\input{chapters/chapter07}
+\input{chapters/chapter08}
+\input{chapters/chapter09}
+\input{chapters/chapter10}
+
+% ==================== 第三篇：应用篇 ====================
+\part{应用篇}
+
+\input{chapters/chapter11}
+\input{chapters/chapter12}
+\input{chapters/chapter13}
+
+% ==================== 第四篇：前沿篇 ====================
+\part{前沿篇}
+
+\input{chapters/chapter14}
+\input{chapters/chapter15}
+\input{chapters/chapter16}
+
+% ==================== 附录 ====================
+\appendix
+\part*{附录}
+\addcontentsline{toc}{part}{附录}
+
+\input{appendices/appendixA}
+\input{appendices/appendixB}
+\input{appendices/appendixC}
+\input{appendices/appendixD}
+
+% ==================== 参考文献 ====================
+\backmatter
+\chapter*{参考文献}
+\addcontentsline{toc}{chapter}{参考文献}
+
+\begin{enumerate}[label={[\arabic*]}]
+    \item Ghallab M, Nau D, Traverso P. Automated Planning: Theory and Practice[M]. Morgan Kaufmann, 2004.
+    \item Russell S, Norvig P. Artificial Intelligence: A Modern Approach (4th Edition)[M]. Pearson, 2020.
+    \item Geffner H, Bonet B. A Concise Introduction to Models and Methods for Automated Planning[M]. Morgan \& Claypool Publishers, 2013.
+    \item 蔡自兴, 刘丽珏, 陈白帆, 等. 人工智能及其应用（第7版）[M]. 清华大学出版社, 2024.
+    \item 王万良. 人工智能导论（第5版）[M]. 高等教育出版社, 2020.
+    \item LaValle S M. Planning Algorithms[M]. Cambridge University Press, 2006.
+    \item Wooldridge M. An Introduction to MultiAgent Systems (2nd Edition)[M]. John Wiley \& Sons, 2009.
+    \item Sutton R S, Barto A G. Reinforcement Learning: An Introduction (2nd Edition)[M]. MIT Press, 2018.
+    \item Kautz H, Selman B. Planning as satisfiability[C]. ECAI, 1992: 359-363.
+    \item Hoffmann J, Nebel B. The FF planning system: Fast plan generation through heuristic search[J]. Journal of Artificial Intelligence Research, 2001, 14: 253-302.
+    \item Helmert M. The Fast Downward Planning System[J]. Journal of Artificial Intelligence Research, 2006, 26: 191-246.
+    \item Nau D, Au T C, Ilghami O, et al. SHOP2: An HTN planning system[J]. Journal of Artificial Intelligence Research, 2003, 20: 379-404.
+    \item Kaelbling L P, Littman M L, Cassandra A R. Planning and acting in partially observable stochastic domains[J]. Artificial Intelligence, 1998, 101(1-2): 99-134.
+    \item Stern R, Sturtevant N, Felner A, et al. Multi-agent pathfinding: Definitions, variants, and benchmarks[C]. SOCS, 2019.
+    \item Garrett C R, Lozano-Pérez T, Kaelbling L P. PDDLStream: Integrating symbolic planners and blackbox samplers via optimistic adaptive planning[C]. ICAPS, 2020.
+\end{enumerate}
+
+% ==================== 术语表 ====================
+\chapter*{术语表}
+\addcontentsline{toc}{chapter}{术语表}
+
+\begin{longtable}{p{4cm}p{4cm}p{6cm}}
+    \toprule
+    \textbf{中文术语} & \textbf{英文术语} & \textbf{说明} \\
+    \midrule
+    \endfirsthead
+    \toprule
+    \textbf{中文术语} & \textbf{英文术语} & \textbf{说明} \\
+    \midrule
+    \endhead
+    \bottomrule
+    \endfoot
+    任务规划 & Task Planning & 制定行动序列以实现目标的过程 \\
+    自动规划 & Automated Planning & 由计算机自动生成规划的技术 \\
+    状态空间 & State Space & 所有可能状态的集合 \\
+    动作 & Action & 改变系统状态的操作 \\
+    前提条件 & Precondition & 动作执行前必须满足的条件 \\
+    效果 & Effect & 动作执行后产生的状态变化 \\
+    启发式 & Heuristic & 引导搜索的估计函数 \\
+    STRIPS & STRIPS & Stanford Research Institute Problem Solver \\
+    PDDL & PDDL & Planning Domain Definition Language \\
+    HTN & HTN & Hierarchical Task Network \\
+    时态规划 & Temporal Planning & 考虑时间约束的规划 \\
+    调度 & Scheduling & 为任务分配时间和资源 \\
+    多智能体系统 & Multi-Agent System & 多个智能体协作的系统 \\
+    MDP & MDP & Markov Decision Process \\
+    POMDP & POMDP & Partially Observable MDP \\
+    运动规划 & Motion Planning & 规划物理运动轨迹 \\
+    TAMP & TAMP & Task and Motion Planning \\
+    VRP & VRP & Vehicle Routing Problem \\
+\end{longtable}
+
+\end{document}

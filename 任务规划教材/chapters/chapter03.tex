@@ -1,0 +1,344 @@
+% 第3章 经典规划理论
+\chapter{经典规划理论}
+\label{chap:classical}
+
+本章介绍经典规划的核心理论，包括STRIPS表示语言、PDDL规划领域定义语言，以及基本的规划算法。
+
+\section{STRIPS表示语言}
+
+\keyterm{STRIPS}（Stanford Research Institute Problem Solver）是1969年由Fikes和Nilsson提出的规划系统，其表示方法至今仍是规划领域的基础。
+
+\subsection{前提条件与效果}
+
+STRIPS使用\keyterm{前提条件}（Preconditions）和\keyterm{效果}（Effects）来描述动作：
+
+\begin{definition}[STRIPS动作]
+    一个STRIPS动作$a$由三部分组成：
+    \begin{itemize}
+        \item \textbf{前提条件} $\text{Pre}(a)$：动作执行前必须满足的条件集合
+        \item \textbf{添加效果} $\text{Add}(a)$：动作执行后变为真的事实集合
+        \item \textbf{删除效果} $\text{Del}(a)$：动作执行后变为假的事实集合
+    \end{itemize}
+\end{definition}
+
+\subsection{动作模式定义}
+
+在实际应用中，我们通常定义\keyterm{动作模式}（Action Schema），即带参数的动作模板。
+
+\begin{example}[积木世界问题]
+\label{ex:blocksworld-strips}
+    积木世界是规划领域的经典测试问题。假设有若干积木和一个机械手，目标是通过移动积木实现特定的堆叠配置。
+
+    \textbf{谓词定义}：
+    \begin{itemize}
+        \item $\text{on}(x, y)$：积木$x$在积木$y$上面
+        \item $\text{ontable}(x)$：积木$x$在桌面上
+        \item $\text{clear}(x)$：积木$x$上面没有其他积木
+        \item $\text{holding}(x)$：机械手正在抓取积木$x$
+        \item $\text{arm-empty}$：机械手是空的
+    \end{itemize}
+
+    \textbf{动作模式}：
+
+    \begin{center}
+    \fbox{\parbox{0.8\textwidth}{
+        \textbf{动作}：$\text{pick-up}(x)$ \\
+        \textbf{前提}：$\text{ontable}(x) \land \text{clear}(x) \land \text{arm-empty}$ \\
+        \textbf{效果}：$\text{holding}(x) \land \neg\text{ontable}(x) \land \neg\text{arm-empty}$
+    }}
+    \end{center}
+
+    \begin{center}
+    \fbox{\parbox{0.8\textwidth}{
+        \textbf{动作}：$\text{put-down}(x)$ \\
+        \textbf{前提}：$\text{holding}(x)$ \\
+        \textbf{效果}：$\text{ontable}(x) \land \text{clear}(x) \land \text{arm-empty} \land \neg\text{holding}(x)$
+    }}
+    \end{center}
+
+    \begin{center}
+    \fbox{\parbox{0.8\textwidth}{
+        \textbf{动作}：$\text{stack}(x, y)$ \\
+        \textbf{前提}：$\text{holding}(x) \land \text{clear}(y)$ \\
+        \textbf{效果}：$\text{on}(x,y) \land \text{clear}(x) \land \text{arm-empty} \land \neg\text{holding}(x) \land \neg\text{clear}(y)$
+    }}
+    \end{center}
+
+    \begin{center}
+    \fbox{\parbox{0.8\textwidth}{
+        \textbf{动作}：$\text{unstack}(x, y)$ \\
+        \textbf{前提}：$\text{on}(x,y) \land \text{clear}(x) \land \text{arm-empty}$ \\
+        \textbf{效果}：$\text{holding}(x) \land \text{clear}(y) \land \neg\text{on}(x,y) \land \neg\text{arm-empty}$
+    }}
+    \end{center}
+\end{example}
+
+\section{PDDL规划领域定义语言}
+
+\keyterm{PDDL}（Planning Domain Definition Language）是1998年为国际规划竞赛制定的标准规划语言。
+
+\subsection{PDDL语法结构}
+
+PDDL将规划问题分为两个文件：
+\begin{itemize}
+    \item \textbf{领域文件}（Domain File）：定义谓词和动作模式
+    \item \textbf{问题文件}（Problem File）：定义具体实例的初始状态和目标
+\end{itemize}
+
+\subsection{领域文件与问题文件}
+
+\begin{example}[物流运输领域建模]
+\label{ex:logistics-pddl}
+    考虑一个简化的物流问题：有若干城市、卡车和包裹，目标是将包裹运送到指定目的地。
+
+    \textbf{领域文件}（logistics-domain.pddl）：
+
+\begin{lstlisting}[language=PDDL]
+(define (domain logistics)
+  (:requirements :strips :typing)
+
+  (:types
+    city location thing - object
+    package vehicle - thing
+    truck airplane - vehicle
+  )
+
+  (:predicates
+    (in-city ?loc - location ?city - city)
+    (at ?obj - thing ?loc - location)
+    (in ?pkg - package ?veh - vehicle)
+  )
+
+  (:action load-truck
+    :parameters (?pkg - package ?truck - truck ?loc - location)
+    :precondition (and
+      (at ?truck ?loc)
+      (at ?pkg ?loc)
+    )
+    :effect (and
+      (not (at ?pkg ?loc))
+      (in ?pkg ?truck)
+    )
+  )
+
+  (:action unload-truck
+    :parameters (?pkg - package ?truck - truck ?loc - location)
+    :precondition (and
+      (at ?truck ?loc)
+      (in ?pkg ?truck)
+    )
+    :effect (and
+      (not (in ?pkg ?truck))
+      (at ?pkg ?loc)
+    )
+  )
+
+  (:action drive-truck
+    :parameters (?truck - truck ?from ?to - location ?city - city)
+    :precondition (and
+      (at ?truck ?from)
+      (in-city ?from ?city)
+      (in-city ?to ?city)
+    )
+    :effect (and
+      (not (at ?truck ?from))
+      (at ?truck ?to)
+    )
+  )
+)
+\end{lstlisting}
+
+    \textbf{问题文件}（logistics-problem.pddl）：
+
+\begin{lstlisting}[language=PDDL]
+(define (problem logistics-1)
+  (:domain logistics)
+
+  (:objects
+    city1 city2 - city
+    loc1-1 loc1-2 loc2-1 loc2-2 - location
+    truck1 truck2 - truck
+    pkg1 pkg2 - package
+  )
+
+  (:init
+    (in-city loc1-1 city1) (in-city loc1-2 city1)
+    (in-city loc2-1 city2) (in-city loc2-2 city2)
+    (at truck1 loc1-1)
+    (at truck2 loc2-1)
+    (at pkg1 loc1-2)
+    (at pkg2 loc2-1)
+  )
+
+  (:goal (and
+    (at pkg1 loc2-2)
+    (at pkg2 loc1-1)
+  ))
+)
+\end{lstlisting}
+\end{example}
+
+\subsection{PDDL扩展特性}
+
+PDDL经历了多个版本的演进，引入了许多扩展特性：
+
+\begin{table}[htbp]
+    \centering
+    \caption{PDDL版本演进}
+    \label{tab:pddl-versions}
+    \begin{tabular}{lll}
+        \toprule
+        版本 & 年份 & 主要特性 \\
+        \midrule
+        PDDL 1.2 & 1998 & STRIPS、类型、量词 \\
+        PDDL 2.1 & 2002 & 数值fluents、持续性动作 \\
+        PDDL 2.2 & 2004 & 派生谓词、时态初始文字 \\
+        PDDL 3.0 & 2006 & 轨迹约束、偏好 \\
+        PDDL 3.1 & 2008 & 对象fluents \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{前向状态空间规划}
+
+\keyterm{前向规划}（Forward Planning）也称为\keyterm{前进规划}（Progression），从初始状态出发，逐步应用动作直到达到目标。
+
+\subsection{基本算法}
+
+前向规划的基本思想是将规划问题转化为图搜索问题，其中：
+\begin{itemize}
+    \item 节点是状态
+    \item 边是动作
+    \item 初始节点是$s_0$
+    \item 目标节点是满足$g$的状态
+\end{itemize}
+
+\subsection{可达性分析}
+
+\begin{definition}[可达状态]
+    从初始状态$s_0$出发，通过执行一系列动作可以到达的状态称为\keyterm{可达状态}。所有可达状态的集合称为\keyterm{可达状态空间}。
+\end{definition}
+
+\section{后向状态空间规划}
+
+\keyterm{后向规划}（Backward Planning）也称为\keyterm{回归规划}（Regression），从目标条件出发，逆向推导需要满足的前提条件。
+
+\subsection{回归搜索}
+
+\begin{definition}[回归]
+    给定目标条件$g$和动作$a$，如果$a$可能实现$g$中的某些子目标，则$g$关于$a$的\keyterm{回归}定义为：
+    \begin{equation}
+        \text{regress}(g, a) = (g \setminus \text{Add}(a)) \cup \text{Pre}(a)
+    \end{equation}
+    前提是$\text{Add}(a) \cap g \neq \emptyset$且$\text{Del}(a) \cap g = \emptyset$。
+\end{definition}
+
+\subsection{相关性分析}
+
+在后向搜索中，我们只考虑与目标\keyterm{相关}的动作，即那些能够实现至少一个目标子条件的动作。
+
+\section{规划图与GraphPlan算法}
+
+\keyterm{GraphPlan}是1995年由Blum和Furst提出的规划算法，它通过构建规划图来加速规划过程。
+
+\subsection{规划图构造}
+
+\begin{definition}[规划图]
+    规划图是一个有向分层图，包含交替的\keyterm{命题层}和\keyterm{动作层}：
+    \begin{itemize}
+        \item 命题层包含在该时刻可能为真的命题
+        \item 动作层包含在该时刻可能执行的动作
+        \item 层之间通过前提条件和效果连接
+    \end{itemize}
+\end{definition}
+
+\subsection{互斥关系}
+
+\begin{definition}[互斥]
+    两个动作（或两个命题）是\keyterm{互斥的}（Mutex），如果它们不能在同一规划步骤中同时出现。动作互斥的条件包括：
+    \begin{enumerate}
+        \item \textbf{不一致效果}：一个动作的效果否定另一个的效果
+        \item \textbf{干扰}：一个动作的效果否定另一个的前提
+        \item \textbf{竞争需求}：两个动作的前提条件互斥
+    \end{enumerate}
+\end{definition}
+
+\subsection{解的提取}
+
+在规划图构造完成后，使用后向搜索提取解。
+
+\begin{example}[火箭运输问题]
+\label{ex:rocket}
+    考虑一个简化的火箭运输问题：
+    \begin{itemize}
+        \item 有两个地点：伦敦（London）和巴黎（Paris）
+        \item 有一枚火箭R1，初始在伦敦
+        \item 有两件货物A和B，初始都在伦敦
+        \item 目标：将A和B都运送到巴黎
+    \end{itemize}
+
+    \textbf{动作}：
+    \begin{itemize}
+        \item $\text{load}(c, r, l)$：在地点$l$将货物$c$装载到火箭$r$
+        \item $\text{unload}(c, r, l)$：在地点$l$将货物$c$从火箭$r$卸载
+        \item $\text{move}(r, from, to)$：火箭$r$从$from$飞到$to$
+    \end{itemize}
+
+    \textbf{规划图}（部分）：
+
+    \begin{center}
+    \begin{tikzpicture}[scale=0.9,
+        prop/.style={rectangle, draw, minimum width=2cm, minimum height=0.6cm, font=\small},
+        action/.style={ellipse, draw, minimum width=1.5cm, font=\small},
+        mutex/.style={red, dashed, thick}
+    ]
+        % 第0层命题
+        \node[prop] (at-a-l-0) at (0,3) {at(A,L)};
+        \node[prop] (at-b-l-0) at (0,2) {at(B,L)};
+        \node[prop] (at-r-l-0) at (0,1) {at(R,L)};
+        \node[prop] (fuel-0) at (0,0) {fuel(R)};
+
+        % 第1层动作
+        \node[action] (load-a) at (3,2.5) {load(A)};
+        \node[action] (load-b) at (3,1.5) {load(B)};
+        \node[action] (noop1) at (3,0.5) {no-op};
+
+        % 连接
+        \draw[->] (at-a-l-0) -- (load-a);
+        \draw[->] (at-r-l-0) -- (load-a);
+        \draw[->] (at-b-l-0) -- (load-b);
+        \draw[->] (at-r-l-0) -- (load-b);
+
+        % 标签
+        \node at (0,-1) {$P_0$};
+        \node at (3,-1) {$A_1$};
+    \end{tikzpicture}
+    \end{center}
+
+    \textbf{解}：
+    \begin{enumerate}
+        \item load(A, R1, London)
+        \item load(B, R1, London)
+        \item move(R1, London, Paris)
+        \item unload(A, R1, Paris)
+        \item unload(B, R1, Paris)
+    \end{enumerate}
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了经典规划的核心理论。STRIPS是最早也是最基础的规划表示方法，通过前提条件和效果描述动作。PDDL是现代规划的标准语言，支持类型、数值、时态等扩展特性。前向规划和后向规划是两种基本的规划策略，GraphPlan通过构建规划图和分析互斥关系来加速规划过程。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 用STRIPS格式定义一个"河内塔"（Tower of Hanoi）问题的动作。
+
+    \item 编写PDDL领域文件，建模一个简单的"机器人取物"问题：机器人需要在房间之间移动并拾取物品。
+
+    \item 对于示例\ref{ex:rocket}中的火箭运输问题，手工构造完整的规划图（直到所有目标第一次同时出现且不互斥）。
+
+    \item 分析前向规划和后向规划各自的优缺点，讨论在什么情况下应该选择哪种方法。
+
+    \item 实现一个简单的GraphPlan算法，求解积木世界问题。
+\end{enumerate}

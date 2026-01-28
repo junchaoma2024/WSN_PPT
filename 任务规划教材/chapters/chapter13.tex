@@ -1,0 +1,206 @@
+% 第13章 军事任务规划
+\chapter{军事任务规划}
+\label{chap:military}
+
+本章介绍任务规划在军事领域的应用。
+
+\section{军事规划概述}
+
+\subsection{作战规划层次}
+
+军事规划通常分为多个层次：
+\begin{itemize}
+    \item \textbf{战略层}：国家级战略目标和资源分配
+    \item \textbf{战役层}：战区级作战计划
+    \item \textbf{战术层}：具体作战行动规划
+    \item \textbf{技术层}：武器系统和平台控制
+\end{itemize}
+
+\subsection{C4ISR系统}
+
+\begin{definition}[C4ISR]
+    \keyterm{C4ISR}代表指挥（Command）、控制（Control）、通信（Communication）、计算机（Computer）、情报（Intelligence）、监视（Surveillance）和侦察（Reconnaissance）。
+\end{definition}
+
+任务规划系统是C4ISR的核心组件之一。
+
+\section{兵力部署规划}
+
+\subsection{力量配置优化}
+
+\begin{definition}[兵力部署问题]
+    给定作战目标和可用兵力，确定各作战单元的部署位置和任务分配，以最大化作战效能。
+\end{definition}
+
+\subsection{后勤保障规划}
+
+后勤保障规划包括：
+\begin{itemize}
+    \item 物资补给调度
+    \item 运输路线规划
+    \item 维修保障安排
+    \item 医疗后送计划
+\end{itemize}
+
+\begin{example}[两栖登陆作战兵力部署]
+\label{ex:amphibious}
+    某两栖作战需要在指定海岸登陆并建立滩头阵地。
+
+    \textbf{可用兵力}：
+    \begin{itemize}
+        \item 3个海军陆战队营
+        \item 2个装甲连
+        \item 空中支援力量
+        \item 舰炮火力支援
+    \end{itemize}
+
+    \textbf{规划内容}：
+    \begin{enumerate}
+        \item 登陆点选择
+        \item 各波次兵力编组
+        \item 火力支援计划
+        \item 后续梯队跟进时机
+    \end{enumerate}
+
+    \textbf{约束条件}：
+    \begin{itemize}
+        \item 滩头地形限制
+        \item 敌方防御部署
+        \item 潮汐和天气窗口
+        \item 登陆舰艇容量
+    \end{itemize}
+\end{example}
+
+\section{无人系统任务规划}
+
+\subsection{无人机航迹规划}
+
+\begin{definition}[航迹规划]
+    为无人机确定从起点到目标再返回的飞行路径，需要考虑威胁规避、燃料约束、任务时限等因素。
+\end{definition}
+
+航迹规划方法：
+\begin{itemize}
+    \item Voronoi图方法
+    \item A*及其变体
+    \item RRT方法
+    \item 势场法
+\end{itemize}
+
+\subsection{无人车任务分配}
+
+无人地面车辆（UGV）任务规划包括：
+\begin{itemize}
+    \item 巡逻路线规划
+    \item 侦察任务分配
+    \item 物资运输调度
+\end{itemize}
+
+\subsection{有人-无人协同}
+
+\keyterm{MUM-T}（Manned-Unmanned Teaming）是现代军事的重要作战概念：
+\begin{itemize}
+    \item 有人平台指挥控制
+    \item 无人平台执行危险任务
+    \item 协同态势感知
+    \item 任务动态分配
+\end{itemize}
+
+\begin{example}[无人机侦察监视任务]
+\label{ex:uav-reconnaissance}
+    使用4架侦察无人机对某区域进行持续监视。
+
+    \textbf{任务要求}：
+    \begin{itemize}
+        \item 监视区域面积：$100 \times 100$ km$^2$
+        \item 监视周期：24小时
+        \item 重点目标需要持续监视
+        \item 发现可疑目标需要详细侦察
+    \end{itemize}
+
+    \textbf{规划内容}：
+    \begin{enumerate}
+        \item 巡逻航线设计
+        \item 换班和加油调度
+        \item 应急任务响应
+        \item 通信中继安排
+    \end{enumerate}
+
+    \textbf{优化目标}：最大化区域覆盖率，最小化目标发现延迟。
+\end{example}
+
+\begin{example}[无人机蜂群协同打击]
+\label{ex:swarm-attack}
+    无人机蜂群对多个目标实施协同打击。
+
+    \textbf{任务场景}：
+    \begin{itemize}
+        \item 30架察打一体无人机
+        \item 10个已知目标
+        \item 未知的防空威胁
+        \item 通信可能被干扰
+    \end{itemize}
+
+    \textbf{规划层次}：
+    \begin{enumerate}
+        \item \textbf{任务分配}：确定每架无人机的目标
+        \item \textbf{航迹规划}：规划进入和撤离航线
+        \item \textbf{协同时序}：同步攻击时间
+        \item \textbf{应急处置}：处理损失和新发现目标
+    \end{enumerate}
+
+    \textbf{分布式规划}：
+    \begin{itemize}
+        \item 中央规划初始方案
+        \item 各无人机本地调整
+        \item 基于共识的协调
+        \item 自主重规划能力
+    \end{itemize}
+\end{example}
+
+\section{电子战任务规划}
+
+\begin{example}[电子干扰任务规划]
+\label{ex:ew}
+    电子战飞机需要对敌方雷达网络实施干扰。
+
+    \textbf{情报输入}：
+    \begin{itemize}
+        \item 敌方雷达位置和类型
+        \item 雷达工作参数
+        \item 我方干扰设备能力
+    \end{itemize}
+
+    \textbf{规划内容}：
+    \begin{enumerate}
+        \item 干扰阵位选择
+        \item 干扰样式和时序
+        \item 功率和频率分配
+        \item 协同配合计划
+    \end{enumerate}
+
+    \textbf{效能评估}：
+    \begin{itemize}
+        \item 雷达探测概率降低程度
+        \item 掩护目标的暴露风险
+        \item 干扰资源消耗
+    \end{itemize}
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了任务规划在军事领域的应用。军事规划涵盖多个层次，从战略到技术层面。无人系统任务规划是当前的研究热点，包括航迹规划、任务分配和有人-无人协同。电子战规划是信息化战争的重要组成部分。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 设计一个简单的无人机航迹规划算法，考虑禁飞区和威胁区。
+
+    \item 对于示例\ref{ex:amphibious}，分析规划中需要考虑的不确定性因素。
+
+    \item 比较集中式和分布式无人机蜂群规划的优缺点。
+
+    \item 用HTN方法建模一个军事任务分解过程。
+
+    \item 讨论人工智能在军事任务规划中的伦理问题。
+\end{enumerate}
