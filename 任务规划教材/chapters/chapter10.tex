@@ -1,0 +1,160 @@
+% 第10章 运动规划基础
+\chapter{运动规划基础}
+\label{chap:motion}
+
+本章介绍机器人运动规划的基本概念和方法。
+
+\section{构型空间}
+
+\subsection{机器人构型表示}
+
+\begin{definition}[构型]
+    机器人的\keyterm{构型}（Configuration）是完全描述机器人位置和姿态所需的最小参数集合。构型的维度称为\keyterm{自由度}（DOF）。
+\end{definition}
+
+例如：
+\begin{itemize}
+    \item 平面移动机器人：3 DOF $(x, y, \theta)$
+    \item 六轴机械臂：6 DOF $(\theta_1, \theta_2, \ldots, \theta_6)$
+    \item 人形机器人：通常 > 20 DOF
+\end{itemize}
+
+\subsection{障碍物映射}
+
+\begin{definition}[构型空间障碍物]
+    工作空间中的障碍物在构型空间中形成\keyterm{C空间障碍物}（C-obstacle），机器人的任何构型如果导致与障碍物碰撞，则属于C空间障碍物。
+\end{definition}
+
+\section{采样规划方法}
+
+\subsection{PRM（概率路线图）}
+
+\begin{definition}[PRM]
+    \keyterm{概率路线图}（Probabilistic Roadmap）方法分两个阶段：
+    \begin{enumerate}
+        \item \textbf{学习阶段}：随机采样构型，连接近邻形成路线图
+        \item \textbf{查询阶段}：将起点和终点连接到路线图，搜索路径
+    \end{enumerate}
+\end{definition}
+
+\subsection{RRT（快速探索随机树）}
+
+\begin{definition}[RRT]
+    \keyterm{快速探索随机树}（Rapidly-exploring Random Tree）通过增量式构建搜索树来探索构型空间。
+\end{definition}
+
+\begin{algorithm}[H]
+    \caption{基本RRT算法}
+    \label{alg:rrt}
+    \KwIn{起点 $q_{\text{init}}$，终点 $q_{\text{goal}}$}
+    \KwOut{从起点到终点的路径}
+
+    $T \gets$ 初始化树，包含 $q_{\text{init}}$\;
+    \For{$k = 1$ \KwTo $K$}{
+        $q_{\text{rand}} \gets$ 随机采样（偶尔采样 $q_{\text{goal}}$）\;
+        $q_{\text{near}} \gets$ 树中距离 $q_{\text{rand}}$ 最近的节点\;
+        $q_{\text{new}} \gets$ 从 $q_{\text{near}}$ 向 $q_{\text{rand}}$ 方向扩展一步\;
+        \If{路径 $(q_{\text{near}}, q_{\text{new}})$ 无碰撞}{
+            将 $q_{\text{new}}$ 加入树\;
+            \If{$q_{\text{new}}$ 接近 $q_{\text{goal}}$}{
+                \KwRet{构造路径}
+            }
+        }
+    }
+    \KwRet{失败}
+\end{algorithm}
+
+\subsection{RRT*与渐进最优性}
+
+\begin{definition}[RRT*]
+    \keyterm{RRT*}是RRT的改进版本，通过重新布线（rewiring）操作保证渐进最优性。
+\end{definition}
+
+\begin{example}[机械臂运动规划]
+\label{ex:manipulator}
+    一个6自由度工业机械臂需要将工件从A点移动到B点，工作空间中有障碍物。
+
+    \textbf{构型空间}：$\mathbb{R}^6$，每个维度对应一个关节角度
+
+    \textbf{约束}：
+    \begin{itemize}
+        \item 关节角度限制
+        \item 避免碰撞（与障碍物、与自身）
+        \item 奇异点避免
+    \end{itemize}
+
+    \textbf{使用RRT规划}：
+    \begin{enumerate}
+        \item 在6维构型空间中随机采样
+        \item 使用正向运动学计算末端位置
+        \item 使用碰撞检测验证路径
+        \item 路径平滑处理
+    \end{enumerate}
+\end{example}
+
+\section{任务与运动规划集成（TAMP）}
+
+\subsection{符号-几何接口}
+
+\keyterm{TAMP}（Task and Motion Planning）的挑战在于连接符号层面的任务规划和几何层面的运动规划。
+
+关键问题：
+\begin{itemize}
+    \item 符号动作的几何可行性检验
+    \item 几何约束的符号化表示
+    \item 规划层次之间的信息传递
+\end{itemize}
+
+\subsection{PDDLStream}
+
+\begin{definition}[PDDLStream]
+    \keyterm{PDDLStream}扩展了PDDL，引入了流（Stream）来生成连续参数（如位姿、轨迹）。
+\end{definition}
+
+\begin{example}[服务机器人抓取规划]
+\label{ex:manipulation}
+    服务机器人需要从桌上抓取一个杯子并放入橱柜。
+
+    \textbf{任务层面}（符号规划）：
+    \begin{enumerate}
+        \item 移动到桌子附近
+        \item 抓取杯子
+        \item 移动到橱柜附近
+        \item 打开橱柜门
+        \item 放入杯子
+        \item 关闭橱柜门
+    \end{enumerate}
+
+    \textbf{运动层面}（几何规划）：
+    \begin{itemize}
+        \item 导航路径规划
+        \item 抓取位姿采样
+        \item 机械臂运动规划
+        \item 门把手操作轨迹
+    \end{itemize}
+
+    \textbf{集成挑战}：
+    \begin{itemize}
+        \item 某些抓取位姿可能因碰撞不可行
+        \item 放置位置影响后续操作
+        \item 需要同时考虑导航和操作
+    \end{itemize}
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了运动规划的基本概念和方法。构型空间是运动规划的数学基础。PRM和RRT是两类主要的采样规划方法。TAMP集成了任务规划和运动规划，是机器人规划的前沿方向。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 对于一个在$10 \times 10$网格中的移动机器人，比较A*和RRT的性能。
+
+    \item 证明RRT*具有渐进最优性。
+
+    \item 为示例\ref{ex:manipulator}设计碰撞检测算法。
+
+    \item 讨论TAMP中符号规划和运动规划如何交互。
+
+    \item 实现基本的RRT算法，在2D空间中规划路径。
+\end{enumerate}

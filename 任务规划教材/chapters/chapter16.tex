@@ -1,0 +1,155 @@
+% 第16章 规划系统的可解释性与安全性
+\chapter{规划系统的可解释性与安全性 \grad}
+\label{chap:safety}
+
+本章讨论规划系统的可解释性和安全性问题，属于研究生拓展内容。
+
+\section{可解释规划}
+
+\subsection{计划解释生成}
+
+\begin{definition}[计划解释]
+    \keyterm{计划解释}是向用户说明为什么规划器生成了特定的计划，以及为什么没有选择其他方案。
+\end{definition}
+
+解释类型：
+\begin{itemize}
+    \item \textbf{对比解释}：为什么选择动作A而不是B？
+    \item \textbf{因果解释}：这个动作导致了什么结果？
+    \item \textbf{目标解释}：这个动作如何帮助实现目标？
+\end{itemize}
+
+\subsection{人机协同规划}
+
+人机协同规划中，系统需要：
+\begin{itemize}
+    \item 理解人类的意图和偏好
+    \item 解释自己的决策
+    \item 接受人类的反馈和修正
+    \item 保持适当的自主性
+\end{itemize}
+
+\begin{definition}[混合主动规划]
+    \keyterm{混合主动规划}（Mixed-Initiative Planning）中，人类和AI系统共同参与规划过程，各自贡献专长。
+\end{definition}
+
+\section{规划系统验证}
+
+\subsection{形式化验证方法}
+
+\begin{definition}[形式化验证]
+    \keyterm{形式化验证}使用数学方法证明规划系统满足特定性质。
+\end{definition}
+
+验证目标包括：
+\begin{itemize}
+    \item \textbf{正确性}：计划能够达到目标
+    \item \textbf{完整性}：如果解存在，系统能找到
+    \item \textbf{最优性}：找到的解是最优的
+    \item \textbf{安全性}：执行过程中不会进入危险状态
+\end{itemize}
+
+\subsection{模型检测}
+
+\begin{definition}[模型检测]
+    \keyterm{模型检测}（Model Checking）自动验证系统模型是否满足给定的时态逻辑性质。
+\end{definition}
+
+在规划中的应用：
+\begin{itemize}
+    \item 验证计划满足安全约束
+    \item 检测死锁和活锁
+    \item 验证时序性质
+\end{itemize}
+
+\section{安全关键系统规划}
+
+\subsection{安全约束规划}
+
+在安全关键系统中，规划必须满足硬性安全约束：
+\begin{itemize}
+    \item 机器人必须避免碰撞
+    \item 车辆必须遵守交通规则
+    \item 医疗系统必须避免有害操作
+\end{itemize}
+
+\begin{definition}[安全规划]
+    \keyterm{安全规划}生成的计划保证在执行过程中永远不会进入不安全状态。
+\end{definition}
+
+方法：
+\begin{itemize}
+    \item 将安全约束编码到规划问题中
+    \item 使用屏障函数保证安全
+    \item 在线监控和干预
+\end{itemize}
+
+\subsection{鲁棒性分析}
+
+分析规划系统在以下情况下的表现：
+\begin{itemize}
+    \item 模型不准确
+    \item 执行误差
+    \item 环境变化
+    \item 对抗性干扰
+\end{itemize}
+
+\section{伦理与法规}
+
+\subsection{自主系统伦理}
+
+自主规划系统面临的伦理问题：
+\begin{itemize}
+    \item \textbf{责任归属}：当自主系统造成损害时，谁负责？
+    \item \textbf{透明度}：用户是否知道系统如何做决策？
+    \item \textbf{公平性}：决策是否存在偏见？
+    \item \textbf{自主性边界}：系统何时应该请求人类干预？
+\end{itemize}
+
+\subsection{军事AI治理}
+
+军事AI规划系统的特殊考虑：
+\begin{itemize}
+    \item \textbf{人类控制}：致命性决策必须有人类参与
+    \item \textbf{国际法遵从}：遵守武装冲突法
+    \item \textbf{责任链}：明确指挥和责任关系
+    \item \textbf{可预测性}：行为应当可预测和可解释
+\end{itemize}
+
+\begin{example}[自主驾驶的伦理困境]
+    自动驾驶车辆面临不可避免的碰撞时，应该如何决策？
+
+    \textbf{场景}：车辆前方突然出现行人，左侧是护栏，右侧是其他行人。
+
+    \textbf{伦理问题}：
+    \begin{itemize}
+        \item 是否可以"选择"伤害谁？
+        \item 是否应该保护乘客优先？
+        \item 如何量化不同选择的"代价"？
+    \end{itemize}
+
+    \textbf{技术考虑}：
+    \begin{itemize}
+        \item 规划系统如何表示这类约束？
+        \item 决策过程如何做到可解释？
+        \item 如何满足法规要求？
+    \end{itemize}
+\end{example}
+
+\section*{本章小结}
+
+本章讨论了规划系统的可解释性和安全性。可解释规划帮助用户理解和信任系统决策。形式化验证和模型检测为规划系统提供正确性保证。安全关键系统需要特别的规划方法。伦理和法规问题是自主系统部署的重要考虑。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 为一个简单的规划问题设计解释生成方法。
+
+    \item 讨论人机协同规划中的信任问题。
+
+    \item 用模型检测验证一个简单规划系统的安全性质。
+
+    \item 分析自动驾驶规划系统的伦理设计原则。
+
+    \item 讨论军事AI规划系统应该遵循的原则。
+\end{enumerate}

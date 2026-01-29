@@ -1,0 +1,185 @@
+% 第9章 多智能体规划
+\chapter{多智能体规划}
+\label{chap:multiagent}
+
+本章讨论多个智能体协同完成任务的规划问题。
+
+\section{多智能体系统基础}
+
+\subsection{智能体架构}
+
+\begin{definition}[智能体]
+    \keyterm{智能体}（Agent）是一个能够感知环境并采取行动以实现目标的自主实体。智能体架构包括：
+    \begin{itemize}
+        \item 感知模块：获取环境信息
+        \item 决策模块：选择行动
+        \item 执行模块：执行选定的行动
+        \item 通信模块：与其他智能体交互
+    \end{itemize}
+\end{definition}
+
+\subsection{协调与通信}
+
+多智能体系统的核心挑战是协调：
+\begin{itemize}
+    \item \textbf{集中式协调}：存在中央协调器
+    \item \textbf{分布式协调}：智能体自主协商
+    \item \textbf{隐式协调}：通过环境间接交互
+\end{itemize}
+
+\section{分布式规划}
+
+\subsection{任务分配}
+
+\begin{definition}[任务分配问题]
+    给定$n$个智能体和$m$个任务，\keyterm{任务分配}问题是找到一个分配方案，使得总效用最大化或总代价最小化。
+\end{definition}
+
+常用算法：
+\begin{itemize}
+    \item 拍卖算法
+    \item 匈牙利算法
+    \item 合同网协议
+\end{itemize}
+
+\subsection{计划合并}
+
+当每个智能体独立生成计划后，需要合并这些计划以避免冲突。
+
+\section{多智能体路径规划（MAPF）}
+
+\subsection{MAPF问题定义}
+
+\begin{definition}[MAPF]
+    \keyterm{多智能体路径规划}（Multi-Agent Path Finding）问题：给定$n$个智能体，每个智能体有起点和终点，在图上找到无冲突的路径使所有智能体到达各自目标。
+\end{definition}
+
+冲突类型：
+\begin{itemize}
+    \item \textbf{顶点冲突}：两个智能体同时占用同一顶点
+    \item \textbf{边冲突}：两个智能体同时使用同一条边（相向移动）
+\end{itemize}
+
+\subsection{CBS算法}
+
+\begin{definition}[冲突基搜索]
+    \keyterm{CBS}（Conflict-Based Search）是一种两层搜索算法：
+    \begin{itemize}
+        \item 高层：搜索冲突树，识别和解决冲突
+        \item 低层：为每个智能体规划满足约束的路径
+    \end{itemize}
+\end{definition}
+
+\begin{algorithm}[H]
+    \caption{CBS算法}
+    \label{alg:cbs}
+    \KwIn{MAPF问题}
+    \KwOut{无冲突路径集合或失败}
+
+    为每个智能体计算最短路径\;
+    $\text{root} \gets$ 创建根节点，包含所有初始路径\;
+    $\text{OPEN} \gets \{\text{root}\}$\;
+
+    \While{$\text{OPEN}$ 非空}{
+        $N \gets \text{OPEN}$ 中代价最小的节点\;
+        验证 $N$ 中的路径是否有冲突\;
+        \If{无冲突}{
+            \KwRet{$N$ 中的路径}
+        }
+        选择第一个冲突 $(a_i, a_j, v, t)$\;
+        \ForEach{智能体 $a \in \{a_i, a_j\}$}{
+            创建子节点 $N'$，添加约束"$a$在时刻$t$不能在$v$"\;
+            为 $a$ 重新规划满足新约束的路径\;
+            \If{路径存在}{
+                将 $N'$ 加入 $\text{OPEN}$\;
+            }
+        }
+    }
+    \KwRet{失败}
+\end{algorithm}
+
+\subsection{优先级规划}
+
+\keyterm{优先级规划}按某种顺序依次为智能体规划路径，后规划的智能体需要避让先规划的智能体。
+
+\begin{example}[仓储机器人协同调度]
+\label{ex:warehouse}
+    某自动化仓库有50台AGV（自动引导车）负责货物搬运。系统需要：
+    \begin{itemize}
+        \item 分配搬运任务给AGV
+        \item 规划无冲突的移动路径
+        \item 处理实时订单和突发情况
+    \end{itemize}
+
+    \textbf{挑战}：
+    \begin{itemize}
+        \item 狭窄通道可能造成死锁
+        \item 需要实时重规划
+        \item 充电站调度
+    \end{itemize}
+
+    \textbf{解决方案}：
+    \begin{enumerate}
+        \item 使用拍卖机制分配任务
+        \item 使用CBS或其变体规划路径
+        \item 实现滚动窗口重规划
+    \end{enumerate}
+\end{example}
+
+\begin{example}[无人机蜂群编队规划]
+\label{ex:swarm}
+    20架无人机需要从分散位置汇聚形成特定编队，然后保持编队飞向目标。
+
+    \textbf{阶段1：汇聚规划}
+    \begin{itemize}
+        \item 每架无人机分配编队中的目标位置
+        \item 规划无碰撞的汇聚路径
+        \item 同步到达时间
+    \end{itemize}
+
+    \textbf{阶段2：编队飞行}
+    \begin{itemize}
+        \item 领航无人机规划主航线
+        \item 其他无人机保持相对位置
+        \item 处理编队变换指令
+    \end{itemize}
+
+    \textbf{阶段3：障碍规避}
+    \begin{itemize}
+        \item 检测障碍物
+        \item 编队收缩或分裂
+        \item 通过后恢复编队
+    \end{itemize}
+\end{example}
+
+\section{博弈论与规划}
+
+\subsection{纳什均衡}
+
+当智能体有各自的目标时，规划问题变成博弈。
+
+\begin{definition}[纳什均衡]
+    \keyterm{纳什均衡}是一个策略组合，其中没有智能体能通过单方面改变策略获得更高收益。
+\end{definition}
+
+\subsection{对抗规划}
+
+在存在对手的情况下进行规划，需要考虑对手的可能反应。
+
+\section*{本章小结}
+
+本章介绍了多智能体规划的主要问题和方法。任务分配和计划合并是分布式规划的核心问题。MAPF是多智能体路径规划的标准形式化，CBS是求解MAPF的有效算法。博弈论为存在竞争关系的多智能体规划提供了理论基础。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 设计一个3智能体的MAPF问题实例，手工用CBS算法求解。
+
+    \item 比较集中式和分布式多智能体规划的优缺点。
+
+    \item 对于示例\ref{ex:warehouse}，讨论如何处理死锁情况。
+
+    \item 实现一个简单的优先级规划算法，并分析其完备性。
+
+    \item 将示例\ref{ex:swarm}建模为MAPF问题，讨论可能的简化假设。
+\end{enumerate}

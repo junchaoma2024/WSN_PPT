@@ -1,0 +1,128 @@
+% 第14章 基于学习的规划方法
+\chapter{基于学习的规划方法 \grad}
+\label{chap:learning}
+
+本章介绍机器学习与规划的结合，属于研究生拓展内容。
+
+\section{强化学习与规划}
+
+\subsection{模型规划RL}
+
+\begin{definition}[基于模型的强化学习]
+    \keyterm{基于模型的强化学习}（Model-Based RL）通过学习环境动力学模型，然后在模型上进行规划来做出决策。
+\end{definition}
+
+\textbf{基本框架}：
+\begin{enumerate}
+    \item 与环境交互收集数据
+    \item 学习转移模型 $\hat{T}(s'|s,a)$ 和奖励模型 $\hat{R}(s,a)$
+    \item 在学习的模型上规划
+    \item 执行规划得到的动作
+\end{enumerate}
+
+\subsection{AlphaGo与蒙特卡洛树搜索}
+
+AlphaGo结合了深度学习和蒙特卡洛树搜索（MCTS）：
+\begin{itemize}
+    \item \textbf{策略网络}：估计动作概率分布
+    \item \textbf{价值网络}：估计局面价值
+    \item \textbf{MCTS}：使用网络引导搜索
+\end{itemize}
+
+\begin{algorithm}[H]
+    \caption{MCTS基本算法}
+    \label{alg:mcts}
+    \KwIn{根节点状态 $s$}
+    \KwOut{最佳动作}
+
+    \For{$i = 1$ \KwTo $N$}{
+        $\text{node} \gets \text{root}$\;
+        \tcp{选择阶段}
+        \While{$\text{node}$ 完全展开且非叶节点}{
+            $\text{node} \gets$ UCB1选择的子节点\;
+        }
+        \tcp{展开阶段}
+        \If{$\text{node}$ 未完全展开}{
+            $\text{node} \gets$ 展开一个未尝试的动作\;
+        }
+        \tcp{模拟阶段}
+        $v \gets$ 随机模拟到终局\;
+        \tcp{回传阶段}
+        回传 $v$ 更新路径上所有节点的统计\;
+    }
+    \KwRet{访问次数最多的动作}
+\end{algorithm}
+
+\section{模仿学习}
+
+\subsection{行为克隆}
+
+\begin{definition}[行为克隆]
+    \keyterm{行为克隆}（Behavior Cloning）直接从专家演示中学习策略，将状态-动作对作为监督学习问题。
+\end{definition}
+
+问题：分布漂移（Distribution Shift）——训练时的状态分布与执行时不同。
+
+\subsection{逆强化学习}
+
+\begin{definition}[逆强化学习]
+    \keyterm{逆强化学习}（Inverse Reinforcement Learning，IRL）从专家演示中推断奖励函数，然后用标准RL方法学习策略。
+\end{definition}
+
+\section{神经网络规划器}
+
+\subsection{神经符号规划}
+
+\keyterm{神经符号规划}结合神经网络的学习能力和符号规划的推理能力：
+\begin{itemize}
+    \item 神经网络处理感知和特征提取
+    \item 符号系统处理推理和规划
+    \item 接口层连接两个组件
+\end{itemize}
+
+\subsection{图神经网络在规划中的应用}
+
+\keyterm{图神经网络}（GNN）可以处理规划问题的结构化表示：
+\begin{itemize}
+    \item 状态表示为图结构
+    \item GNN学习状态特征
+    \item 用于启发式估计或策略学习
+\end{itemize}
+
+\section{迁移学习与元学习}
+
+\subsection{领域迁移}
+
+在源领域学习的规划知识可以迁移到目标领域：
+\begin{itemize}
+    \item 启发式函数迁移
+    \item 动作模式迁移
+    \item 领域知识迁移
+\end{itemize}
+
+\subsection{少样本规划}
+
+\keyterm{元学习}使规划器能够快速适应新领域：
+\begin{itemize}
+    \item 学习如何学习规划
+    \item 从少量样本中提取领域特征
+    \item 快速调整规划策略
+\end{itemize}
+
+\section*{本章小结}
+
+本章介绍了基于学习的规划方法。强化学习与规划的结合是重要的研究方向，AlphaGo是成功案例。模仿学习从专家演示中学习。神经符号规划结合了深度学习和符号推理的优势。迁移学习和元学习帮助规划器泛化到新问题。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 解释为什么AlphaGo需要结合策略网络和价值网络。
+
+    \item 比较行为克隆和逆强化学习的优缺点。
+
+    \item 设计一个用GNN表示规划问题状态的方案。
+
+    \item 讨论神经网络规划器的可解释性问题。
+
+    \item 阅读一篇神经符号规划的最新论文，总结其主要贡献。
+\end{enumerate}

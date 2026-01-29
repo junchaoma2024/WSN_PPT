@@ -1,0 +1,139 @@
+% 第5章 时态规划与调度
+\chapter{时态规划与调度}
+\label{chap:temporal}
+
+本章介绍考虑时间约束的规划问题，包括时态规划和调度问题。
+
+\section{时态逻辑基础}
+
+\subsection{时态算子}
+
+时态逻辑引入了描述时间的算子：
+\begin{itemize}
+    \item $\square \phi$（总是）：$\phi$在所有未来时刻都为真
+    \item $\Diamond \phi$（最终）：$\phi$在某个未来时刻为真
+    \item $\bigcirc \phi$（下一刻）：$\phi$在下一时刻为真
+    \item $\phi \mathcal{U} \psi$（直到）：$\phi$保持为真直到$\psi$变为真
+\end{itemize}
+
+\subsection{时态约束}
+
+\begin{definition}[时态约束]
+    时态约束规定动作之间的时间关系，常见形式包括：
+    \begin{itemize}
+        \item 先后约束：动作$a$必须在动作$b$之前完成
+        \item 同时约束：动作$a$和$b$必须同时执行
+        \item 时间窗约束：动作必须在指定时间范围内执行
+        \item 持续时间约束：动作执行需要一定的时间
+    \end{itemize}
+\end{definition}
+
+\section{PDDL 2.1时态扩展}
+
+\subsection{持续性动作}
+
+\begin{definition}[持续性动作]
+    \keyterm{持续性动作}（Durative Action）有明确的开始时刻、结束时刻和持续时间。其定义包括：
+    \begin{itemize}
+        \item \texttt{:duration}：动作的持续时间
+        \item \texttt{:condition}：开始条件、结束条件和持续条件
+        \item \texttt{:effect}：开始效果和结束效果
+    \end{itemize}
+\end{definition}
+
+\begin{lstlisting}[language=PDDL]
+(:durative-action drive
+  :parameters (?truck - truck ?from ?to - location)
+  :duration (= ?duration (travel-time ?from ?to))
+  :condition (and
+    (at start (at ?truck ?from))
+    (over all (road ?from ?to))
+  )
+  :effect (and
+    (at start (not (at ?truck ?from)))
+    (at end (at ?truck ?to))
+  )
+)
+\end{lstlisting}
+
+\subsection{并发执行}
+
+时态规划允许多个动作并发执行，但需要满足以下条件：
+\begin{enumerate}
+    \item 不存在资源冲突
+    \item 不违反因果依赖
+    \item 满足时间约束
+\end{enumerate}
+
+\section{时态规划算法}
+
+\subsection{SAPA规划器}
+
+SAPA是一个前向搜索时态规划器，使用时态启发式引导搜索。
+
+\subsection{TFD规划器}
+
+TFD（Temporal Fast Downward）扩展了Fast Downward以支持时态规划。
+
+\section{调度问题}
+
+\subsection{作业车间调度}
+
+\begin{definition}[作业车间调度]
+    \keyterm{作业车间调度}（Job Shop Scheduling）问题定义如下：
+    \begin{itemize}
+        \item 有$n$个作业（jobs）和$m$台机器（machines）
+        \item 每个作业包含若干工序，工序之间有先后约束
+        \item 每个工序需要在特定机器上处理特定时间
+        \item 目标是最小化总完工时间（makespan）
+    \end{itemize}
+\end{definition}
+
+\subsection{资源约束项目调度}
+
+\begin{definition}[RCPSP]
+    \keyterm{资源约束项目调度问题}（Resource-Constrained Project Scheduling Problem，RCPSP）是一类考虑有限资源约束的调度问题。
+\end{definition}
+
+\begin{example}[生产线调度优化]
+\label{ex:production}
+    某制造企业有3条生产线和10个生产订单。每个订单需要经过多道工序，部分工序可以在不同生产线上执行。约束条件包括：
+    \begin{itemize}
+        \item 每条生产线同一时刻只能处理一个工序
+        \item 同一订单的工序之间有先后关系
+        \item 部分订单有交货期限制
+    \end{itemize}
+
+    目标是最小化总延迟时间或最大化产能利用率。
+\end{example}
+
+\begin{example}[航班调度问题]
+\label{ex:flight}
+    机场需要为当日100架次航班分配停机位和登机口。约束条件包括：
+    \begin{itemize}
+        \item 每个停机位同一时刻只能停放一架飞机
+        \item 登机口与停机位之间需要满足一定的对应关系
+        \item 不同机型对停机位有不同要求
+        \item 需要预留足够的周转时间
+    \end{itemize}
+
+    目标是最小化乘客步行距离或最大化机场运营效率。
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了时态规划与调度。时态规划扩展了经典规划以处理时间约束和持续性动作。PDDL 2.1引入了持续性动作和数值fluent。调度问题是规划的重要应用领域，包括作业车间调度和资源约束项目调度。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 用PDDL 2.1编写一个简单的时态规划领域，包含至少两个持续性动作。
+
+    \item 对于示例\ref{ex:production}中的生产调度问题，画出一个可行的甘特图。
+
+    \item 比较规划问题和调度问题的异同点。
+
+    \item 分析时态规划相比经典规划的计算复杂性。
+
+    \item 设计一个启发式函数，用于评估时态规划中的部分计划质量。
+\end{enumerate}

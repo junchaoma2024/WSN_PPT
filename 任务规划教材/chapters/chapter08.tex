@@ -1,0 +1,129 @@
+% 第8章 不确定性规划
+\chapter{不确定性规划}
+\label{chap:uncertainty}
+
+本章讨论在不确定环境下的规划问题。
+
+\section{非确定性规划}
+
+\subsection{条件规划}
+
+\begin{definition}[条件规划]
+    \keyterm{条件规划}（Contingent Planning）生成的计划包含条件分支，根据执行过程中观测到的信息选择不同的动作。
+\end{definition}
+
+条件计划可以表示为树结构：
+\begin{itemize}
+    \item 内部节点是观测或条件判断
+    \item 叶节点是动作序列
+\end{itemize}
+
+\subsection{一致性规划}
+
+\begin{definition}[一致性规划]
+    \keyterm{一致性规划}（Conformant Planning）在没有任何观测能力的情况下进行规划。计划必须在所有可能的初始状态下都能达到目标。
+\end{definition}
+
+\section{部分可观测规划}
+
+\subsection{信念状态}
+
+\begin{definition}[信念状态]
+    当智能体不能完全观测环境状态时，它维护一个\keyterm{信念状态}（Belief State），表示对当前可能状态的概率分布或集合。
+\end{definition}
+
+\subsection{信念空间搜索}
+
+在信念空间中搜索，节点是信念状态，边是动作和观测的组合。
+
+\begin{example}[传感器受限的机器人导航]
+\label{ex:robot-navigation}
+    一个机器人在$4 \times 4$网格中导航，但传感器只能检测相邻格子是否有障碍物，不能确定自己的精确位置。
+
+    \textbf{信念状态}：可能位置的集合
+
+    \textbf{动作}：上、下、左、右移动
+
+    \textbf{观测}：相邻四个方向的障碍物情况
+
+    机器人需要在不确定自己位置的情况下，规划到达目标区域的策略。通过执行动作和获取观测，逐渐缩小信念状态，最终确定位置并到达目标。
+\end{example}
+
+\section{概率规划}
+
+\subsection{马尔可夫决策过程（MDP）}
+
+\begin{definition}[MDP]
+    \keyterm{马尔可夫决策过程}定义为五元组 $\langle S, A, T, R, \gamma \rangle$：
+    \begin{itemize}
+        \item $S$：状态空间
+        \item $A$：动作空间
+        \item $T: S \times A \times S \to [0,1]$：转移概率函数
+        \item $R: S \times A \to \mathbb{R}$：奖励函数
+        \item $\gamma \in [0,1)$：折扣因子
+    \end{itemize}
+\end{definition}
+
+\subsection{部分可观测MDP（POMDP）}
+
+\begin{definition}[POMDP]
+    \keyterm{POMDP}在MDP基础上增加：
+    \begin{itemize}
+        \item $\Omega$：观测空间
+        \item $O: S \times A \times \Omega \to [0,1]$：观测概率函数
+    \end{itemize}
+\end{definition}
+
+\subsection{值迭代与策略迭代}
+
+\begin{algorithm}[H]
+    \caption{值迭代算法}
+    \label{alg:value-iteration}
+    \KwIn{MDP $\langle S, A, T, R, \gamma \rangle$}
+    \KwOut{最优值函数 $V^*$}
+
+    初始化 $V(s) = 0$ 对所有 $s \in S$\;
+    \Repeat{收敛}{
+        \ForEach{$s \in S$}{
+            $V(s) \gets \max_{a \in A} \left[ R(s,a) + \gamma \sum_{s' \in S} T(s,a,s') V(s') \right]$\;
+        }
+    }
+    \KwRet{$V$}
+\end{algorithm}
+
+\begin{example}[无人机任务规划中的不确定性处理]
+\label{ex:uav-uncertainty}
+    无人机侦察任务中存在多种不确定性：
+    \begin{itemize}
+        \item \textbf{天气不确定性}：风速、能见度可能变化
+        \item \textbf{目标不确定性}：目标可能移动或隐藏
+        \item \textbf{传感器不确定性}：侦察可能失败
+        \item \textbf{威胁不确定性}：敌方防空系统位置不确定
+    \end{itemize}
+
+    使用POMDP建模：
+    \begin{itemize}
+        \item 状态包括：无人机位置、剩余燃料、目标状态、威胁状态
+        \item 动作包括：飞向某区域、执行侦察、返航
+        \item 观测包括：是否发现目标、是否被探测
+        \item 奖励设计：发现目标获得正奖励，被击落获得大负奖励
+    \end{itemize}
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了不确定性规划的主要方法。条件规划和一致性规划处理非确定性。信念状态用于表示部分可观测环境。MDP和POMDP提供了处理概率不确定性的数学框架。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 设计一个需要条件规划的问题场景，画出条件计划树。
+
+    \item 对于示例\ref{ex:robot-navigation}，设计一个缩小信念状态的动作序列。
+
+    \item 用MDP建模一个简单的路径规划问题，其中动作有时会失败。
+
+    \item 比较MDP和POMDP的计算复杂性差异。
+
+    \item 实现值迭代算法，求解一个$5 \times 5$网格世界MDP。
+\end{enumerate}

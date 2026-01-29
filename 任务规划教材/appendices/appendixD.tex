@@ -1,0 +1,250 @@
+% 附录D 编程实验指导
+\chapter{编程实验指导}
+\label{app:experiments}
+
+本附录提供配套的编程实验指导。
+
+\section{实验1：状态空间搜索实现}
+
+\subsection{实验目的}
+
+\begin{enumerate}
+    \item 理解状态空间搜索的基本原理
+    \item 实现BFS、DFS和A*算法
+    \item 比较不同搜索策略的性能
+\end{enumerate}
+
+\subsection{实验内容}
+
+实现八数码问题（8-puzzle）求解器。
+
+\textbf{任务1}：实现状态表示
+\begin{lstlisting}[language=Python]
+class PuzzleState:
+    def __init__(self, board):
+        """board是3x3的列表，0表示空格"""
+        self.board = board
+
+    def get_neighbors(self):
+        """返回所有可能的后继状态"""
+        pass
+
+    def is_goal(self):
+        """判断是否为目标状态"""
+        pass
+\end{lstlisting}
+
+\textbf{任务2}：实现BFS
+\begin{lstlisting}[language=Python]
+def bfs(initial_state):
+    """广度优先搜索"""
+    frontier = deque([initial_state])
+    explored = set()
+    # 实现搜索逻辑
+    pass
+\end{lstlisting}
+
+\textbf{任务3}：实现A*算法
+\begin{lstlisting}[language=Python]
+def astar(initial_state, heuristic):
+    """A*搜索"""
+    # 使用优先队列
+    # 实现f = g + h的评估
+    pass
+\end{lstlisting}
+
+\textbf{任务4}：实现启发式函数
+\begin{itemize}
+    \item 曼哈顿距离
+    \item 错位数
+    \item 线性冲突
+\end{itemize}
+
+\subsection{实验报告要求}
+
+\begin{enumerate}
+    \item 比较BFS和A*的扩展节点数
+    \item 分析不同启发式的效果
+    \item 讨论算法的时间和空间复杂度
+\end{enumerate}
+
+\section{实验2：PDDL建模练习}
+
+\subsection{实验目的}
+
+\begin{enumerate}
+    \item 掌握PDDL语法
+    \item 学会建模实际问题
+    \item 使用规划器求解
+\end{enumerate}
+
+\subsection{实验内容}
+
+为"机器人仓库"问题编写PDDL描述。
+
+\textbf{问题描述}：
+\begin{itemize}
+    \item 仓库是$n \times m$的网格
+    \item 有若干机器人和货物
+    \item 机器人可以移动、拾取和放下货物
+    \item 目标是将货物运送到指定位置
+\end{itemize}
+
+\textbf{任务1}：编写领域文件
+\begin{itemize}
+    \item 定义类型：location, robot, package
+    \item 定义谓词：at, holding, empty, adjacent
+    \item 定义动作：move, pick, place
+\end{itemize}
+
+\textbf{任务2}：编写问题文件
+\begin{itemize}
+    \item 定义具体的仓库布局
+    \item 设置初始状态
+    \item 指定目标条件
+\end{itemize}
+
+\textbf{任务3}：使用规划器求解
+\begin{lstlisting}[language=bash]
+# 使用Fast Downward
+./fast-downward.py warehouse-domain.pddl warehouse-problem.pddl \
+    --search "astar(ff())"
+\end{lstlisting}
+
+\section{实验3：HTN规划系统使用}
+
+\subsection{实验目的}
+
+\begin{enumerate}
+    \item 理解HTN规划的原理
+    \item 学会使用SHOP2或Pyhop
+    \item 设计任务分解方法
+\end{enumerate}
+
+\subsection{实验内容}
+
+使用Pyhop实现"旅行规划"系统。
+
+\textbf{安装Pyhop}：
+\begin{lstlisting}[language=bash]
+git clone https://github.com/dananau/pyhop.git
+\end{lstlisting}
+
+\textbf{任务}：
+\begin{enumerate}
+    \item 定义原子任务：taxi, walk, fly
+    \item 定义复合任务：travel
+    \item 定义分解方法
+    \item 测试不同场景
+\end{enumerate}
+
+\begin{lstlisting}[language=Python]
+import pyhop
+
+def travel_by_taxi(state, person, origin, dest):
+    """打车方法"""
+    if state.cash[person] >= taxi_fare(origin, dest):
+        return [('taxi', person, origin, dest)]
+    return False
+
+pyhop.declare_methods('travel', travel_by_taxi, travel_by_foot)
+\end{lstlisting}
+
+\section{实验4：多智能体路径规划仿真}
+
+\subsection{实验目的}
+
+\begin{enumerate}
+    \item 理解MAPF问题
+    \item 实现基本的MAPF算法
+    \item 可视化多智能体路径
+\end{enumerate}
+
+\subsection{实验内容}
+
+实现优先级规划和CBS算法。
+
+\textbf{任务1}：实现地图和智能体表示
+
+\textbf{任务2}：实现优先级规划
+\begin{lstlisting}[language=Python]
+def priority_planning(agents, obstacles):
+    """按优先级顺序规划"""
+    paths = []
+    for agent in sorted(agents, key=priority):
+        path = astar_with_constraints(agent, paths)
+        paths.append(path)
+    return paths
+\end{lstlisting}
+
+\textbf{任务3}：实现冲突检测和CBS框架
+
+\textbf{任务4}：可视化
+\begin{itemize}
+    \item 使用matplotlib或pygame
+    \item 动态展示智能体移动
+    \item 标注冲突位置
+\end{itemize}
+
+\section{实验5：VRP求解器开发}
+
+\subsection{实验目的}
+
+\begin{enumerate}
+    \item 理解VRP问题
+    \item 实现构造启发式
+    \item 实现改进启发式
+\end{enumerate}
+
+\subsection{实验内容}
+
+为小规模VRP问题开发求解器。
+
+\textbf{任务1}：实现最近邻构造法
+\begin{lstlisting}[language=Python]
+def nearest_neighbor(depot, customers, vehicle_capacity):
+    """最近邻启发式"""
+    routes = []
+    unvisited = set(customers)
+    while unvisited:
+        route = [depot]
+        load = 0
+        while unvisited:
+            nearest = find_nearest(route[-1], unvisited)
+            if load + demand[nearest] <= vehicle_capacity:
+                route.append(nearest)
+                load += demand[nearest]
+                unvisited.remove(nearest)
+            else:
+                break
+        route.append(depot)
+        routes.append(route)
+    return routes
+\end{lstlisting}
+
+\textbf{任务2}：实现2-opt改进
+
+\textbf{任务3}：测试和比较
+\begin{itemize}
+    \item 在标准测试集上测试
+    \item 比较不同方法的解质量
+    \item 分析计算时间
+\end{itemize}
+
+\section{提交要求}
+
+每个实验需要提交：
+\begin{enumerate}
+    \item 源代码（带注释）
+    \item 实验报告（PDF格式）
+    \item 运行结果截图或日志
+\end{enumerate}
+
+实验报告应包含：
+\begin{itemize}
+    \item 实验目的
+    \item 算法描述
+    \item 实现细节
+    \item 结果分析
+    \item 问题和思考
+\end{itemize}

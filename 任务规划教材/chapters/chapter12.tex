@@ -1,0 +1,159 @@
+% 第12章 通信与编码传输规划
+\chapter{通信与编码传输规划}
+\label{chap:communication}
+
+本章介绍任务规划在通信网络领域的应用。
+
+\section{通信网络资源调度}
+
+\subsection{信道分配}
+
+\begin{definition}[信道分配问题]
+    在无线通信网络中，\keyterm{信道分配}问题是将有限的频谱资源分配给各用户或基站，以最大化系统容量并最小化干扰。
+\end{definition}
+
+信道分配可以建模为图着色问题：
+\begin{itemize}
+    \item 节点表示通信链路
+    \item 边表示干扰关系
+    \item 颜色表示信道
+\end{itemize}
+
+\subsection{功率控制}
+
+功率控制问题是确定每个发射机的发射功率，以满足通信质量要求并最小化总功耗或干扰。
+
+\section{无线传感器网络任务规划}
+
+\subsection{数据采集调度}
+
+\begin{definition}[数据采集调度]
+    在无线传感器网络中，\keyterm{数据采集调度}确定每个传感器节点何时进行数据采集、处理和传输，以平衡数据时效性和能量消耗。
+\end{definition}
+
+\subsection{能量感知路由}
+
+由于传感器节点通常由电池供电，路由协议需要考虑能量因素：
+\begin{itemize}
+    \item 最小能量路由
+    \item 能量均衡路由
+    \item 基于剩余能量的路由
+\end{itemize}
+
+\begin{example}[物联网数据汇聚规划]
+\label{ex:iot-aggregation}
+    某智慧农业系统部署了1000个土壤传感器，需要定期向网关汇报数据。
+
+    \textbf{约束条件}：
+    \begin{itemize}
+        \item 每个传感器电池容量有限
+        \item 传输距离影响能耗
+        \item 数据需要在规定时间内到达
+        \item 部分节点可以进行数据聚合
+    \end{itemize}
+
+    \textbf{规划内容}：
+    \begin{enumerate}
+        \item 确定数据汇聚树结构
+        \item 调度每个节点的醒睡周期
+        \item 确定数据聚合点
+        \item 优化传输时隙分配
+    \end{enumerate}
+
+    \textbf{优化目标}：最大化网络寿命，保证数据时效性。
+\end{example}
+
+\section{卫星通信任务规划}
+
+\subsection{卫星过境调度}
+
+\begin{definition}[卫星过境调度]
+    地面站需要与多颗卫星通信，但视窗时间有限。\keyterm{卫星过境调度}问题是确定地面站与哪颗卫星在何时通信。
+\end{definition}
+
+\subsection{星地链路规划}
+
+\begin{example}[遥感卫星成像任务规划]
+\label{ex:satellite-imaging}
+    某遥感卫星星座需要完成100个地面目标的成像任务。
+
+    \textbf{约束条件}：
+    \begin{itemize}
+        \item 每颗卫星的轨道决定了可观测时间窗
+        \item 卫星姿态调整需要时间
+        \item 星上存储容量有限
+        \item 数据需要在一定时间内下传
+    \end{itemize}
+
+    \textbf{规划决策}：
+    \begin{enumerate}
+        \item 任务分配：哪颗卫星观测哪个目标
+        \item 观测调度：何时进行观测
+        \item 数据下传：何时通过哪个地面站下传
+    \end{enumerate}
+
+    \textbf{优化目标}：最大化完成的任务数，优先满足高优先级任务。
+
+    \textbf{规划算法}：
+    \begin{itemize}
+        \item 基于约束满足的方法
+        \item 启发式搜索
+        \item 遗传算法
+    \end{itemize}
+\end{example}
+
+\section{数据中心任务调度}
+
+\begin{example}[云计算资源编排]
+\label{ex:cloud-orchestration}
+    云计算平台需要调度大量虚拟机和容器。
+
+    \textbf{任务类型}：
+    \begin{itemize}
+        \item 批处理任务：可延迟执行
+        \item 交互式任务：需要快速响应
+        \item 流式任务：持续执行
+    \end{itemize}
+
+    \textbf{资源约束}：
+    \begin{itemize}
+        \item CPU、内存、存储、网络带宽
+        \item 物理机的容量限制
+        \item 数据局部性要求
+        \item 服务质量（QoS）保证
+    \end{itemize}
+
+    \textbf{调度目标}：
+    \begin{itemize}
+        \item 最小化任务完成时间
+        \item 最大化资源利用率
+        \item 最小化能耗
+        \item 保证服务等级协议（SLA）
+    \end{itemize}
+
+    \textbf{调度策略}：
+    \begin{enumerate}
+        \item 基于优先级的调度
+        \item 基于公平性的调度
+        \item 基于预测的调度
+        \item 基于强化学习的调度
+    \end{enumerate}
+\end{example}
+
+\section*{本章小结}
+
+本章介绍了任务规划在通信领域的应用。信道分配和功率控制是无线网络的基本优化问题。无线传感器网络需要考虑能量约束。卫星通信和数据中心调度是大规模资源分配问题。
+
+\section*{习题}
+
+\begin{enumerate}
+    \item 将一个简单的信道分配问题建模为图着色问题并求解。
+
+    \item 设计一个能量感知的路由算法，分析其对网络寿命的影响。
+
+    \item 对于示例\ref{ex:satellite-imaging}，用整数规划建模并求解一个小规模实例。
+
+    \item 比较不同云计算调度策略的优缺点。
+
+    \item 设计一个物联网数据采集调度算法，考虑能量和时延约束。
+\end{enumerate}

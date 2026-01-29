@@ -1,0 +1,135 @@
+% 附录C 国际规划竞赛（IPC）介绍
+\chapter{国际规划竞赛（IPC）介绍}
+\label{app:ipc}
+
+本附录介绍国际规划竞赛的背景和主要赛道。
+
+\section{IPC历史}
+
+\keyterm{国际规划竞赛}（International Planning Competition，IPC）是自动规划领域的重要评测平台，始于1998年。
+
+\begin{table}[htbp]
+    \centering
+    \caption{IPC历史}
+    \begin{tabular}{lll}
+        \toprule
+        年份 & 届次 & 主要创新 \\
+        \midrule
+        1998 & IPC-1 & 引入PDDL \\
+        2000 & IPC-2 & ADL特性 \\
+        2002 & IPC-3 & 时态规划赛道 \\
+        2004 & IPC-4 & 数值规划 \\
+        2006 & IPC-5 & 偏好和约束 \\
+        2008 & IPC-6 & 不确定性赛道 \\
+        2011 & IPC-7 & 学习赛道 \\
+        2014 & IPC-8 & 确定性和学习 \\
+        2018 & IPC-9 & 多个子竞赛 \\
+        2023 & IPC-10 & HTN赛道、学习赛道 \\
+        \bottomrule
+    \end{tabular}
+\end{table}
+
+\section{竞赛赛道}
+
+\subsection{经典赛道}
+
+\textbf{特点}：
+\begin{itemize}
+    \item 完全可观测
+    \item 确定性动作
+    \item 有限状态空间
+    \item 使用PDDL描述
+\end{itemize}
+
+\textbf{评价指标}：
+\begin{itemize}
+    \item 解的数量
+    \item 解的质量（代价）
+    \item 求解时间
+    \item IPC得分
+\end{itemize}
+
+\subsection{最优规划赛道}
+
+要求找到代价最小的解，规划器必须证明解的最优性。
+
+\subsection{满足性规划赛道}
+
+只要求找到可行解，不要求最优。
+
+\subsection{HTN赛道}
+
+使用HDDL语言，评估层次任务网络规划器。
+
+\subsection{学习赛道}
+
+规划器可以在相似问题上学习，然后在新问题上测试。
+
+\section{基准领域}
+
+\subsection{经典领域}
+
+\begin{description}
+    \item[Blocksworld] 积木世界，最经典的测试领域
+    \item[Logistics] 物流运输，多城市、多车辆
+    \item[Gripper] 机器人搬运球
+    \item[Satellite] 卫星观测调度
+    \item[Rovers] 火星探测器规划
+    \item[Airport] 机场地面交通控制
+    \item[Pipesworld] 管道输油调度
+\end{description}
+
+\subsection{时态领域}
+
+\begin{description}
+    \item[Zenotravel] 旅行规划，考虑燃料
+    \item[Depots] 仓库物流
+    \item[DriverLog] 司机和卡车调度
+\end{description}
+
+\section{参与IPC}
+
+\subsection{获取基准问题}
+
+\begin{lstlisting}[language=bash]
+# 克隆IPC基准仓库
+git clone https://github.com/aibasel/downward-benchmarks.git
+\end{lstlisting}
+
+\subsection{评测工具}
+
+\begin{itemize}
+    \item \textbf{Lab}：实验框架，用于运行和分析规划实验
+    \item \textbf{VAL}：计划验证工具
+    \item \textbf{IPC得分计算}：标准化的评分方法
+\end{itemize}
+
+\subsection{IPC得分}
+
+对于问题$p$和规划器$P$，IPC得分定义为：
+\begin{equation}
+    \text{Score}(P, p) = \frac{C^*}{C(P, p)}
+\end{equation}
+其中$C^*$是已知最优解代价，$C(P, p)$是$P$找到的解的代价。
+
+总得分是所有问题得分之和。
+
+\section{优秀规划器}
+
+历年IPC优秀规划器：
+\begin{itemize}
+    \item \textbf{Fast Downward}：多次获奖
+    \item \textbf{LAMA}：IPC 2011冠军
+    \item \textbf{Scorpion}：最优规划赛道优秀表现
+    \item \textbf{BFWS}：最佳优先宽度搜索
+    \item \textbf{Ragnarok}：IPC 2023经典赛道第一
+\end{itemize}
+
+\section{相关资源}
+
+\begin{itemize}
+    \item IPC官网：\url{https://www.icaps-conference.org/competitions/}
+    \item IPC 2023：\url{https://ipc2023.github.io/}
+    \item PDDL参考：\url{https://planning.wiki/}
+    \item Downward基准：\url{https://github.com/aibasel/downward-benchmarks}
+\end{itemize}
