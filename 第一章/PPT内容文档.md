@@ -378,7 +378,7 @@ Sensor Network and Its Applications
 • 无线局域网（WLAN）：覆盖建筑物或校园
   - 示例：WiFi（IEEE 802.11）
 
-• 无线个域网（WPAN）：覆盖个人周围（10米内）
+• 无线个域网（WPAN）：覆盖个人周围（10米内） 
   - 示例：蓝牙、Zigbee、UWB
 
 • 无线体域网（WBAN）：覆盖人体周围
