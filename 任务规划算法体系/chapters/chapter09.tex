@@ -1,0 +1,165 @@
+% 第9章：大语言模型与任务规划
+\chapter{大语言模型与任务规划}
+
+\begin{levelbox}
+LLM规划是最活跃的研究前沿。LLM直接规划和混合方法（9.1--9.2节）为研究生核心内容，推理增强（9.3节）为研究生扩展内容，具身智能规划（9.4节）为自学拓展。
+\end{levelbox}
+
+% =============================================
+\section{LLM直接规划 \grad}
+
+\subsection{LLM作为规划器}
+
+大语言模型（LLM）凭借海量知识和推理能力，可以直接生成任务规划：
+
+\begin{algbox}[title={\textbf{LLM直接规划的基本方式}}]
+\begin{itemize}
+  \item \textbf{零样本规划：}直接向LLM描述任务和约束，让其生成动作序列
+  \item \textbf{少样本规划：}提供几个规划示例作为上下文，引导LLM按格式输出
+  \item \textbf{结构化输出：}要求LLM以PDDL、JSON等结构化格式输出规划
+\end{itemize}
+\end{algbox}
+
+\subsection{LLM规划的优势与局限}
+
+\textbf{优势：}
+\begin{itemize}
+  \item 丰富的世界知识：无需显式建模领域知识
+  \item 自然语言接口：用户可以用自然语言描述任务
+  \item 灵活性：可以处理开放域的新颖任务
+\end{itemize}
+
+\textbf{局限：}
+\begin{itemize}
+  \item \textbf{幻觉问题：}可能生成看似合理但实际不可行的规划
+  \item \textbf{约束违反：}难以严格满足复杂的逻辑和资源约束
+  \item \textbf{长序列规划：}随着步骤增加，错误累积导致规划质量下降
+  \item \textbf{可验证性：}难以形式化验证规划的正确性
+\end{itemize}
+
+% =============================================
+\section{LLM + 规划器混合方法 \grad}
+
+\subsection{LLM+P框架}
+
+LLM+P（Liu et al., 2023）将LLM的语言理解能力与经典规划器的求解能力结合：
+
+\begin{algbox}[title={\textbf{LLM+P工作流程}}]
+\begin{enumerate}
+  \item LLM将自然语言问题描述翻译为PDDL格式
+  \item 经典规划器（如Fast Downward）求解PDDL问题
+  \item LLM将规划器输出翻译回自然语言解释
+\end{enumerate}
+\textbf{优势：}结合LLM的语言能力和规划器的求解保证。\\
+\textbf{挑战：}PDDL翻译的准确性是瓶颈。
+\end{algbox}
+
+\subsection{LLM生成启发式}
+
+一种新颖的结合方式：让LLM为特定领域生成启发式函数代码，然后在传统搜索框架中使用。
+
+\begin{example}[LLM生成的启发式]
+给定积木世界的问题描述，LLM可以生成如下Python启发式函数：
+\begin{lstlisting}[language=Python]
+def heuristic(state, goal):
+    misplaced = 0
+    for block, target_pos in goal.items():
+        if state[block] != target_pos:
+            misplaced += 1
+    return misplaced
+\end{lstlisting}
+虽然这个启发式可能不是最优的，但LLM能够快速为新领域生成合理的启发式，无需人工设计。
+\end{example}
+
+\subsection{SayPlan \self}
+
+SayPlan使用LLM进行大规模场景中的任务规划：
+\begin{itemize}
+  \item 使用3D场景图（3D Scene Graph）表示环境
+  \item LLM通过迭代搜索场景图来定位相关物体和区域
+  \item 结合场景约束验证来过滤不可行的规划步骤
+\end{itemize}
+
+% =============================================
+\section{推理增强的LLM规划 \grad}
+
+\subsection{思维链（Chain-of-Thought, CoT）}
+
+\begin{keypoint}
+CoT提示让LLM在给出最终答案前展示推理过程：
+\begin{itemize}
+  \item 分步推理减少跳跃性思维导致的错误
+  \item 在规划中表现为：先分析当前状态、识别子目标、考虑约束，再给出动作
+  \item 变体：Zero-shot CoT（``Let's think step by step''）、Auto-CoT等
+\end{itemize}
+\end{keypoint}
+
+\subsection{思维树（Tree of Thoughts, ToT）}
+
+ToT将线性推理扩展为树状搜索：
+\begin{enumerate}
+  \item 在每个决策点生成多个候选思路
+  \item 评估每个思路的前景
+  \item 使用BFS或DFS在思维树中搜索
+  \item 支持回溯：放弃不佳的思路
+\end{enumerate}
+
+\subsection{思维图（Graph of Thoughts, GoT）\self}
+
+GoT进一步将推理结构从树扩展为有向无环图（DAG），允许多个推理分支合并和交互。
+
+\subsection{RAP（Reasoning via Planning）\self}
+
+将LLM的推理过程建模为MDP，使用MCTS在推理空间中搜索，LLM既作为策略提供候选推理步骤，又作为世界模型评估状态价值。
+
+% =============================================
+\section{具身智能中的LLM规划 \self}
+
+\subsection{SayCan}
+
+\begin{algbox}[title={\textbf{SayCan：LLM + 可供性}}]
+SayCan（Google, 2022）将LLM的语言理解与机器人的可供性（Affordance）结合：
+\begin{enumerate}
+  \item LLM生成候选动作的语言描述及其概率（``Say''）
+  \item 预训练的技能策略评估每个动作在当前状态下的可行性（``Can''）
+  \item 综合两者选择最佳动作：$\arg\max_a P_{\mathrm{LLM}}(a|q) \cdot P_{\mathrm{affordance}}(a|s)$
+\end{enumerate}
+\end{algbox}
+
+\subsection{Code as Policies}
+
+直接让LLM生成机器人控制代码（Python），利用预定义的API与机器人交互。LLM的代码生成能力使其可以处理空间推理、循环和条件等复杂逻辑。
+
+\subsection{VoxPoser \self}
+
+使用LLM和视觉-语言模型在3D体素空间中生成约束和可供性地图，指导机器人的运动规划。零样本地将语言指令转化为机器人动作。
+
+\subsection{RT-2与PaLM-E \self}
+
+\begin{itemize}
+  \item \textbf{RT-2（Robotic Transformer 2）：}将视觉-语言模型直接用作机器人策略，输出离散化的动作token。
+  \item \textbf{PaLM-E：}具身多模态语言模型，将传感器数据（图像、点云）作为token嵌入语言模型，统一处理语言理解和机器人规划。
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：智能仓储中的任务规划}}]
+在智能仓储场景中，LLM可以理解自然语言的订单描述，并为机器人集群生成取货-打包-配送的任务序列。SayCan式的方法可以确保规划的每一步都是机器人物理上可执行的。
+\end{appbox}
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item LLM直接规划灵活但缺乏保证；LLM+规划器混合方法兼顾两者优势。
+  \item CoT/ToT/GoT通过结构化推理提升LLM的规划能力。
+  \item 具身智能中的LLM规划（SayCan、Code as Policies等）是机器人应用的热点方向。
+  \item LLM规划的核心挑战是可靠性和可验证性。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 使用LLM API为一个简单的家庭任务（如准备咖啡）生成规划，分析其合理性。
+  \item （研究生）比较LLM+P和LLM直接规划在同一问题集上的成功率。
+  \item （研究生）设计一个实验评估CoT和ToT在任务规划中的效果差异。
+  \item 讨论：LLM规划何时可以替代传统规划器？何时不能？
+\end{enumerate}

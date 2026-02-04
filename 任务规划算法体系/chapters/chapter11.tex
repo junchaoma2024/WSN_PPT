@@ -1,0 +1,180 @@
+% 第11章：多智能体规划
+\chapter{多智能体规划}
+
+\begin{levelbox}
+多智能体规划涉及多个智能体的协调与协作。MAPF基础和博弈论方法（11.1--11.2节）为本科/研究生内容，多智能体RL（11.3节）为研究生内容，分布式规划（11.4节）为自学拓展。
+\end{levelbox}
+
+% =============================================
+\section{多智能体路径规划（MAPF） \ug}
+
+\subsection{问题定义}
+
+\begin{definition}[MAPF问题]
+给定一个图$G=(V,E)$和$k$个智能体，每个智能体$i$有起始位置$s_i$和目标位置$g_i$。要求为所有智能体规划无冲突的路径（同一时刻不能有两个智能体占据同一节点或沿同一边反向移动）。
+\end{definition}
+
+\textbf{优化目标：}
+\begin{itemize}
+  \item \textbf{Makespan：}最小化所有智能体完成任务的最大时间
+  \item \textbf{Sum of Costs：}最小化所有智能体路径代价之和
+\end{itemize}
+
+\subsection{CBS（Conflict-Based Search） \ug}
+
+\begin{algbox}[title={\textbf{CBS算法}}]
+CBS是一种双层搜索算法：
+\begin{enumerate}
+  \item \textbf{低层搜索：}为每个智能体独立规划路径（遵守给定的约束）
+  \item \textbf{高层搜索：}在约束树（Constraint Tree）中搜索
+    \begin{itemize}
+      \item 根节点：无约束，每个智能体走自己的最短路径
+      \item 检测冲突：两个智能体在同一时刻占据同一位置
+      \item 分支：对冲突生成两个子节点，分别约束其中一个智能体避开冲突位置/时刻
+      \item 重复直到找到无冲突的方案
+    \end{itemize}
+\end{enumerate}
+\textbf{最优性：}CBS在Sum of Costs目标下返回最优解。
+\end{algbox}
+
+\subsection{ICTS（Increasing Cost Tree Search） \grad}
+
+ICTS也是双层搜索：
+\begin{itemize}
+  \item 高层搜索：递增代价树，枚举各智能体路径代价的可能组合
+  \item 低层搜索：验证给定代价组合下是否存在无冲突方案
+\end{itemize}
+
+\subsection{LaCAM与LaCAM* \grad}
+
+LaCAM是一种高效的亚最优MAPF算法：
+\begin{itemize}
+  \item 在联合配置空间中进行搜索，但使用惰性约束生成避免指数爆炸
+  \item LaCAM*是其改进版本，在保持效率的同时提供更好的解质量
+  \item 可以在秒级求解数千个智能体的MAPF问题
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：自动驾驶交叉路口协调}}]
+在城市交叉路口，多辆自动驾驶车辆需要在避免碰撞的前提下高效通过。MAPF算法可以建模为：每辆车是一个智能体，路口的离散网格/车道为图的节点，需要在时空中规划无冲突的通行方案。
+\end{appbox}
+
+% =============================================
+\section{博弈论方法 \grad}
+
+\subsection{博弈论与多智能体规划}
+
+当多个智能体有不同甚至对立的目标时，需要博弈论框架来分析和求解。
+
+\begin{definition}[正则形式博弈]
+一个$n$人博弈由 $\langle N, (S_i)_{i \in N}, (u_i)_{i \in N} \rangle$ 定义：
+\begin{itemize}
+  \item $N = \{1, \ldots, n\}$：参与者集合
+  \item $S_i$：参与者$i$的策略集合
+  \item $u_i: S_1 \times \cdots \times S_n \rightarrow \mathbb{R}$：参与者$i$的效用函数
+\end{itemize}
+\end{definition}
+
+\subsection{纳什均衡与规划}
+
+纳什均衡是博弈的基本解概念：没有任何参与者可以通过单方面改变策略来提高自己的效用。在多智能体规划中，纳什均衡可以作为多个自利智能体交互的预测结果。
+
+\subsection{Stackelberg博弈}
+
+Stackelberg博弈描述了领导者-跟随者的层次结构：
+\begin{itemize}
+  \item 领导者先选择策略
+  \item 跟随者观察到领导者的策略后做出最优响应
+  \item 在安全博弈、资源部署等领域有重要应用
+\end{itemize}
+
+% =============================================
+\section{多智能体强化学习（MARL） \grad}
+
+\subsection{MARL基本框架}
+
+多智能体环境通常建模为\textbf{随机博弈}（Stochastic Game）或\textbf{Dec-POMDP}（分布式POMDP）。
+
+\subsection{CTDE范式（集中训练分布式执行）}
+
+\begin{keypoint}
+CTDE（Centralized Training with Decentralized Execution）是MARL的主流范式：
+\begin{itemize}
+  \item \textbf{训练时：}所有智能体的信息集中处理，学习全局最优的协作策略
+  \item \textbf{执行时：}每个智能体仅基于自己的局部观测做出决策
+\end{itemize}
+\end{keypoint}
+
+\subsection{QMIX}
+
+QMIX将联合动作价值函数分解为各智能体的个体价值函数的单调混合：
+$$Q_{\mathrm{tot}}(\boldsymbol{\tau}, \mathbf{a}) = f_{\mathrm{mix}}(Q_1(\tau_1, a_1), \ldots, Q_n(\tau_n, a_n); s)$$
+其中混合网络$f_{\mathrm{mix}}$的权重均为非负，保证单调性。
+
+\subsection{MAPPO}
+
+MAPPO将PPO扩展到多智能体设定，每个智能体有独立的Actor和共享的Critic：
+\begin{itemize}
+  \item Actor：基于局部观测输出动作
+  \item Critic：基于全局状态评估价值
+  \item 实现简单，在StarCraft II等基准上效果优异
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：无人机蜂群协同}}]
+无人机蜂群执行搜索救援、区域监视等任务时，需要多架无人机协同规划。MARL可以学习：
+\begin{itemize}
+  \item 区域分配：各无人机负责不同区域
+  \item 编队控制：保持通信连通性的同时覆盖最大区域
+  \item 任务协调：动态分配新发现的目标
+\end{itemize}
+QMIX或MAPPO可以在模拟环境中训练协同策略，然后部署到真实无人机上。
+\end{appbox}
+
+% =============================================
+\section{分布式规划 \self}
+
+\subsection{MA-STRIPS}
+
+MA-STRIPS将经典STRIPS规划扩展到多智能体设定：
+\begin{itemize}
+  \item 每个智能体有自己的动作集合和局部视角
+  \item 通过通信协调生成联合规划
+  \item 隐私保护：智能体不需要完全共享自己的内部信息
+\end{itemize}
+
+\subsection{Plan Merging}
+
+规划合并方法先让每个智能体独立生成自己的局部规划，然后通过协商合并为一致的联合规划：
+\begin{enumerate}
+  \item 各智能体独立规划
+  \item 检测规划间的冲突
+  \item 通过协商解决冲突（重排序、等待、替代动作）
+\end{enumerate}
+
+\subsection{联盟形成}
+
+联盟形成（Coalition Formation）研究智能体如何动态组成合作小组以完成任务：
+\begin{itemize}
+  \item 任务分配与联盟组建的联合优化
+  \item 基于能力匹配和代价分摊的联盟稳定性分析
+  \item 在军事多平台协同中有重要应用
+\end{itemize}
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item MAPF是多智能体规划的基础问题，CBS是最优求解的代表算法。
+  \item 博弈论为利益冲突的多智能体交互提供分析框架。
+  \item MARL（QMIX、MAPPO）通过集中训练分布式执行实现多智能体协作规划。
+  \item 分布式规划保护智能体隐私的同时实现协调。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 在一个$8 \times 8$的网格上，用CBS为4个智能体规划无冲突路径。
+  \item 分析CBS在最坏情况下的计算复杂度。
+  \item （研究生）比较QMIX和MAPPO在一个协同导航任务中的学习效率。
+  \item （研究生）设计一个场景说明纳什均衡可能不是社会最优的。
+  \item 讨论：在军事协同规划中，集中式和分布式规划各有什么优缺点？
+\end{enumerate}

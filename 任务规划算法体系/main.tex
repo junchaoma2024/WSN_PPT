@@ -1,0 +1,294 @@
+% !TEX program = xelatex
+% 任务规划算法体系 - 教材
+% 编译方式: xelatex main.tex (运行两次以生成目录)
+
+\documentclass[a4paper,12pt,openany]{ctexbook}
+
+% ============ 基础宏包 ============
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds,decorations.pathreplacing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable,theorems}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+% hyperref 放在最后加载
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,urlcolor=blue!60!black,bookmarks=true,bookmarksnumbered=true]{hyperref}
+
+% ============ 颜色定义 ============
+\definecolor{ugcolor}{RGB}{0,102,204}       % 本科生 - 蓝色
+\definecolor{gradcolor}{RGB}{204,51,0}      % 研究生 - 红色
+\definecolor{selfcolor}{RGB}{0,153,76}      % 自学拓展 - 绿色
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{partcolor}{RGB}{0,51,102}
+
+% ============ 受众标记命令 ============
+% 本科生适用
+\newcommand{\ug}{\texorpdfstring{\textcolor{ugcolor}{\textbf{[本]}}}{[本]}}
+% 研究生扩展
+\newcommand{\grad}{\texorpdfstring{\textcolor{gradcolor}{\textbf{[研]}}}{[研]}}
+% 自学拓展
+\newcommand{\self}{\texorpdfstring{\textcolor{selfcolor}{\textbf{[拓]}}}{[拓]}}
+
+% ============ 定理环境 ============
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{example}{例}[chapter]
+\newtheorem{remark}{注}[chapter]
+\theoremstyle{plain}
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+
+% ============ tcolorbox 环境 ============
+\newtcolorbox{keypoint}[1][]{
+  colback=blue!5!white,
+  colframe=blue!60!black,
+  title={\textbf{要点}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{algbox}[1][]{
+  colback=gray!5!white,
+  colframe=gray!60!black,
+  title={\textbf{算法概要}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{appbox}[1][]{
+  colback=green!5!white,
+  colframe=green!60!black,
+  title={\textbf{应用案例}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{levelbox}[1][]{
+  colback=orange!5!white,
+  colframe=orange!60!black,
+  title={\textbf{学习建议}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+% ============ 代码环境 ============
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  showstringspaces=false
+}
+
+% ============ 页眉页脚 ============
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============ 章节标题格式 ============
+\ctexset{
+  part/format = \Huge\bfseries\centering\color{partcolor},
+  chapter/format = \LARGE\bfseries\color{blue!70!black},
+  section/format = \Large\bfseries,
+  subsection/format = \large\bfseries
+}
+
+% ============ 算法环境中文化 ============
+\floatname{algorithm}{算法}
+\renewcommand{\algorithmicrequire}{\textbf{输入:}}
+\renewcommand{\algorithmicensure}{\textbf{输出:}}
+
+% ============ 文档信息 ============
+\title{{\Huge\bfseries 任务规划算法体系}\\[1em]
+{\Large 从经典方法到智能规划}\\[2em]
+{\normalsize\color{gray} 教学参考教材}}
+\author{}
+\date{\today}
+
+\begin{document}
+
+% ============ 封面 ============
+\maketitle
+
+% ============ 受众标记说明 ============
+\thispagestyle{empty}
+\vspace*{3cm}
+\begin{center}
+{\Large\bfseries 本书受众标记说明}
+\end{center}
+\vspace{1cm}
+
+\noindent 本书内容覆盖面较广，为方便不同层次的读者使用，采用以下标记区分内容的适用层次：
+
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{clp{8cm}}
+\toprule
+\textbf{标记} & \textbf{适用层次} & \textbf{说明} \\
+\midrule
+\textcolor{ugcolor}{\textbf{[本]}} & 本科生教学 & 核心基础内容，建议本科生课堂讲授和学习。掌握这些内容即可建立完整的任务规划知识体系。 \\[0.5em]
+\textcolor{gradcolor}{\textbf{[研]}} & 研究生扩展 & 进阶内容，适合研究生课程或本科高年级选修。涉及前沿算法和深入理论分析。 \\[0.5em]
+\textcolor{selfcolor}{\textbf{[拓]}} & 自学拓展 & 补充阅读材料，适合感兴趣的读者自学。包含最新研究进展和特殊应用领域。 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{2em}
+\noindent\textbf{建议学习路线：}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{本科生（32--48学时）：}重点学习标记为 \ug{} 的章节，建立扎实的基础。
+  \item \textbf{研究生（48--64学时）：}在 \ug{} 内容基础上，深入学习 \grad{} 标记的内容。
+  \item \textbf{自学参考：}可根据兴趣选择 \self{} 标记的内容进行拓展阅读。
+\end{itemize}
+
+\clearpage
+
+% ============ 目录 ============
+\tableofcontents
+
+% ============ 前言 ============
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+
+任务规划（Task Planning）是人工智能领域的核心研究方向之一，其目标是让智能体能够自主地制定行动方案以达成预设目标。从早期的GPS（General Problem Solver）到当今基于大语言模型的智能规划系统，任务规划技术经历了数十年的发展，形成了丰富而完整的算法体系。
+
+本书旨在系统梳理任务规划领域的主要算法，建立清晰的方法论体系。全书按照算法的技术路线和演化脉络，分为六个篇章：
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{第一篇：经典规划方法}——介绍基于符号推理和搜索的传统规划算法，这是整个领域的理论基石。
+  \item \textbf{第二篇：元启发式与优化方法}——介绍基于群体智能和进化计算的规划求解方法。
+  \item \textbf{第三篇：强化学习与规划}——探讨基于试错学习的规划方法，包括基于模型和无模型的方法。
+  \item \textbf{第四篇：深度学习与规划}——介绍利用深度神经网络提升规划能力的现代方法。
+  \item \textbf{第五篇：大语言模型与规划}——聚焦LLM驱动的最新规划技术，包括具身智能和语言智能体。
+  \item \textbf{第六篇：多智能体规划}——讨论多个智能体协同规划的理论与方法。
+\end{itemize}
+
+每个篇章中，我们既关注算法的核心思想和理论分析，也注重其在交通调度、通信编码、军事指挥等实际领域的应用。书中采用受众标记系统，帮助不同层次的读者高效地选择学习内容。
+
+\vspace{2em}
+\hfill 编者
+
+\hfill \today
+
+% =============================================
+% 第一篇：经典规划方法
+% =============================================
+\part{经典规划方法}
+
+\include{chapters/chapter01}
+\include{chapters/chapter02}
+\include{chapters/chapter03}
+\include{chapters/chapter04}
+
+% =============================================
+% 第二篇：元启发式与优化方法
+% =============================================
+\part{元启发式与优化方法}
+
+\include{chapters/chapter05}
+
+% =============================================
+% 第三篇：强化学习与规划
+% =============================================
+\part{强化学习与规划}
+
+\include{chapters/chapter06}
+\include{chapters/chapter07}
+
+% =============================================
+% 第四篇：深度学习与规划
+% =============================================
+\part{深度学习与规划}
+
+\include{chapters/chapter08}
+
+% =============================================
+% 第五篇：大语言模型与规划
+% =============================================
+\part{大语言模型与规划}
+
+\include{chapters/chapter09}
+\include{chapters/chapter10}
+
+% =============================================
+% 第六篇：多智能体规划
+% =============================================
+\part{多智能体规划}
+
+\include{chapters/chapter11}
+
+% =============================================
+% 附录
+% =============================================
+\appendix
+\include{appendices/appendixA}
+
+% ============ 参考文献 ============
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{参考文献}
+
+\bibitem{ghallab2004} Ghallab M, Nau D, Traverso P. Automated Planning: Theory and Practice[M]. Morgan Kaufmann, 2004.
+\bibitem{ghallab2016} Ghallab M, Nau D, Traverso P. Automated Planning and Acting[M]. Cambridge University Press, 2016.
+\bibitem{russell2020} Russell S, Norvig P. Artificial Intelligence: A Modern Approach (4th ed)[M]. Pearson, 2020.
+\bibitem{lavalle2006} LaValle S M. Planning Algorithms[M]. Cambridge University Press, 2006.
+\bibitem{sutton2018} Sutton R S, Barto A G. Reinforcement Learning: An Introduction (2nd ed)[M]. MIT Press, 2018.
+\bibitem{shoham2009} Shoham Y, Leyton-Brown K. Multiagent Systems: Algorithmic, Game-Theoretic, and Logical Foundations[M]. Cambridge University Press, 2009.
+
+\bibitem{hoffmann2001} Hoffmann J, Nebel B. The FF Planning System: Fast Plan Generation Through Heuristic Search[J]. JAIR, 2001, 14:253--302.
+\bibitem{helmert2006} Helmert M. The Fast Downward Planning System[J]. JAIR, 2006, 26:191--246.
+\bibitem{blum1997} Blum A L, Furst M L. Fast Planning Through Planning Graph Analysis[J]. Artificial Intelligence, 1997, 90(1-2):281--300.
+\bibitem{kautz1992} Kautz H, Selman B. Planning as Satisfiability[C]. ECAI, 1992.
+\bibitem{erol1994} Erol K, Hendler J, Nau D S. HTN Planning: Complexity and Expressivity[C]. AAAI, 1994.
+\bibitem{fox2003} Fox M, Long D. PDDL2.1: An Extension to PDDL for Expressing Temporal Planning Domains[J]. JAIR, 2003, 20:61--124.
+
+\bibitem{silver2016} Silver D, et al. Mastering the Game of Go with Deep Neural Networks and Tree Search[J]. Nature, 2016, 529(7587):484--489.
+\bibitem{silver2017} Silver D, et al. Mastering the Game of Go without Human Knowledge[J]. Nature, 2017, 550(7676):354--359.
+\bibitem{schrittwieser2020} Schrittwieser J, et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model[J]. Nature, 2020, 584(7839):186--190.
+\bibitem{hafner2023} Hafner D, et al. Mastering Diverse Domains through World Models[J]. arXiv:2301.04104, 2023.
+\bibitem{chen2021} Chen L, et al. Decision Transformer: Reinforcement Learning via Sequence Modeling[C]. NeurIPS, 2021.
+
+\bibitem{janner2022} Janner M, Du Y, Tenenbaum J B, Levine S. Planning with Diffusion for Flexible Behavior Synthesis[C]. ICML, 2022.
+\bibitem{chi2023} Chi C, et al. Diffusion Policy: Visuomotor Policy Learning via Action Diffusion[C]. RSS, 2023.
+
+\bibitem{ahn2022} Ahn M, et al. Do As I Can, Not As I Say: Grounding Language in Robotic Affordances[C]. CoRL, 2022.
+\bibitem{yao2023} Yao S, et al. ReAct: Synergizing Reasoning and Acting in Language Models[C]. ICLR, 2023.
+\bibitem{wei2022} Wei J, et al. Chain-of-Thought Prompting Elicits Reasoning in Large Language Models[C]. NeurIPS, 2022.
+\bibitem{yao2023tot} Yao S, et al. Tree of Thoughts: Deliberate Problem Solving with Large Language Models[C]. NeurIPS, 2023.
+\bibitem{liu2023llmp} Liu B, et al. LLM+P: Empowering Large Language Models with Optimal Planning Proficiency[J]. arXiv:2304.11477, 2023.
+\bibitem{wang2023voyager} Wang G, et al. Voyager: An Open-Ended Embodied Agent with Large Language Models[J]. arXiv:2305.16291, 2023.
+
+\bibitem{sharon2015} Sharon G, et al. Conflict-Based Search for Optimal Multi-Agent Pathfinding[J]. Artificial Intelligence, 2015, 219:40--66.
+\bibitem{stern2019} Stern R, et al. Multi-Agent Pathfinding: Definitions, Variants, and Benchmarks[C]. SoCS, 2019.
+
+\end{thebibliography}
+
+\end{document}

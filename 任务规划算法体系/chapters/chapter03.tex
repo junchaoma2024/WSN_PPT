@@ -1,0 +1,204 @@
+% 第3章：经典规划算法
+\chapter{经典规划算法}
+
+\begin{levelbox}
+本章涵盖经典规划的核心算法。SAT/CSP规划（3.1--3.2节）为本科生内容，HTN与偏序规划（3.3--3.4节）为本科/研究生共同内容，时态与不确定性规划（3.5--3.6节）主要面向研究生。
+\end{levelbox}
+
+% =============================================
+\section{基于SAT的规划 \ug}
+
+\subsection{规划问题的SAT编码}
+
+SAT规划的核心思想：将规划问题编码为命题逻辑公式，利用高效的SAT求解器来求解。
+
+\begin{algbox}[title={\textbf{SAT规划基本框架}}]
+\begin{enumerate}
+  \item 设定一个时间步长上限$T$；
+  \item 将规划问题编码为包含$T$个时间步的SAT公式$\phi_T$；
+  \item 调用SAT求解器：若$\phi_T$可满足，从满足赋值中提取规划；若不可满足，增大$T$重试。
+\end{enumerate}
+\end{algbox}
+
+编码需要处理以下约束：
+\begin{itemize}
+  \item 初始状态约束和目标约束；
+  \item 动作前置条件和效果的因果约束；
+  \item 帧公理（Frame Axioms）：未被动作改变的事实保持不变；
+  \item 互斥约束：冲突动作不能同时执行。
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：通信网络编码方案选择}}]
+在通信系统中，需要根据信道条件、带宽需求和QoS约束选择合适的编码和传输方案。可以将可选的编码方式、调制方案和功率等级建模为SAT变量，将兼容性和性能要求建模为约束子句，利用SAT求解器自动找到满足所有约束的最优传输配置。
+\end{appbox}
+
+\subsection{SATplan与Madagascar}
+
+\textbf{SATplan}是SAT规划的代表系统，多次在IPC竞赛中取得优异成绩。\textbf{Madagascar}进一步优化了编码效率和并行求解能力。
+
+% =============================================
+\section{基于CSP/SMT的规划 \ug}
+
+\subsection{CSP规划}
+
+约束满足问题（CSP）规划将规划建模为变量-值-约束的框架，适合处理复杂的资源和时间约束。
+
+\subsection{SMT规划 \grad}
+
+可满足性模理论（SMT）扩展了SAT，支持整数算术、实数算术等理论，能够处理数值变量和连续资源约束。
+
+\begin{example}[SMT规划：资源调度]
+考虑一个任务调度问题：$n$个任务需要分配到$m$台机器上，每个任务有处理时间、截止日期和资源需求。使用SMT编码可以自然地表达：
+\begin{itemize}
+  \item 时间变量：$t_i \in \mathbb{R}$（任务$i$的开始时间）
+  \item 资源约束：任何时刻每台机器上的资源使用不超过容量
+  \item 时序约束：前置任务必须先完成
+\end{itemize}
+\end{example}
+
+% =============================================
+\section{层次任务网络（HTN） \ug}
+
+\subsection{HTN规划基本概念}
+
+HTN（Hierarchical Task Network）规划采用自顶向下的任务分解策略，将复杂任务逐步分解为可直接执行的原子动作。
+
+\begin{definition}[HTN规划]
+一个HTN规划问题包括：
+\begin{itemize}
+  \item 原子任务（Primitive Tasks）：可直接执行的动作；
+  \item 复合任务（Compound Tasks）：需要进一步分解的高层任务；
+  \item 方法（Methods）：定义复合任务如何分解为子任务序列；
+  \item 初始任务网络（Initial Task Network）：需要完成的顶层任务。
+\end{itemize}
+\end{definition}
+
+\subsection{全序HTN与偏序HTN}
+
+\begin{itemize}
+  \item \textbf{全序HTN（Totally Ordered HTN）：}子任务之间有严格的线性顺序。SHOP/SHOP2是代表系统。
+  \item \textbf{偏序HTN（Partially Ordered HTN）：}子任务之间只有部分顺序约束，允许并行执行。PANDA规划器支持此类问题。
+\end{itemize}
+
+\subsection{SHOP/SHOP2规划器}
+
+SHOP（Simple Hierarchical Ordered Planner）是最著名的HTN规划器：
+\begin{itemize}
+  \item 使用全序分解，简化了搜索过程；
+  \item 支持在前置条件中使用任意Lisp表达式；
+  \item 在实际应用中表现优异，广泛用于军事规划、Web服务组合等领域。
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：军事作战任务规划}}]
+军事任务规划天然具有层次结构：战略目标分解为战役任务，战役任务再分解为具体的战术行动。HTN规划可以建模为：
+\begin{itemize}
+  \item 战略层：``夺取制空权''分解为``压制防空''$+$``空中巡逻''$+$``战场遮断''
+  \item 战术层：``压制防空''分解为``电子干扰''$+$``反辐射打击''$+$``效果评估''
+  \item 执行层：``电子干扰''分解为具体的频率选择和功率设置动作
+\end{itemize}
+\end{appbox}
+
+% =============================================
+\section{偏序规划（POP） \ug}
+
+\subsection{偏序规划的基本思想}
+
+偏序规划（Partial-Order Planning）在\textbf{规划空间}（而非状态空间）中搜索。它维护一个部分规划，通过逐步添加动作和排序约束来完善。
+
+\begin{definition}[部分规划]
+一个部分规划 $P = \langle A, \prec, \mathcal{B}, \mathcal{L} \rangle$ 包含：
+\begin{itemize}
+  \item $A$：动作集合；
+  \item $\prec$：动作间的偏序关系；
+  \item $\mathcal{B}$：变量绑定约束；
+  \item $\mathcal{L}$：因果链接（Causal Links），记录哪个动作提供了哪个前置条件。
+\end{itemize}
+\end{definition}
+
+\subsection{最小承诺策略}
+
+偏序规划的核心原则是\textbf{最小承诺}（Least Commitment）：尽可能推迟决策，只在必要时添加排序约束，保留更多的灵活性。
+
+\subsection{因果链接与威胁解决}
+
+当一个动作可能破坏已建立的因果链接时，产生\textbf{威胁}（Threat）。解决威胁的方式有两种：
+\begin{itemize}
+  \item \textbf{提升（Promotion）：}将威胁动作排在因果链接之后；
+  \item \textbf{降级（Demotion）：}将威胁动作排在因果链接之前。
+\end{itemize}
+
+% =============================================
+\section{时态规划 \grad}
+
+\subsection{持续性动作}
+
+经典规划假设动作瞬时执行，而时态规划允许动作具有持续时间。PDDL 2.1引入了\textbf{持续性动作}（Durative Actions），包含：
+\begin{itemize}
+  \item 起始条件和效果（at start）
+  \item 持续条件（over all）
+  \item 终止条件和效果（at end）
+  \item 持续时间约束
+\end{itemize}
+
+\subsection{时态规划器}
+
+\begin{itemize}
+  \item \textbf{TFD（Temporal Fast Downward）：}扩展Fast Downward支持时态规划，使用时态松弛的启发式。
+  \item \textbf{OPTIC：}支持连续变化和时态约束的规划器。
+  \item \textbf{Scotty：}使用凸优化处理连续时态规划问题。
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：交通信号配时}}]
+城市交通信号配时本质上是时态规划问题：每个信号相位有持续时间，不同方向的绿灯不能同时亮起，且需要满足最小绿灯时间、行人过街时间等约束。时态规划器可以自动生成满足安全和效率要求的信号配时方案。
+\end{appbox}
+
+% =============================================
+\section{不确定性环境下的规划 \grad}
+
+\subsection{一致性规划（Conformant Planning）}
+
+在不确定初始状态下，一致性规划寻找一个在所有可能初始状态下都能达成目标的动作序列。本质上是在信念空间（Belief Space）中的搜索。
+
+\subsection{条件规划（Contingent Planning）}
+
+条件规划允许在执行过程中进行观测和分支：根据观测结果选择不同的后续动作。其输出是一棵\textbf{条件规划树}而非线性序列。
+
+\subsection{MDP规划 \grad}
+
+马尔可夫决策过程（MDP）以概率方式处理动作不确定性：
+
+\begin{definition}[MDP]
+一个MDP由$\langle S, A, T, R, \gamma \rangle$定义：
+\begin{itemize}
+  \item $S$：状态集合
+  \item $A$：动作集合
+  \item $T(s'|s,a)$：状态转移概率
+  \item $R(s,a)$：回报函数
+  \item $\gamma \in [0,1)$：折扣因子
+\end{itemize}
+\end{definition}
+
+\textbf{值迭代}和\textbf{策略迭代}是求解MDP的经典算法。
+
+\subsection{POMDP规划 \self}
+
+部分可观测马尔可夫决策过程（POMDP）在MDP基础上增加了观测的不确定性。POMDP的精确求解是PSPACE-完全的，实践中通常使用近似方法（如PBVI、SARSOP）。
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item SAT/CSP/SMT将规划问题转化为约束求解问题，利用成熟的求解器技术。
+  \item HTN通过任务分解捕获领域的层次结构，是实际应用中最成功的规划范式之一。
+  \item 偏序规划的最小承诺策略保留了规划的灵活性。
+  \item 时态规划和不确定性规划扩展了经典规划的表达能力。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 将一个3-任务调度问题编码为SAT公式并手动求解。
+  \item 为``准备早餐''设计HTN方法层次。
+  \item 比较前向状态空间搜索和偏序规划在积木世界问题上的搜索空间大小。
+  \item （研究生）分析PDDL 2.1时态规划的表达能力与计算复杂性。
+\end{enumerate}

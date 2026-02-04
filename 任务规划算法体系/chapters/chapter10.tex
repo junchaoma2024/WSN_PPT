@@ -1,0 +1,138 @@
+% 第10章：语言智能体
+\chapter{语言智能体 \grad}
+
+\begin{levelbox}
+语言智能体是LLM规划的前沿应用方向。ReAct和Reflexion（10.1--10.2节）为研究生核心内容，多智能体LLM和自主探索智能体（10.3--10.4节）为自学拓展。
+\end{levelbox}
+
+% =============================================
+\section{ReAct：推理与行动的协同 \grad}
+
+\subsection{ReAct框架}
+
+ReAct（Yao et al., 2023）将推理（Reasoning）和行动（Acting）交织在一起：
+
+\begin{algbox}[title={\textbf{ReAct循环}}]
+\begin{enumerate}
+  \item \textbf{思考（Thought）：}LLM分析当前状况，推理下一步该做什么
+  \item \textbf{行动（Action）：}LLM生成一个具体动作（如搜索、查询、操作）
+  \item \textbf{观测（Observation）：}从环境获取动作的执行结果
+  \item 重复以上循环直到任务完成
+\end{enumerate}
+与CoT的区别：ReAct能够与外部环境交互获取真实信息，而非仅凭LLM的内部知识推理。
+\end{algbox}
+
+\subsection{ReAct在任务规划中的应用}
+
+ReAct特别适合需要信息收集和动态决策的规划任务：
+\begin{itemize}
+  \item 在线购物：搜索商品、比较价格、下单
+  \item 信息检索：多步搜索和推理回答复杂问题
+  \item 软件操作：在Web界面上完成多步操作
+\end{itemize}
+
+% =============================================
+\section{Reflexion：自我反思的规划 \grad}
+
+\subsection{Reflexion框架}
+
+Reflexion（Shinn et al., 2023）让智能体从失败中学习：
+
+\begin{algbox}[title={\textbf{Reflexion工作流程}}]
+\begin{enumerate}
+  \item \textbf{执行（Act）：}智能体尝试完成任务
+  \item \textbf{评估（Evaluate）：}判断任务是否成功
+  \item \textbf{反思（Reflect）：}若失败，LLM生成对失败原因的文字分析
+  \item \textbf{重试（Retry）：}将反思结果加入上下文，重新尝试
+\end{enumerate}
+\textbf{关键：}反思是以自然语言形式存储在记忆中的经验教训，类似人类的``经验总结''。
+\end{algbox}
+
+\subsection{LATS（Language Agent Tree Search）\self}
+
+LATS将MCTS引入语言智能体：
+\begin{itemize}
+  \item 将ReAct轨迹视为搜索树的路径
+  \item 使用LLM自评估作为节点价值估计
+  \item 环境反馈作为评价信号
+  \item 支持回溯和多路径探索
+\end{itemize}
+
+% =============================================
+\section{多智能体LLM系统 \self}
+
+\subsection{AutoGen}
+
+AutoGen（Microsoft）是一个多智能体对话框架：
+\begin{itemize}
+  \item 支持多个LLM智能体之间的对话和协作
+  \item 智能体可以扮演不同角色（程序员、评审者、用户代理等）
+  \item 通过对话协议编排复杂的工作流
+\end{itemize}
+
+\subsection{MetaGPT}
+
+MetaGPT为LLM智能体引入标准化操作流程（SOP）：
+\begin{itemize}
+  \item 模拟软件公司的角色分工：产品经理、架构师、程序员、测试员
+  \item 使用结构化文档（需求文档、设计文档、代码审查）进行信息传递
+  \item 通过角色间的协作自动完成软件开发
+\end{itemize}
+
+\subsection{ChatDev}
+
+ChatDev让多个LLM角色通过对话协作开发软件：
+\begin{itemize}
+  \item 模拟``聊天驱动''的软件开发流程
+  \item 各角色依次参与设计、编码、测试、文档等环节
+  \item 展示了LLM多智能体在创造性任务中的协同能力
+\end{itemize}
+
+% =============================================
+\section{自主探索与终身学习智能体 \self}
+
+\subsection{Voyager}
+
+Voyager（Wang et al., 2023）是在Minecraft中的终身学习智能体：
+
+\begin{keypoint}
+Voyager的三个核心组件：
+\begin{enumerate}
+  \item \textbf{自动课程（Automatic Curriculum）：}LLM根据当前能力和探索进度自动设定下一个学习目标
+  \item \textbf{技能库（Skill Library）：}将已学会的行为以代码形式存储，可复用和组合
+  \item \textbf{迭代提示（Iterative Prompting）：}根据环境反馈和执行错误迭代改进代码
+\end{enumerate}
+Voyager展示了LLM驱动的开放世界持续探索和能力增长。
+\end{keypoint}
+
+\subsection{DEPS（Describe, Explain, Plan, Select）\self}
+
+DEPS为LLM智能体提供了系统的错误恢复机制：先描述当前状况，解释失败原因，重新规划，选择最佳方案。
+
+\subsection{Generative Agents \self}
+
+Generative Agents（Park et al., 2023）在虚拟小镇中模拟了25个智能体的社会行为：
+\begin{itemize}
+  \item 每个智能体有记忆流、反思和规划模块
+  \item 智能体可以形成社交关系、传播信息、协调活动
+  \item 展示了LLM在模拟复杂社会行为方面的潜力
+\end{itemize}
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item ReAct通过推理-行动交替实现了LLM与环境的有效交互。
+  \item Reflexion通过自我反思实现了从失败中学习。
+  \item 多智能体LLM系统（AutoGen、MetaGPT）探索了角色协作的规划模式。
+  \item Voyager等系统展示了LLM驱动的开放世界终身学习智能体的可能性。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item （研究生）实现一个简化的ReAct框架，让LLM通过工具使用完成一个多步骤任务。
+  \item （研究生）比较ReAct和Reflexion在同一任务上的成功率和效率。
+  \item 讨论：多智能体LLM系统中的``涌现行为''是真正的智能还是表面模式？
+  \item 分析Voyager技能库的设计：为什么代码形式比自然语言形式更适合存储技能？
+\end{enumerate}

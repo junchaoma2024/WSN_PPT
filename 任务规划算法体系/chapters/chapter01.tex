@@ -1,0 +1,138 @@
+% 第1章：任务规划基础与状态空间搜索
+\chapter{任务规划基础与状态空间搜索 \ug}
+
+\begin{levelbox}
+本章为全书基础，所有层次读者均需掌握。内容涵盖任务规划的基本概念、形式化描述和状态空间搜索方法，是理解后续所有算法的前提。
+\end{levelbox}
+
+% =============================================
+\section{任务规划概述}
+
+\subsection{什么是任务规划}
+
+任务规划（Task Planning），又称自动规划（Automated Planning），是人工智能的重要分支。其核心问题可以描述为：给定一个初始状态、一组可执行的动作和一个目标条件，自动生成一个动作序列（即\textbf{规划}），使得从初始状态出发依次执行这些动作后能够到达满足目标条件的状态。
+
+\begin{definition}[经典规划问题]
+一个经典规划问题可以形式化为四元组 $\Pi = \langle \mathcal{F}, \mathcal{A}, I, G \rangle$，其中：
+\begin{itemize}
+  \item $\mathcal{F}$：有限的命题变量集合（状态变量）；
+  \item $\mathcal{A}$：有限的动作集合，每个动作 $a \in \mathcal{A}$ 由前置条件 $\mathrm{pre}(a)$、添加效果 $\mathrm{add}(a)$ 和删除效果 $\mathrm{del}(a)$ 描述；
+  \item $I \subseteq \mathcal{F}$：初始状态；
+  \item $G \subseteq \mathcal{F}$：目标条件。
+\end{itemize}
+\end{definition}
+
+\subsection{规划与搜索的关系}
+
+任务规划本质上是一种搜索问题。状态空间构成了一个有向图，其中节点是状态，边是动作。规划的过程就是在这个图中寻找从初始状态到目标状态的路径。
+
+\subsection{PDDL：规划领域定义语言}
+
+PDDL（Planning Domain Definition Language）是规划领域的标准建模语言，由1998年的第一届国际规划竞赛（IPC）引入。PDDL将规划问题分为\textbf{领域描述}（Domain）和\textbf{问题描述}（Problem）两部分。
+
+\begin{example}[积木世界的PDDL描述]
+积木世界（Blocksworld）是经典的规划基准问题。假设有三个积木A、B、C，初始状态为A在桌上、B在A上、C在B上（即C-B-A-桌），目标是将它们排列为A-B-C-桌。
+
+领域文件定义了四个基本动作：拿起（pick-up）、放下（put-down）、堆叠（stack）、卸载（unstack）。问题文件则指定具体的初始状态和目标状态。
+\end{example}
+
+% =============================================
+\section{无信息搜索方法 \ug}
+
+无信息搜索（Uninformed Search）又称盲目搜索，不使用问题的特定知识来引导搜索方向。
+
+\subsection{宽度优先搜索（BFS）}
+
+宽度优先搜索按层次逐层扩展节点，保证找到最短路径（步数最少的规划）。
+
+\begin{algbox}[title={\textbf{BFS基本思想}}]
+\begin{enumerate}
+  \item 将初始状态放入队列；
+  \item 取出队首状态，检查是否满足目标；
+  \item 若不满足，生成所有后继状态并加入队尾；
+  \item 重复直到找到目标或队列为空。
+\end{enumerate}
+\textbf{完备性：}是\quad \textbf{最优性：}是（步数最优）\quad \textbf{时间复杂度：}$O(b^d)$\quad \textbf{空间复杂度：}$O(b^d)$
+\end{algbox}
+
+\subsection{深度优先搜索（DFS）}
+
+深度优先搜索沿一条路径深入到底再回溯，空间效率高但不保证最优性。
+
+\subsection{迭代加深搜索（IDS）}
+
+迭代加深搜索结合了BFS的完备性和DFS的空间效率，是无信息搜索中最实用的方法之一。它以递增的深度限制反复执行深度有限搜索。
+
+\subsection{双向搜索}
+
+双向搜索同时从初始状态和目标状态出发进行搜索，当两个搜索前沿相遇时找到解。理论上可将搜索复杂度从$O(b^d)$降低到$O(b^{d/2})$。
+
+% =============================================
+\section{启发式搜索方法 \ug}
+
+启发式搜索（Heuristic Search）利用问题特定的估价函数引导搜索方向，是现代规划器的核心技术。
+
+\subsection{贪婪最佳优先搜索（GBFS）}
+
+贪婪最佳优先搜索总是扩展启发值$h(n)$最小的节点。速度快但不保证最优性。
+
+\subsection{A*搜索}
+
+\begin{definition}[A*搜索]
+A*搜索使用评价函数 $f(n) = g(n) + h(n)$，其中$g(n)$是从初始状态到$n$的实际代价，$h(n)$是从$n$到目标的启发式估计。当$h(n)$是可接纳的（即不超过实际代价）时，A*保证找到最优解。
+\end{definition}
+
+\begin{keypoint}
+A*搜索的关键性质：
+\begin{itemize}
+  \item \textbf{可接纳性（Admissibility）：}若$h(n) \leq h^*(n)$对所有$n$成立（$h^*$为实际代价），则A*找到最优解。
+  \item \textbf{一致性（Consistency）：}若$h(n) \leq c(n,a,n') + h(n')$，则A*不需要重新打开已关闭的节点。
+  \item 在相同启发函数下，A*扩展的节点数不超过任何其他最优搜索算法。
+\end{itemize}
+\end{keypoint}
+
+\subsection{IDA*搜索}
+
+IDA*（Iterative Deepening A*）将迭代加深与A*结合，使用$f$值作为深度限制的阈值。空间复杂度仅为$O(bd)$，适合内存受限的场景。
+
+\subsection{加权A*搜索 \grad}
+
+加权A*使用$f(n) = g(n) + w \cdot h(n)$（$w > 1$），牺牲最优性换取搜索速度。找到的解的代价不超过最优解的$w$倍。
+
+% =============================================
+\section{规划中的搜索策略}
+
+\subsection{前向搜索（前进状态空间搜索）}
+
+从初始状态出发，通过应用动作逐步向目标推进。大多数现代规划器采用这种方式。
+
+\subsection{后向搜索（回归搜索）}
+
+从目标条件出发，反向寻找能够达成目标的动作序列。在某些问题中效率更高。
+
+\subsection{搜索中的剪枝技术}
+
+\begin{itemize}
+  \item \textbf{重复状态检测：}使用哈希表记录已访问状态，避免重复探索。
+  \item \textbf{有用动作剪枝（Helpful Actions）：}FF规划器引入的技术，只考虑"有用"的动作以减少分支因子。
+  \item \textbf{对称性消除：}识别和排除对称等价的搜索分支。
+\end{itemize}
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item 任务规划的核心是在状态空间中搜索从初始状态到目标状态的动作序列。
+  \item PDDL是规划问题的标准描述语言。
+  \item 无信息搜索提供基本保障，启发式搜索是实用规划器的基础。
+  \item A*搜索在可接纳启发函数下保证最优性。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 用PDDL描述一个简单的物流配送问题。
+  \item 比较BFS和DFS在积木世界问题上的性能差异。
+  \item 证明：若启发函数$h$是一致的，则它也是可接纳的。
+  \item 在一个$4 \times 4$的网格世界中，比较A*和贪婪最佳优先搜索的节点扩展数量。
+\end{enumerate}

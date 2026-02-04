@@ -1,0 +1,146 @@
+% 附录A：算法分类速查表与学习路线图
+\chapter{算法分类速查表与学习路线图}
+
+本附录汇总全书涉及的主要算法，提供分类速查和学习建议。
+
+% =============================================
+\section*{A.1 算法总表}
+
+\begin{longtable}{p{3.5cm}p{4cm}p{1.2cm}p{4.5cm}}
+\toprule
+\textbf{算法类别} & \textbf{代表算法} & \textbf{层次} & \textbf{核心特点} \\
+\midrule
+\endfirsthead
+\toprule
+\textbf{算法类别} & \textbf{代表算法} & \textbf{层次} & \textbf{核心特点} \\
+\midrule
+\endhead
+\bottomrule
+\endfoot
+
+\multicolumn{4}{l}{\textbf{第一篇：经典规划方法}} \\
+\midrule
+无信息搜索 & BFS, DFS, IDS & \textcolor{ugcolor}{本} & 不使用启发信息 \\
+启发式搜索 & A*, IDA*, GBFS & \textcolor{ugcolor}{本} & 启发函数引导搜索 \\
+加权A* & WA* & \textcolor{gradcolor}{研} & 牺牲最优性换速度 \\
+松弛启发式 & $h^{\max}$, $h^{\mathrm{add}}$, $h^{\mathrm{FF}}$ & \textcolor{ugcolor}{本} & 删除松弛估计 \\
+规划图 & GraphPlan & \textcolor{ugcolor}{本} & 互斥分析+解提取 \\
+抽象启发式 & PDB, Merge\&Shrink & \textcolor{gradcolor}{研} & 问题投影和抽象 \\
+地标启发式 & LM-Cut, 地标计数 & \textcolor{gradcolor}{研} & 必经之路分析 \\
+SAT规划 & SATplan, Madagascar & \textcolor{ugcolor}{本} & 转化为SAT求解 \\
+CSP/SMT规划 & CSP编码, SMT规划 & \textcolor{ugcolor}{本}/\textcolor{gradcolor}{研} & 约束满足求解 \\
+HTN规划 & SHOP/SHOP2, PANDA & \textcolor{ugcolor}{本} & 层次任务分解 \\
+偏序规划 & POP & \textcolor{ugcolor}{本} & 最小承诺策略 \\
+时态规划 & TFD, OPTIC & \textcolor{gradcolor}{研} & 处理持续性动作 \\
+MDP/POMDP & 值迭代, PBVI & \textcolor{gradcolor}{研} & 概率不确定性 \\
+FF规划器 & FF (EHC+$h^{\mathrm{FF}}$) & \textcolor{ugcolor}{本} & 松弛启发+爬山 \\
+Fast Downward & FD (SAS$^+$) & \textcolor{ugcolor}{本} & 模块化框架 \\
+LAMA & 地标+多启发式 & \textcolor{ugcolor}{本} & 满足规划冠军 \\
+Scorpion/SymK & 饱和代价/符号搜索 & \textcolor{gradcolor}{研} & 最优规划前沿 \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{第二篇：元启发式与优化方法}} \\
+\midrule
+遗传算法 & GA & \textcolor{ugcolor}{本} & 选择交叉变异 \\
+模拟退火 & SA & \textcolor{ugcolor}{本} & 概率接受+冷却 \\
+差分进化 & DE & \textcolor{gradcolor}{研} & 差异向量驱动 \\
+禁忌搜索 & TS & \textcolor{gradcolor}{研} & 禁忌表+特赦 \\
+粒子群优化 & PSO & \textcolor{gradcolor}{研} & 群体信息共享 \\
+蚁群优化 & ACO, MMAS & \textcolor{gradcolor}{研} & 信息素引导 \\
+新型元启发式 & GWO, WOA, HHO & \textcolor{selfcolor}{拓} & 自然现象启发 \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{第三篇：强化学习与规划}} \\
+\midrule
+Dyna架构 & Dyna-Q & \textcolor{ugcolor}{本} & 学习+规划统一 \\
+蒙特卡洛树搜索 & MCTS, UCT & \textcolor{ugcolor}{本} & 采样+模拟评估 \\
+AlphaGo/Zero & MCTS+深度网络 & \textcolor{gradcolor}{研} & 自我对弈+搜索 \\
+MuZero & 学习的世界模型 & \textcolor{gradcolor}{研} & 隐空间规划 \\
+Dreamer系列 & DreamerV1--V3 & \textcolor{gradcolor}{研} & 想象中的规划 \\
+DQN系列 & DQN, Rainbow & \textcolor{ugcolor}{本} & 深度Q网络 \\
+策略梯度 & REINFORCE, A2C & \textcolor{ugcolor}{本} & 直接优化策略 \\
+PPO & PPO & \textcolor{gradcolor}{研} & 裁剪策略更新 \\
+SAC & SAC & \textcolor{gradcolor}{研} & 最大熵RL \\
+层次RL & Options, HIRO & \textcolor{gradcolor}{研} & 时间抽象 \\
+Decision Transformer & DT & \textcolor{gradcolor}{研} & 序列建模=RL \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{第四篇：深度学习与规划}} \\
+\midrule
+图神经网络规划 & ASNets & \textcolor{gradcolor}{研} & 图结构泛化 \\
+Transformer规划 & Plansformer & \textcolor{gradcolor}{研} & 端到端生成 \\
+扩散模型规划 & Diffuser, Diff.\ Policy & \textcolor{selfcolor}{拓} & 轨迹去噪生成 \\
+神经符号规划 & NLM, NSRT & \textcolor{selfcolor}{拓} & 感知+推理融合 \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{第五篇：大语言模型与规划}} \\
+\midrule
+LLM直接规划 & Zero/Few-shot规划 & \textcolor{gradcolor}{研} & 语言知识驱动 \\
+LLM+规划器 & LLM+P & \textcolor{gradcolor}{研} & 混合求解 \\
+思维链/树/图 & CoT, ToT, GoT & \textcolor{gradcolor}{研} & 结构化推理 \\
+具身LLM规划 & SayCan, Code as Policies & \textcolor{selfcolor}{拓} & 机器人+LLM \\
+语言智能体 & ReAct, Reflexion & \textcolor{gradcolor}{研} & 推理+行动+反思 \\
+多智能体LLM & AutoGen, MetaGPT & \textcolor{selfcolor}{拓} & 角色协作 \\
+自主探索 & Voyager & \textcolor{selfcolor}{拓} & 终身学习 \\
+\midrule
+
+\multicolumn{4}{l}{\textbf{第六篇：多智能体规划}} \\
+\midrule
+MAPF & CBS, ICTS & \textcolor{ugcolor}{本}/\textcolor{gradcolor}{研} & 无冲突路径 \\
+LaCAM & LaCAM/LaCAM* & \textcolor{gradcolor}{研} & 大规模MAPF \\
+博弈论方法 & Nash, Stackelberg & \textcolor{gradcolor}{研} & 利益冲突建模 \\
+MARL & QMIX, MAPPO & \textcolor{gradcolor}{研} & 集中训练分布执行 \\
+分布式规划 & MA-STRIPS & \textcolor{selfcolor}{拓} & 隐私保护协调 \\
+\end{longtable}
+
+% =============================================
+\section*{A.2 推荐学习路线}
+
+\subsection*{本科生核心路线（建议32--48学时）}
+
+\begin{enumerate}
+  \item \textbf{基础（8--12学时）：}第1章（搜索基础）$\rightarrow$ 第2章1--2节（松弛启发式、规划图）
+  \item \textbf{经典算法（8--12学时）：}第3章1--4节（SAT、HTN、POP）$\rightarrow$ 第4章1--3节（FF、FD、LAMA）
+  \item \textbf{优化方法（4--6学时）：}第5章1--2节（GA、SA）
+  \item \textbf{强化学习（8--12学时）：}第6章1--2节（Dyna、MCTS）$\rightarrow$ 第7章1--2节（DQN、策略梯度）
+  \item \textbf{多智能体（4--6学时）：}第11章1节（MAPF、CBS）
+\end{enumerate}
+
+\subsection*{研究生扩展路线（在本科基础上增加16--32学时）}
+
+\begin{enumerate}
+  \item \textbf{高级启发式（4--6学时）：}第2章3--4节（PDB、LM-Cut）
+  \item \textbf{时态与不确定性（4--6学时）：}第3章5--6节
+  \item \textbf{高级RL（4--8学时）：}第6章3--4节（AlphaZero、Dreamer）$\rightarrow$ 第7章3--4节（层次RL、DT）
+  \item \textbf{深度学习规划（4--6学时）：}第8章1--2节（GNN、Transformer）
+  \item \textbf{LLM规划（4--8学时）：}第9章1--3节 $\rightarrow$ 第10章1--2节
+  \item \textbf{多智能体进阶（4--6学时）：}第11章2--3节（博弈论、MARL）
+\end{enumerate}
+
+\subsection*{自学拓展专题}
+
+以下内容适合感兴趣的读者根据研究方向选择阅读：
+\begin{itemize}
+  \item 扩散模型与规划（第8章3节）
+  \item 神经符号规划（第8章4节）
+  \item 具身智能LLM规划（第9章4节）
+  \item 语言智能体前沿（第10章3--4节）
+  \item 分布式规划（第11章4节）
+  \item 新型元启发式综述（第5章4节）
+\end{itemize}
+
+% =============================================
+\section*{A.3 算法演化脉络图}
+
+任务规划算法的发展可以概括为以下几条主线：
+
+\begin{enumerate}
+  \item \textbf{符号推理主线：}STRIPS $\rightarrow$ GraphPlan $\rightarrow$ SAT规划 $\rightarrow$ 启发式搜索（FF/FD） $\rightarrow$ 地标/抽象启发式
+  \item \textbf{层次分解主线：}HTN $\rightarrow$ SHOP/SHOP2 $\rightarrow$ PANDA $\rightarrow$ 时态HTN
+  \item \textbf{优化求解主线：}SA/GA $\rightarrow$ PSO/ACO $\rightarrow$ 混合元启发式
+  \item \textbf{学习规划主线：}Dyna $\rightarrow$ DQN $\rightarrow$ AlphaGo/MuZero $\rightarrow$ Dreamer $\rightarrow$ Decision Transformer
+  \item \textbf{深度生成主线：}VAE/GAN $\rightarrow$ Transformer $\rightarrow$ 扩散模型 $\rightarrow$ 轨迹生成规划
+  \item \textbf{语言智能主线：}GPT $\rightarrow$ CoT/ToT $\rightarrow$ ReAct/Reflexion $\rightarrow$ Voyager $\rightarrow$ 多智能体LLM
+\end{enumerate}
+
+这些主线并非孤立发展，而是在不断交叉融合。例如，MuZero结合了学习和搜索，LLM+P结合了语言模型和符号规划，ASNets结合了深度学习和经典规划。未来的发展趋势是各主线的进一步融合，形成更强大的统一规划框架。

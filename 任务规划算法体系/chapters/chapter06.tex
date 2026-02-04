@@ -1,0 +1,154 @@
+% 第6章：基于模型的强化学习与规划
+\chapter{基于模型的强化学习与规划}
+
+\begin{levelbox}
+强化学习与规划的结合是当前AI的前沿方向。MDP/动态规划和蒙特卡洛树搜索（6.1--6.2节）为本科生核心内容，世界模型和AlphaGo/MuZero（6.3--6.4节）为研究生内容。
+\end{levelbox}
+
+% =============================================
+\section{从MDP到强化学习规划 \ug}
+
+\subsection{动态规划方法回顾}
+
+在已知MDP模型的前提下，经典动态规划方法可以求解最优策略：
+
+\textbf{值迭代（Value Iteration）：}
+$$V_{k+1}(s) = \max_a \left[ R(s,a) + \gamma \sum_{s'} T(s'|s,a) V_k(s') \right]$$
+
+\textbf{策略迭代（Policy Iteration）：}交替进行策略评估（计算$V^\pi$）和策略改进（贪心更新$\pi$）。
+
+\subsection{Dyna架构 \ug}
+
+Dyna（Sutton, 1991）是将学习与规划统一起来的开创性框架：
+
+\begin{algbox}[title={\textbf{Dyna-Q核心思想}}]
+\begin{enumerate}
+  \item \textbf{与环境交互：}执行动作，获得真实经验$(s, a, r, s')$；
+  \item \textbf{模型学习：}用真实经验更新环境模型$\hat{T}$和$\hat{R}$；
+  \item \textbf{直接强化学习：}用真实经验更新$Q$值；
+  \item \textbf{规划（模拟）：}从模型中采样$k$条模拟经验，用于额外的$Q$值更新。
+\end{enumerate}
+每次真实交互后进行$k$步规划，大幅提升样本效率。
+\end{algbox}
+
+% =============================================
+\section{蒙特卡洛树搜索（MCTS） \ug}
+
+\subsection{MCTS基本框架}
+
+MCTS是一种基于采样的搜索方法，通过反复模拟来估计动作的价值。
+
+\begin{algbox}[title={\textbf{MCTS四个阶段}}]
+\begin{enumerate}
+  \item \textbf{选择（Selection）：}从根节点出发，按照树策略（如UCT）选择子节点直到达到叶节点；
+  \item \textbf{扩展（Expansion）：}在叶节点添加一个或多个新子节点；
+  \item \textbf{模拟（Simulation）：}从新节点出发，使用默认策略（通常随机）进行快速模拟直到终态；
+  \item \textbf{回溯（Backpropagation）：}将模拟结果沿路径回传更新所有祖先节点的统计信息。
+\end{enumerate}
+\end{algbox}
+
+\subsection{UCT算法}
+
+UCT（Upper Confidence Bounds for Trees）使用UCB1公式平衡探索与利用：
+$$\mathrm{UCT}(s, a) = \bar{Q}(s, a) + c \sqrt{\frac{\ln N(s)}{N(s, a)}}$$
+其中$\bar{Q}(s,a)$是动作$a$的平均回报，$N(s)$是状态$s$的访问次数，$N(s,a)$是动作$a$被选择的次数，$c$是探索常数。
+
+\begin{appbox}[title={\textbf{应用：博弈规划}}]
+MCTS在博弈中的应用最为经典。在围棋、国际象棋等游戏中，MCTS通过大量模拟评估每步棋的长期价值。MCTS的``随时''（Anytime）特性使其在限时决策中特别有用：可以随时返回当前最佳动作，给予更多时间则给出更好的结果。
+\end{appbox}
+
+% =============================================
+\section{AlphaGo系列 \grad}
+
+\subsection{AlphaGo（2016）}
+
+AlphaGo首次击败围棋世界冠军，结合了四个关键组件：
+\begin{enumerate}
+  \item 基于人类棋谱训练的策略网络$p_\sigma$（监督学习）
+  \item 通过自我对弈强化学习改进的策略网络$p_\rho$
+  \item 预测游戏胜负的价值网络$v_\theta$
+  \item 将神经网络与MCTS结合的搜索过程
+\end{enumerate}
+
+\subsection{AlphaGo Zero与AlphaZero（2017）}
+
+\begin{keypoint}
+AlphaGo Zero的突破：
+\begin{itemize}
+  \item \textbf{无需人类知识：}完全从随机开始自我对弈训练
+  \item \textbf{统一的网络：}单一神经网络同时输出策略$\mathbf{p}$和价值$v$
+  \item \textbf{简化的MCTS：}不使用快速走棋模拟，直接用价值网络评估叶节点
+  \item \textbf{训练循环：}MCTS产生训练数据 $\rightarrow$ 训练网络 $\rightarrow$ 新网络指导MCTS
+\end{itemize}
+AlphaZero进一步推广到国际象棋和日本将棋，证明了方法的通用性。
+\end{keypoint}
+
+% =============================================
+\section{世界模型与规划 \grad}
+
+\subsection{MuZero（2020）}
+
+MuZero是AlphaZero的重要推广，不需要已知的环境规则：
+
+\begin{algbox}[title={\textbf{MuZero的三个学习函数}}]
+\begin{enumerate}
+  \item \textbf{表示函数$h$：}将观测映射到隐状态 $s^0 = h(o_1, \ldots, o_t)$
+  \item \textbf{动力学函数$g$：}预测下一个隐状态和即时奖励 $(r^k, s^k) = g(s^{k-1}, a^k)$
+  \item \textbf{预测函数$f$：}从隐状态预测策略和价值 $(\mathbf{p}^k, v^k) = f(s^k)$
+\end{enumerate}
+MuZero在隐状态空间中进行MCTS规划，无需学习完整的状态转移模型，只需学习对规划有用的信息。
+\end{algbox}
+
+\subsection{Dreamer系列 \grad}
+
+Dreamer学习环境的世界模型，然后``在想象中''（in imagination）进行规划：
+
+\begin{itemize}
+  \item \textbf{DreamerV1（2020）：}使用循环状态空间模型（RSSM）学习世界模型，在潜在空间中用价值函数评估想象轨迹。
+  \item \textbf{DreamerV2（2021）：}改用离散表示，在Atari游戏上首次超越无模型方法。
+  \item \textbf{DreamerV3（2023）：}通过符号化分布（Symlog）预测和自适应调整机制，无需调参即可在多种任务上工作，包括Minecraft钻石挖掘。
+\end{itemize}
+
+\begin{keypoint}
+世界模型规划的核心优势：
+\begin{itemize}
+  \item \textbf{样本效率：}通过模型生成大量模拟经验，减少与真实环境的交互次数。
+  \item \textbf{可迁移性：}学到的世界模型可用于不同任务。
+  \item \textbf{安全性：}可以在模型中``试错''而不影响真实环境。
+\end{itemize}
+核心挑战：模型误差的累积（Compounding Error）可能导致规划在长时间尺度上不可靠。
+\end{keypoint}
+
+% =============================================
+\section{其他基于模型的RL规划方法 \self}
+
+\subsection{MBPO（Model-Based Policy Optimization）}
+
+使用短期模型rollout来扩充真实数据，通过控制rollout长度平衡模型精度和数据量。
+
+\subsection{PlaNet（Planning Network）}
+
+完全在隐状态空间中规划，使用CEM（交叉熵方法）进行在线规划。不训练策略网络，纯粹依赖规划。
+
+\subsection{TD-MPC系列}
+
+结合时序差分学习和模型预测控制（MPC），在连续控制任务中表现出色。TD-MPC2在多领域80+任务上展示了统一的单一世界模型。
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item Dyna架构统一了学习和规划，是基于模型RL的基础范式。
+  \item MCTS通过采样和模拟评估动作价值，UCT公式平衡探索与利用。
+  \item AlphaGo/AlphaZero/MuZero展示了MCTS+深度学习的强大能力。
+  \item 世界模型（Dreamer系列）通过``在想象中规划''实现高样本效率。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 实现Dyna-Q算法并在简单迷宫问题上测试不同规划步数$k$的影响。
+  \item 用MCTS求解一个简单的棋类游戏（如井字棋），比较不同模拟次数对决策质量的影响。
+  \item （研究生）分析MuZero为什么不需要学习完整的状态重建。
+  \item （研究生）讨论世界模型误差累积的原因及缓解策略。
+\end{enumerate}

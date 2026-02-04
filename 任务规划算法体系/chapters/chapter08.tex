@@ -1,0 +1,150 @@
+% 第8章：深度学习驱动的规划
+\chapter{深度学习驱动的规划}
+
+\begin{levelbox}
+本章介绍深度学习在规划中的前沿应用。GNN规划（8.1节）和Transformer规划（8.2节）为研究生内容，扩散模型规划（8.3节）和神经符号规划（8.4节）为自学拓展。
+\end{levelbox}
+
+% =============================================
+\section{图神经网络与规划 \grad}
+
+\subsection{规划问题的图表示}
+
+规划问题天然具有图结构：动作通过前置条件和效果与状态变量（命题）相连。将规划问题表示为图后，可以利用GNN来学习和泛化。
+
+\subsection{ASNets（Action Schema Networks）}
+
+ASNets是将GNN应用于规划的代表性工作：
+
+\begin{algbox}[title={\textbf{ASNets核心思想}}]
+\begin{enumerate}
+  \item 将规划问题表示为二部图：动作节点和命题节点交替连接
+  \item 使用消息传递网络在图上传播信息
+  \item 网络参数在相同``类型''的动作/命题间共享（利用动作模式的对称性）
+  \item 输出每个动作的执行概率（策略）或状态评估值（启发式）
+\end{enumerate}
+\textbf{泛化能力：}在小规模问题上训练，可以泛化到大规模同类问题。
+\end{algbox}
+
+\subsection{STRIPS-HGN（Hypergraph Networks）}
+
+使用超图网络表示STRIPS问题，其中每个动作作为超边连接其前置条件和效果。超图结构更准确地捕获了动作与命题之间的多元关系。
+
+% =============================================
+\section{Transformer与规划 \grad}
+
+\subsection{学习启发式函数}
+
+使用Transformer从规划实例中学习启发式函数：
+\begin{itemize}
+  \item 将PDDL描述序列化为token序列
+  \item Transformer编码器提取特征
+  \item 输出层预测$h$值
+  \item 可以在多个领域上联合训练，学习跨领域的规划知识
+\end{itemize}
+
+\subsection{Plansformer}
+
+Plansformer直接使用Transformer端到端地生成规划：
+\begin{enumerate}
+  \item 输入：PDDL问题描述（序列化）
+  \item 输出：动作序列
+  \item 训练数据：由传统规划器生成的问题-规划对
+\end{enumerate}
+
+\subsection{基于注意力的搜索引导}
+
+利用Transformer的注意力机制学习哪些状态特征在搜索中最重要，动态调整搜索策略。
+
+% =============================================
+\section{扩散模型与规划 \self}
+
+\subsection{Diffuser}
+
+Diffuser（Janner et al., 2022）将规划问题建模为轨迹去噪过程：
+
+\begin{keypoint}
+Diffuser核心思想：
+\begin{enumerate}
+  \item 将完整轨迹$\tau = (s_0, a_0, s_1, a_1, \ldots, s_T)$视为需要生成的对象
+  \item 前向过程：逐步向轨迹添加噪声
+  \item 反向过程：从纯噪声出发逐步去噪生成轨迹
+  \item 条件生成：通过classifier-guided或classifier-free方式加入目标条件和约束
+\end{enumerate}
+\textbf{优势：}自然支持长期规划、多模态规划分布、灵活的约束引入。
+\end{keypoint}
+
+\subsection{Diffusion Policy}
+
+Diffusion Policy将扩散模型用于机器人操作策略学习：
+\begin{itemize}
+  \item 以观测（图像、机器人状态）为条件，生成动作序列
+  \item 相比其他生成模型，扩散模型更好地表达多模态动作分布
+  \item 在多个机器人操作基准任务上取得了最佳效果
+\end{itemize}
+
+\subsection{扩散规划的优势与局限}
+
+\textbf{优势：}
+\begin{itemize}
+  \item 天然支持多模态规划（同一情境下的多种可行方案）
+  \item 通过引导（guidance）灵活加入各类约束和偏好
+  \item 全局规划：同时生成整条轨迹，避免局部贪心
+\end{itemize}
+
+\textbf{局限：}
+\begin{itemize}
+  \item 推理速度较慢（需要多步去噪）
+  \item 对训练数据的覆盖要求较高
+  \item 理论分析尚不完善
+\end{itemize}
+
+% =============================================
+\section{神经符号规划 \self}
+
+\subsection{概述}
+
+神经符号规划试图结合神经网络的感知学习能力和符号规划的推理保证：
+
+\begin{itemize}
+  \item \textbf{神经感知 + 符号规划：}用神经网络从原始输入（图像、传感器数据）提取符号表示，再用传统规划器求解。
+  \item \textbf{可微规划：}将规划器嵌入可微分的计算图中，支持端到端训练。
+  \item \textbf{神经PDDL：}自动从交互数据中学习PDDL领域模型。
+\end{itemize}
+
+\subsection{NLM（Neural Logic Machines）}
+
+NLM使用张量化的逻辑运算实现可微分的逻辑推理：
+\begin{itemize}
+  \item 用矩阵表示谓词的真值
+  \item 用可学习的卷积操作模拟逻辑规则
+  \item 可以学习积木世界等领域的规划规则
+\end{itemize}
+
+\subsection{NSRT（Neuro-Symbolic Relational Transition models）}
+
+NSRT学习可泛化的关系型状态转移模型：
+\begin{itemize}
+  \item 自动发现操作符（类似PDDL动作）
+  \item 每个操作符关联一个采样器（用于生成连续参数）
+  \item 支持Task and Motion Planning（TAMP）
+\end{itemize}
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item GNN利用规划问题的图结构，实现跨问题规模的泛化。
+  \item Transformer可以直接生成规划或学习启发式函数。
+  \item 扩散模型将规划重新定义为轨迹生成问题，支持多模态和条件规划。
+  \item 神经符号方法试图兼得神经网络的灵活性和符号推理的可靠性。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item （研究生）分析GNN在规划中的泛化能力：为什么ASNets可以在更大规模问题上工作？
+  \item （研究生）比较Diffuser和传统轨迹优化方法的优缺点。
+  \item （研究生）讨论端到端神经规划和传统规划器在可靠性方面的差异。
+  \item 思考：神经符号规划是否能真正结合两种范式的优点？存在哪些根本性挑战？
+\end{enumerate}

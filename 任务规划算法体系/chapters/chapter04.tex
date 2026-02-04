@@ -1,0 +1,126 @@
+% 第4章：现代经典规划器
+\chapter{现代经典规划器 \ug}
+
+\begin{levelbox}
+本章介绍在国际规划竞赛（IPC）中表现优异的代表性规划器。掌握这些系统有助于理解规划算法的实际工程实现。本科生重点掌握FF和Fast Downward的基本原理，研究生应深入了解其优化技术。
+\end{levelbox}
+
+% =============================================
+\section{FF规划器 \ug}
+
+\subsection{FF的搜索框架}
+
+FF（Fast-Forward）是Jörg Hoffmann于2001年开发的规划器，在IPC-2000竞赛中获得冠军。其核心技术包括：
+
+\begin{enumerate}
+  \item \textbf{$h^{\mathrm{FF}}$启发式：}通过求解删除松弛问题获得启发值（见第2章）；
+  \item \textbf{有用动作（Helpful Actions）：}从松弛规划中提取``有用''的动作，优先搜索；
+  \item \textbf{增强爬山搜索（Enforced Hill-Climbing, EHC）：}结合爬山和宽度优先搜索，在启发值改善时前进，陷入局部最优时用BFS逃脱。
+\end{enumerate}
+
+\begin{algbox}[title={\textbf{FF的搜索策略}}]
+FF使用两级搜索框架：
+\begin{enumerate}
+  \item 首先尝试EHC：从当前状态出发，只保留使$h^{\mathrm{FF}}$严格降低的后继（限于有用动作），若无改善则用BFS寻找改善。
+  \item 若EHC失败（无法找到降低$h$值的状态），切换到标准的GBFS搜索（使用完整动作集）。
+\end{enumerate}
+\end{algbox}
+
+\subsection{FF的影响}
+
+FF的设计思想深刻影响了后续规划器的开发：
+\begin{itemize}
+  \item 有用动作剪枝被广泛采用；
+  \item $h^{\mathrm{FF}}$启发式成为基准参考；
+  \item EHC搜索框架被多个后续系统继承。
+\end{itemize}
+
+% =============================================
+\section{Fast Downward \ug}
+
+\subsection{系统架构}
+
+Fast Downward由Malte Helmert于2006年开发，是当前最具影响力的规划系统。其独特的三阶段架构：
+
+\begin{enumerate}
+  \item \textbf{翻译（Translation）：}将PDDL输入转换为紧凑的多值变量表示（SAS$^+$）；
+  \item \textbf{知识编译（Knowledge Compilation）：}计算因果图、领域转换图等数据结构；
+  \item \textbf{搜索（Search）：}使用各种启发式和搜索算法求解。
+\end{enumerate}
+
+\subsection{SAS$^+$表示}
+
+与PDDL的命题表示不同，SAS$^+$使用有限域变量：每个变量$v$的取值域$D_v$可以有多个值。这种表示更紧凑，并能揭示问题的结构信息。
+
+\subsection{Fast Downward的搜索组件}
+
+Fast Downward支持丰富的搜索配置：
+\begin{itemize}
+  \item 搜索算法：A*、GBFS、加权A*、lazy GBFS等
+  \item 启发函数：$h^{\mathrm{FF}}$、$h^{\mathrm{add}}$、因果图、LM-Cut、PDB、合并与收缩等
+  \item 搜索增强：有用动作剪枝、preferred operators、多启发式open list
+\end{itemize}
+
+% =============================================
+\section{LAMA规划器 \ug}
+
+LAMA（Landmarks, Actions, and Multipath-search with $h^{\mathrm{add}}$）在IPC-2008和IPC-2011竞赛中获得冠军。
+
+\subsection{LAMA的核心技术}
+\begin{enumerate}
+  \item \textbf{地标发现与利用：}自动发现规划地标，使用地标计数启发式；
+  \item \textbf{多启发式搜索：}同时使用地标启发式和$h^{\mathrm{FF}}$，维护多个open list交替扩展；
+  \item \textbf{迭代搜索：}找到第一个解后，用其代价作为上界继续搜索更优解。
+\end{enumerate}
+
+% =============================================
+\section{Scorpion与其他现代规划器 \grad}
+
+\subsection{Scorpion}
+
+Scorpion基于饱和代价分区（Saturated Cost Partitioning），将多个抽象启发式的代价分配进行优化组合，在最优规划中取得了领先效果。
+
+\subsection{Complementary系列}
+
+基于互补启发式思想，使用在线选择机制动态决定每个搜索状态使用哪个启发函数。
+
+\subsection{SymK}
+
+SymK使用符号搜索（基于BDD——二叉决策图），可以紧凑表示和操作大规模状态集合。特别适合求解$K$个最优/准最优规划。
+
+% =============================================
+\section{国际规划竞赛（IPC）简介 \self}
+
+\subsection{IPC的历史与赛道}
+
+国际规划竞赛（International Planning Competition）始于1998年，每2--3年举办一次，推动了规划技术的持续进步。主要赛道包括：
+\begin{itemize}
+  \item \textbf{经典赛道（Classical Track）：}确定性、完全可观测的STRIPS/ADL规划
+  \item \textbf{最优赛道（Optimal Track）：}要求找到代价最优的规划
+  \item \textbf{满足赛道（Satisficing Track）：}只需找到合法规划，不要求最优
+  \item \textbf{敏捷赛道（Agile Track）：}比拼求解速度
+  \item \textbf{学习赛道（Learning Track）：}允许对训练问题进行离线学习
+\end{itemize}
+
+\subsection{IPC基准域}
+
+IPC积累了丰富的基准规划域，包括：积木世界、物流、运输、卫星、电梯、供应链、网络安全等，是评估规划算法的标准测试集。
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item FF开创了基于松弛启发式和有用动作剪枝的高效满足规划范式。
+  \item Fast Downward的模块化架构使其成为规划研究的标准平台。
+  \item LAMA通过多启发式和地标技术在满足规划中取得突破。
+  \item 现代最优规划器（Scorpion、SymK）利用抽象和符号方法求解更大规模问题。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 安装Fast Downward，用它求解一个简单的物流规划问题。
+  \item 比较FF的EHC搜索和标准GBFS在同一问题上的节点扩展数。
+  \item 解释LAMA为什么在满足规划竞赛中表现优于最优规划器。
+  \item （研究生）阅读最近一届IPC的竞赛报告，分析获胜系统的关键技术。
+\end{enumerate}

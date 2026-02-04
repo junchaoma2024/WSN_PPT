@@ -1,0 +1,159 @@
+% 第2章：启发式函数设计
+\chapter{启发式函数设计 \ug}
+
+\begin{levelbox}
+启发式函数是现代规划器的核心组件。本章1--3节为本科生核心内容，第4--5节适合研究生深入学习。
+\end{levelbox}
+
+% =============================================
+\section{松弛启发式 \ug}
+
+\subsection{删除松弛（Delete Relaxation）}
+
+删除松弛是规划中最重要的问题简化技术。其核心思想是：忽略所有动作的删除效果，使得一旦某个命题变为真就永远保持为真。
+
+\begin{definition}[删除松弛问题]
+给定规划问题 $\Pi = \langle \mathcal{F}, \mathcal{A}, I, G \rangle$，其删除松弛问题 $\Pi^+ = \langle \mathcal{F}, \mathcal{A}^+, I, G \rangle$，其中每个动作 $a^+ \in \mathcal{A}^+$ 的删除效果为空：$\mathrm{del}(a^+) = \emptyset$。
+\end{definition}
+
+\subsection{$h^{\max}$启发式}
+
+$h^{\max}$估计达成目标中最难实现的单个子目标的代价：
+$$h^{\max}(s) = \max_{g \in G} h^{\max}_1(s, g)$$
+其中$h^{\max}_1(s, g)$递归地计算从状态$s$达成单个事实$g$的最小代价。
+
+$h^{\max}$是可接纳的，但由于忽略了子目标之间的交互，通常过于乐观。
+
+\subsection{$h^{\mathrm{add}}$启发式}
+
+$h^{\mathrm{add}}$假设子目标之间完全独立，将所有子目标的代价相加：
+$$h^{\mathrm{add}}(s) = \sum_{g \in G} h^{\mathrm{add}}_1(s, g)$$
+
+$h^{\mathrm{add}}$通常比$h^{\max}$提供更好的搜索引导，但不是可接纳的（可能高估真实代价）。
+
+\subsection{$h^{\mathrm{FF}}$启发式}
+
+FF启发式（FastForward启发式）通过实际求解删除松弛问题来估计代价。其计算过程分两步：
+\begin{enumerate}
+  \item \textbf{前向传播：}在松弛规划图中逐层计算可达事实；
+  \item \textbf{后向提取：}从目标出发反向提取松弛规划，其长度即为$h^{\mathrm{FF}}$值。
+\end{enumerate}
+
+$h^{\mathrm{FF}}$是FF规划器的核心，在实践中表现极为优秀。它既不是可接纳的也不是不可接纳的，但提供了极好的搜索引导。
+
+\begin{appbox}[title={\textbf{应用：交通信号规划}}]
+在城市交通信号控制中，可以将每个路口的信号状态建模为规划变量。$h^{\mathrm{FF}}$启发式可以高效地估计从当前信号配置到目标通行状态的调整步骤数，帮助快速求解大规模交通信号优化问题。
+\end{appbox}
+
+% =============================================
+\section{规划图启发式 \ug}
+
+\subsection{规划图（Planning Graph）}
+
+规划图由Blum和Furst在1995年提出，是GraphPlan算法的核心数据结构。
+
+\begin{definition}[规划图]
+规划图是一个分层的有向图，交替包含：
+\begin{itemize}
+  \item \textbf{事实层（Fact Layer）：}包含在该层可能为真的命题；
+  \item \textbf{动作层（Action Layer）：}包含前置条件在前一事实层中满足的动作。
+\end{itemize}
+每层还维护\textbf{互斥关系（Mutex）}，标记不能同时成立的事实或不能同时执行的动作。
+\end{definition}
+
+\subsection{GraphPlan算法}
+
+GraphPlan交替进行两个阶段：
+\begin{enumerate}
+  \item \textbf{图扩展：}逐层构建规划图，直到所有目标事实出现在同一层且互不互斥；
+  \item \textbf{解提取：}在规划图中后向搜索无互斥的动作集合。
+\end{enumerate}
+
+\subsection{$h^{\mathrm{level}}$启发式}
+
+基于规划图的启发式函数，取目标事实全部首次出现且互不互斥的最早层号作为启发值。
+
+% =============================================
+\section{抽象启发式 \grad}
+
+\subsection{模式数据库（Pattern Databases, PDB）}
+
+\begin{definition}[模式数据库]
+选取状态变量的一个子集（模式），将规划问题投影到该子集上形成更小的抽象问题。预先计算抽象问题中每个抽象状态到目标的精确距离，存储为查找表。
+\end{definition}
+
+PDB的关键挑战在于模式选择——如何选择"好"的变量子集使得启发值尽可能准确。
+
+\subsection{合并与收缩（Merge-and-Shrink）}
+
+合并与收缩是一种系统性构造抽象的方法：
+\begin{enumerate}
+  \item 从单个变量的转换系统出发；
+  \item 迭代地合并（Merge）两个抽象系统并收缩（Shrink）以控制大小。
+\end{enumerate}
+
+\begin{keypoint}
+合并与收缩产生的启发式是可接纳的和一致的，且在PDB启发式和$h^{\max}$之间建立了统一的理论框架。
+\end{keypoint}
+
+% =============================================
+\section{地标启发式 \grad}
+
+\subsection{地标（Landmarks）}
+
+\begin{definition}[规划地标]
+一个事实$l$是规划问题的地标，当且仅当在每个合法规划中，$l$至少在某个时刻为真。类似地，一个动作$a$是地标，当且仅当$a$出现在每个合法规划中。
+\end{definition}
+
+地标刻画了规划过程中的``必经之路''，提供了丰富的结构信息。
+
+\subsection{LM-Cut启发式}
+
+LM-Cut是一种基于地标的可接纳启发式，通过迭代地寻找代价最小割来计算启发值。它是目前最强的可接纳启发式之一。
+
+\begin{algbox}[title={\textbf{LM-Cut核心思想}}]
+\begin{enumerate}
+  \item 计算$h^{\max}$代价，找到从初始状态到目标的最大代价路径上的一个``割''（cut）；
+  \item 该割中动作的最小代价即为本轮启发值的贡献；
+  \item 将割中动作的代价减去该最小值；
+  \item 重复直到$h^{\max} = 0$，各轮贡献之和即为LM-Cut启发值。
+\end{enumerate}
+\end{algbox}
+
+\subsection{地标计数启发式}
+
+通过统计尚未实现的地标数量来估计剩余代价。虽然不是可接纳的，但计算简单且效果不错。
+
+% =============================================
+\section{其他启发式方法 \self}
+
+\subsection{因果图启发式（Causal Graph Heuristic）}
+
+利用变量之间的因果关系图，将多变量规划问题分解为一系列单变量问题逐个求解。
+
+\subsection{势函数启发式（Potential Heuristics）}
+
+将启发函数建模为状态变量取值的线性函数$h(s) = \sum_v w_{v,s(v)}$，通过线性规划优化权重$w$使得启发函数可接纳且尽可能精确。
+
+\subsection{红黑规划启发式}
+
+将变量分为``红色''（忽略删除效果）和``黑色''（完整处理），在两者之间取得平衡。
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item 删除松弛是规划领域最成功的启发式构造技术，衍生出$h^{\max}$、$h^{\mathrm{add}}$、$h^{\mathrm{FF}}$等重要启发式。
+  \item 规划图提供了另一种启发式信息来源。
+  \item 抽象启发式（PDB、合并与收缩）和地标启发式（LM-Cut）是最优规划的关键技术。
+  \item 启发式设计的核心权衡：信息量 vs.\ 计算代价。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 对一个给定的规划问题，手动计算$h^{\max}$和$h^{\mathrm{add}}$值并比较。
+  \item 构建一个简单问题的规划图并识别互斥关系。
+  \item （研究生）证明LM-Cut启发式的可接纳性。
+  \item （研究生）设计实验比较不同启发式在IPC基准问题上的求解能力。
+\end{enumerate}

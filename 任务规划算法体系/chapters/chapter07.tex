@@ -1,0 +1,148 @@
+% 第7章：无模型强化学习与规划
+\chapter{无模型强化学习与规划}
+
+\begin{levelbox}
+本章介绍不依赖环境模型的强化学习方法及其在规划中的应用。Q-learning和策略梯度（7.1--7.2节）为本科生基础，层次强化学习（7.3节）和序列决策Transformer（7.4节）为研究生内容。
+\end{levelbox}
+
+% =============================================
+\section{值函数方法 \ug}
+
+\subsection{Q-Learning}
+
+Q-Learning是最基本的无模型强化学习算法，通过直接学习动作价值函数$Q(s,a)$来获得最优策略：
+$$Q(s,a) \leftarrow Q(s,a) + \alpha \left[ r + \gamma \max_{a'} Q(s', a') - Q(s,a) \right]$$
+
+\subsection{DQN（Deep Q-Network） \ug}
+
+DQN用深度神经网络近似$Q$函数，引入两个关键技术：
+\begin{itemize}
+  \item \textbf{经验回放（Experience Replay）：}将交互经验存储在缓冲区中，随机采样打破样本相关性。
+  \item \textbf{目标网络（Target Network）：}使用定期更新的副本网络计算目标值，稳定训练过程。
+\end{itemize}
+
+\textbf{DQN的改进版本：}
+\begin{itemize}
+  \item \textbf{Double DQN：}解耦动作选择和价值评估，减少过高估计。
+  \item \textbf{Dueling DQN：}分别估计状态价值$V(s)$和优势函数$A(s,a)$。
+  \item \textbf{Prioritized Experience Replay：}优先采样TD误差大的经验。
+  \item \textbf{Rainbow：}整合多种DQN改进技术。
+\end{itemize}
+
+% =============================================
+\section{策略梯度方法 \ug}
+
+\subsection{REINFORCE}
+
+直接参数化策略$\pi_\theta(a|s)$，通过梯度上升最大化期望回报：
+$$\nabla_\theta J(\theta) = \mathbb{E}_{\pi_\theta}\left[ \nabla_\theta \log \pi_\theta(a|s) \cdot G_t \right]$$
+
+\subsection{Actor-Critic方法 \ug}
+
+结合值函数和策略梯度：
+\begin{itemize}
+  \item \textbf{Actor（策略网络）：}决定采取什么动作
+  \item \textbf{Critic（价值网络）：}评估动作的好坏，减小梯度估计的方差
+\end{itemize}
+
+\subsection{PPO（Proximal Policy Optimization） \grad}
+
+PPO通过裁剪目标函数限制策略更新幅度：
+$$L^{\mathrm{CLIP}}(\theta) = \mathbb{E}\left[\min\left(r_t(\theta)\hat{A}_t,\ \mathrm{clip}(r_t(\theta), 1-\epsilon, 1+\epsilon)\hat{A}_t\right)\right]$$
+其中$r_t(\theta) = \pi_\theta(a_t|s_t)/\pi_{\theta_{\mathrm{old}}}(a_t|s_t)$。
+
+PPO因其实现简单、效果稳定而成为最广泛使用的RL算法之一。
+
+\subsection{SAC（Soft Actor-Critic） \grad}
+
+SAC在最大化回报的同时最大化策略的熵，鼓励探索：
+$$J(\pi) = \sum_t \mathbb{E}\left[ r(s_t, a_t) + \alpha \mathcal{H}(\pi(\cdot|s_t)) \right]$$
+
+SAC在连续动作空间中的机器人控制任务中表现优异。
+
+% =============================================
+\section{层次强化学习 \grad}
+
+\subsection{Options框架}
+
+Options框架为RL引入了时间抽象，将原始动作扩展为``选项''（Option）：
+
+\begin{definition}[Option]
+一个选项$\omega = \langle I_\omega, \pi_\omega, \beta_\omega \rangle$包含：
+\begin{itemize}
+  \item $I_\omega \subseteq S$：启动集合（在哪些状态可以发起该选项）
+  \item $\pi_\omega$：内部策略（选项执行期间的动作选择）
+  \item $\beta_\omega: S \rightarrow [0,1]$：终止条件（在每个状态终止的概率）
+\end{itemize}
+\end{definition}
+
+\subsection{HIRO（Hierarchical RL with Off-policy correction）}
+
+HIRO使用目标条件层次结构：
+\begin{itemize}
+  \item 高层策略：设定子目标（goal）
+  \item 低层策略：学习达成子目标的动作序列
+  \item 通过离策略校正（off-policy correction）提升样本效率
+\end{itemize}
+
+\subsection{HAM和MaxQ}
+
+\begin{itemize}
+  \item \textbf{HAM（Hierarchy of Abstract Machines）：}使用有限状态机层次结构约束策略空间。
+  \item \textbf{MaxQ：}将值函数分解为任务层次中各子任务的贡献之和，支持递归学习。
+\end{itemize}
+
+\begin{appbox}[title={\textbf{应用：军事任务分配中的层次决策}}]
+军事作战中的任务分配天然具有层次结构。层次RL可以建模为：
+\begin{itemize}
+  \item 高层（指挥层）：分配战术目标给各作战单元
+  \item 中层（协调层）：协调单元间的协同行动
+  \item 低层（执行层）：控制具体的机动和打击动作
+\end{itemize}
+Options框架可以将``占领阵地''等复杂行动建模为时间扩展的选项。
+\end{appbox}
+
+% =============================================
+\section{序列决策与Transformer \grad}
+
+\subsection{Decision Transformer}
+
+Decision Transformer将RL问题重新框定为序列建模问题：
+
+\begin{keypoint}
+核心思想：将RL轨迹视为序列 $(R_1, s_1, a_1, R_2, s_2, a_2, \ldots)$，其中$R_t$为``期望回报''（Return-to-Go）。使用GPT架构的Transformer建模该序列，推理时指定高$R_t$即可生成高质量的动作序列。
+
+\textbf{优势：}
+\begin{itemize}
+  \item 无需值函数估计和时序差分学习
+  \item 天然支持离线RL（从已有数据学习）
+  \item 可以通过调节$R_t$控制行为质量
+\end{itemize}
+\end{keypoint}
+
+\subsection{Trajectory Transformer \self}
+
+将轨迹建模推向极致：使用Transformer同时建模状态转移和奖励，将规划实现为轨迹空间上的beam search。
+
+\subsection{Gato \self}
+
+DeepMind的Gato将多种任务（游戏、机器人控制、图像描述、对话）的数据统一为token序列，用单一Transformer处理，探索了通用智能体的可能性。
+
+% =============================================
+\section{本章小结与习题}
+
+\subsection*{本章小结}
+\begin{itemize}
+  \item DQN将深度学习引入RL，经验回放和目标网络是关键技术。
+  \item PPO和SAC是当前最实用的策略梯度算法。
+  \item 层次RL通过时间抽象处理长时间尺度的规划问题。
+  \item Decision Transformer将RL问题转化为序列建模，开辟了新的规划范式。
+\end{itemize}
+
+\subsection*{思考与练习}
+\begin{enumerate}
+  \item 实现Q-Learning并在简单的网格世界中训练智能体导航。
+  \item 比较DQN和Double DQN在同一环境中的学习曲线。
+  \item （研究生）分析Decision Transformer与传统RL方法在离线设定下的优劣。
+  \item （研究生）设计一个层次RL框架来解决多步骤任务规划问题。
+\end{enumerate}
