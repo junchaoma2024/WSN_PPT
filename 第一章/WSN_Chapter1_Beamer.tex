@@ -1,0 +1,1015 @@
+\documentclass[aspectratio=43]{beamer}
+
+% 使用主题
+\usetheme{Madrid}
+\usecolortheme{default}
+
+% 中文支持
+\usepackage{xeCJK}
+\setCJKmainfont{SimSun}  % 宋体
+\setCJKsansfont{SimHei}  % 黑体
+
+% 其他包
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{tikz}
+\usepackage{amsmath}
+
+% 设置颜色
+\definecolor{darkblue}{RGB}{0,51,102}
+\definecolor{lightblue}{RGB}{51,153,255}
+\setbeamercolor{structure}{fg=darkblue}
+\setbeamercolor{frametitle}{fg=white,bg=darkblue}
+
+% 页脚设置
+\setbeamertemplate{footline}[frame number]
+
+% 导航符号
+\setbeamertemplate{navigation symbols}{}
+
+% 标题信息
+\title{传感器网络技术与应用}
+\subtitle{第一章：无线传感器网络概述与基本架构}
+\author{马俊超}
+\institute{江苏理工学院 电信学院信息工程系}
+\date{\today}
+
+\begin{document}
+
+% 标题页
+\begin{frame}
+  \titlepage
+\end{frame}
+
+% 目录
+\begin{frame}{目录}
+  \tableofcontents
+\end{frame}
+
+\section{课程绪论}
+
+\begin{frame}
+  \frametitle{传感器网络技术与应用}
+
+  \begin{itemize}
+  \item<+-> 主讲教师：马俊超（电信学院信息工程系）
+  \item<+-> 研究方向：6G车联网关键技术研究
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{教师简介}
+
+  \begin{itemize}
+  \item<+-> 姓名：马俊超
+  \item<+-> 职称：江苏理工学院工程师，中吴学者
+  \item<+-> 科研成果：发表高水平期刊文章20余篇，主持科研项目4项
+  \item<+-> 联系方式：
+  \item<+-> 邮箱：junchao\_ma@foxmail.com
+  \item<+-> 电话：17798536986
+  \item<+-> 办公地点：60-320
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{一、课程介绍}
+
+  \begin{itemize}
+  \item<+-> 课程名称：传感器网络及应用
+  \item<+-> 课程性质：专业选修课
+  \item<+-> 学时：32学时
+  \item<+-> 先修课程：计算机网络、通信原理
+  \item<+-> 后续课程：物联网工程综合训练
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{二、课程目标}
+
+  \begin{itemize}
+  \item<+-> 掌握传感器网络的基本概念、通信协议、管理与支撑等核心技术
+  \item<+-> 形成传感器网络的体系结构认知
+  \item<+-> 培养复杂工程问题所需的形式化、模型化的抽象思维能力和分析能力
+  \item<+-> 为后续相关工作和研究打下基础
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{三、教材}
+
+  \begin{itemize}
+  \item<+-> 选用教材：
+  \item<+-> 许毅、陈立家、甘浪雄、章阳
+  \item<+-> 《无线传感器网络技术原理及应用》（第2版）
+  \item<+-> 清华大学出版社，2019年
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{参考教材与学习资源}
+
+  \begin{itemize}
+  \item<+-> 参考教材：
+  \item<+-> 在线课程（MOOC）：
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{四、考核标准}
+
+  \begin{itemize}
+  \item<+-> 过程考核（50分）：
+  \item<+-> 平时作业（30分）
+  \item<+-> 课堂考勤（15分）
+  \item<+-> 课堂纪律（5分）
+  \item<+-> 期末考试（50分）：
+  \item<+-> 考试形式：开卷考试
+  \item<+-> 可携带：一张A4纸（自行整理）
+  \item<+-> 取消考试资格情况：
+  \item<+-> 平时成绩<50分（百分制）
+  \item<+-> 缺课3次及以上
+  \item<+-> 作业抄袭或缺交2次及以上
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{什么是无线传感器网络？}
+
+  \begin{itemize}
+  \item<+-> 传感器（Sensor）：
+  \item<+-> 感知环境变化并转换为可测量信号的设备
+  \item<+-> 模仿人类的眼、鼻、耳、手等感官功能
+  \item<+-> 具备感知、处理和通信能力
+  \item<+-> 无线传感器网络（WSN）：
+  \item<+-> 许多分布式传感器节点
+  \item<+-> 形成大范围协作的感知网络
+  \item<+-> 通过无线通信技术（Zigbee、WiFi、Bluetooth等）进行数据传输与交互
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的三大基础技术}
+
+  \begin{itemize}
+  \item<+-> 传感器技术：
+  \item<+-> 实时监测、感知和采集各种环境和检测对象的信息
+  \item<+-> 嵌入式计算技术：
+  \item<+-> 处理信息、数据分析、本地决策
+  \item<+-> 现代网络及无线通信技术：
+  \item<+-> 传输信息、多跳路由、网络协同
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN发展历程 - 军事领域起源}
+
+  \begin{itemize}
+  \item<+-> 1978年：美国国防部高级研究计划局（DARPA）
+  \item<+-> 首次分布式传感器网络研讨会
+  \item<+-> 探讨网络技术、信号处理、分布式算法
+  \item<+-> 1980年代：DARPA分布式传感器网络计划
+  \item<+-> 资助卡耐基梅隆大学研究
+  \item<+-> 后启动传感器信息技术SensIT项目
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{经典案例："热带树"传感器系统}
+
+  \begin{itemize}
+  \item<+-> 背景：越南战争期间，美军需要监测"胡志明小道"
+  \item<+-> 部署：投放2万多个震动和声响传感器
+  \item<+-> 工作原理：
+  \item<+-> 传感器探测车队产生的震动和声音
+  \item<+-> 自动发送信号到指挥中心
+  \item<+-> 引导空军精确轰炸
+  \item<+-> 意义：WSN在军事领域的首次成功应用
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN发展历程 - 90年代突破}
+
+  \begin{itemize}
+  \item<+-> 1993年：无线集成网络传感器（WINS）项目
+  \item<+-> UCLA与罗克韦尔科学中心合作
+  \item<+-> 传感器通过分布式网络接入Internet
+  \item<+-> 1996年：低功率无线集成微型传感器（LWIM）问世
+  \item<+-> 特点：传感器节点微型化、智能化、网络化
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN发展历程 - 工商业应用拓展}
+
+  \begin{itemize}
+  \item<+-> 1995年：美国智能交通系统（ITS）
+  \item<+-> 监测车速、车距、道路通行状况
+  \item<+-> 事故自动联系抢救
+  \item<+-> 2002年：反恐应用
+  \item<+-> 地铁、车站等场所的安全监测
+  \item<+-> 美国能源部与Sandia实验室合作
+  \item<+-> 2002年：英特尔公司发布WSN发展规划
+  \item<+-> 预防医学、环境监测、森林防火等领域
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN发展历程 - 中国的发展}
+
+  \begin{itemize}
+  \item<+-> 1980-1990年代：五大敏传感技术研究
+  \item<+-> 机械敏、力敏、气敏、湿敏、生物敏
+  \item<+-> 1999年：正式启动WSN研究
+  \item<+-> 中国科学院《知识创新工程》
+  \item<+-> WSN列为五大重点项目之一
+  \item<+-> 21世纪初：高校研究热潮
+  \item<+-> 中科院、清华、南大、北邮等
+  \item<+-> 取得一批研究成果
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{无线数据网络的分类}
+
+  \begin{itemize}
+  \item<+-> 有基础设施的无线网络：
+  \item<+-> 需要固定基站（移动、联通、电信）
+  \item<+-> 示例：GSM、CDMA、3G/4G/5G、WiFi、WiMax
+  \item<+-> 特点：需要专门机构规划、部署、管理、维护
+  \item<+-> 无基础设施的无线网络：
+  \item<+-> 无线自组织网络（Ad Hoc Network）
+  \item<+-> 分类：WSN、移动Ad Hoc网络
+  \item<+-> 特点：分布式、快速组网、自组织
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{无线网络类型}
+
+  \begin{itemize}
+  \item<+-> 无线广域网（WWAN）：覆盖范围大（几十公里）
+  \item<+-> 示例：2G/3G/4G/5G移动通信网络
+  \item<+-> 无线城域网（WMAN）：覆盖城市区域
+  \item<+-> 示例：WiMax
+  \item<+-> 无线局域网（WLAN）：覆盖建筑物或校园
+  \item<+-> 示例：WiFi（IEEE 802.11）
+  \item<+-> 无线个域网（WPAN）：覆盖个人周围（10米内）
+  \item<+-> 示例：蓝牙、Zigbee、UWB
+  \item<+-> 无线体域网（WBAN）：覆盖人体周围
+  \item<+-> 示例：医疗健康监测
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{WPAN主要技术对比}
+
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{lllll}
+      \toprule
+      技术 & 传输距离 & 数据速率 & 功耗 & 典型应用 \\
+      \midrule
+      \onslide<1->{Zigbee & 10-100m & 20-250kbps & 极低 & WSN、智能家居 \\}
+      \onslide<2->{蓝牙 & 10-100m & 1-3Mbps & 低 & 音频传输、设备连接 \\}
+      \onslide<3->{WiFi & 50-200m & 11-600Mbps & 较高 & 无线上网 \\}
+      \onslide<4->{UWB & <10m & 100-500Mbps & 低 & 精确定位 \\}
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN与Ad Hoc网络的区别}
+
+  \begin{itemize}
+  \item<+-> 节点规模：
+  \item<+-> Ad Hoc：几十到上百个节点
+  \item<+-> WSN：成百上千甚至更多节点
+  \item<+-> 节点部署：
+  \item<+-> Ad Hoc：节点移动性强，拓扑动态变化
+  \item<+-> WSN：大部分节点固定，拓扑相对稳定
+  \item<+-> 工作模式：
+  \item<+-> Ad Hoc：一对一通信（点对点）
+  \item<+-> WSN：多对一通信（汇聚到sink节点）
+  \item<+-> 设计中心：
+  \item<+-> Ad Hoc：以信息传输为中心
+  \item<+-> WSN：以数据（感知信息）为中心
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{WSN与Ad Hoc网络详细对比}
+
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{lll}
+      \toprule
+      对比项 & Ad Hoc网络 & 无线传感器网络 \\
+      \midrule
+      \onslide<1->{节点数量 & 几十\textasciitilde{}上百 & 成百上千 \\}
+      \onslide<2->{节点移动性 & 强 & 弱（大多固定） \\}
+      \onslide<3->{能量供给 & 持续供电 & 电池供电，受限 \\}
+      \onslide<4->{通信模式 & 一对一（端到端） & 多对一（汇聚） \\}
+      \onslide<5->{路由协议 & 以地址为中心 & 以数据为中心 \\}
+      \onslide<6->{主要目标 & 信息传输 & 数据感知与处理 \\}
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第一学时小结}
+
+  \begin{itemize}
+  \item<+-> 课程基本信息：32学时，专业选修，开卷考试
+  \item<+-> WSN概念：传感器+无线网络+协作感知
+  \item<+-> WSN三大技术：传感器、嵌入式、通信技术
+  \item<+-> 发展历程：军事起源→工商业应用→全面发展
+  \item<+-> 网络分类：有/无基础设施，WPAN技术对比
+  \item<+-> WSN特点：多对一、以数据为中心、节点数量多
+  \item<+-> 为什么WSN通常采用Zigbee而不是WiFi？
+  \item<+-> WSN与传统互联网的本质区别是什么？
+  \end{itemize}
+\end{frame}
+
+\section{无线传感器网络基本架构}
+\begin{frame}
+  \begin{center}
+    \Huge 无线传感器网络基本架构
+  \end{center}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第二学时：无线传感器网络基本架构}
+
+  \begin{itemize}
+  \item<+-> 第一学时回顾：
+  \item<+-> WSN的基本概念
+  \item<+-> 发展历程
+  \item<+-> WSN与Ad Hoc的区别
+  \item<+-> 本学时内容：
+  \item<+-> WSN的系统结构
+  \item<+-> 传感器节点结构
+  \item<+-> WSN的特点
+  \item<+-> 网络拓扑结构
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{无线传感器网络的正式定义}
+
+  \begin{itemize}
+  \item<+-> 定义：
+  \item<+-> 能力：
+  \item<+-> 感知：监测物理世界的参数（温度、湿度、光照等）
+  \item<+-> 处理：节点具备数据处理能力
+  \item<+-> 通信：节点间通过无线方式传输数据
+  \item<+-> 目标：
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的核心技术与三要素}
+
+  \begin{itemize}
+  \item<+-> 核心技术：
+  \item<+-> 三要素：
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN系统结构}
+
+  \begin{itemize}
+  \item<+-> 传感器节点（Sensor Node）：
+  \item<+-> 部署在监测区域
+  \item<+-> 采集数据、处理数据、转发数据
+  \item<+-> 汇聚节点（Sink Node）/基站：
+  \item<+-> 连接WSN与外部网络
+  \item<+-> 协议转换、数据汇聚
+  \item<+-> 管理节点：
+  \item<+-> 面向用户
+  \item<+-> 任务管理、数据查询
+  \item<+-> Internet/卫星：
+  \item<+-> 连接汇聚节点与管理节点
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN系统各组成部分功能详解}
+
+  \begin{itemize}
+  \item<+-> 传感器节点功能（双重角色）：
+  \item<+-> 终端功能：本地信息采集和数据处理
+  \item<+-> 路由器功能：存储、管理、融合、转发其他节点数据
+  \item<+-> 协同功能：与相邻节点协作通信、事件联合判断
+  \item<+-> 汇聚节点功能：
+  \item<+-> 协议转换（WSN ↔ Internet）
+  \item<+-> 数据汇聚与转发
+  \item<+-> 任务分发
+  \item<+-> 管理节点功能：
+  \item<+-> 网络配置与管理
+  \item<+-> 发布监测任务
+  \item<+-> 收集监测数据
+  \item<+-> 用户接口
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{传感器节点组成结构}
+
+  \begin{itemize}
+  \item<+-> 四大模块：
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{感知子模块}
+
+  \begin{itemize}
+  \item<+-> 组成：
+  \item<+-> 传感器探头（温度、湿度、光照、声音、加速度等）
+  \item<+-> 变送系统（信号调理、放大、滤波）
+  \item<+-> A/D转换器（模拟信号→数字信号）
+  \item<+-> 功能：
+  \item<+-> 感知物理世界参数
+  \item<+-> 转换为数字电信号
+  \item<+-> 送入处理模块
+  \item<+-> 常见传感器类型：
+  \item<+-> 温湿度传感器、光照传感器、气体传感器
+  \item<+-> 加速度传感器、压力传感器等
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{处理子模块}
+
+  \begin{itemize}
+  \item<+-> 组成：
+  \item<+-> 微处理器（MCU）
+  \item<+-> 存储器（RAM、ROM、Flash）
+  \item<+-> 嵌入式操作系统（如TinyOS）
+  \item<+-> 功能：
+  \item<+-> 控制整个节点的操作
+  \item<+-> 存储和处理采集的数据
+  \item<+-> 处理其他节点发来的数据
+  \item<+-> 运行网络通信协议
+  \item<+-> 常用处理器：
+  \item<+-> MSP430系列（超低功耗）
+  \item<+-> ARM Cortex-M系列
+  \item<+-> ATmega系列
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{通信子模块}
+
+  \begin{itemize}
+  \item<+-> 组成：
+  \item<+-> 无线收发器（RF transceiver）
+  \item<+-> 天线
+  \item<+-> 调制解调电路
+  \item<+-> 功能：
+  \item<+-> 实现节点间无线通信
+  \item<+-> 交互控制消息
+  \item<+-> 收发业务数据
+  \item<+-> 常用射频芯片：
+  \item<+-> CC2420（Zigbee标准）
+  \item<+-> nRF24L01（2.4GHz）
+  \item<+-> CC1100（433/868/915MHz）
+  \item<+-> 特点：
+  \item<+-> 短距离通信（几十米）
+  \item<+-> 低功耗设计
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{电源模块}
+
+  \begin{itemize}
+  \item<+-> 供电方式：
+  \item<+-> 电池供电（主要方式）
+  \item<+-> 纽扣电池、AA电池、锂电池
+  \item<+-> 能量收集（Energy Harvesting）
+  \item<+-> 太阳能、振动能、热能、射频能
+  \item<+-> 功能：
+  \item<+-> 为节点提供运行所需能量
+  \item<+-> 能量管理与调度
+  \item<+-> 挑战：
+  \item<+-> 电池容量有限
+  \item<+-> 节点通常无法更换电池（部署环境）
+  \item<+-> 网络生存时间受限于电池寿命
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{传感器节点能量消耗分析}
+
+  \begin{itemize}
+  \item<+-> 能量消耗分布（典型值）：
+  \item<+-> 通信模块：50-60\%（能耗最大）
+  \item<+-> 处理模块：20-30\%
+  \item<+-> 感知模块：10-20\%
+  \item<+-> 其他（空闲、休眠等）：<10\%
+  \item<+-> 能耗特点：
+  \item<+-> 通信能耗远大于计算能耗
+  \item<+-> 接收数据的能耗与发送相当
+  \item<+-> 空闲监听也消耗能量
+  \item<+-> 节能策略：
+  \item<+-> 减少通信距离（多跳）
+  \item<+-> 数据融合（减少数据量）
+  \item<+-> 休眠调度（降低空闲能耗）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{典型传感器节点实例}
+
+  \begin{itemize}
+  \item<+-> Berkeley Mote系列：
+  \item<+-> Mica2：ATmega128L + CC1000（433MHz）
+  \item<+-> MicaZ：ATmega128L + CC2420（Zigbee）
+  \item<+-> TelosB：MSP430 + CC2420
+  \item<+-> 商用节点：
+  \item<+-> Crossbow公司传感器节点
+  \item<+-> TI公司CC2530开发板
+  \item<+-> 特点对比：
+  \item<+-> 尺寸：硬币大小到火柴盒大小
+  \item<+-> 功耗：微瓦到毫瓦级
+  \item<+-> 成本：几美元到几十美元
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{节点约束条件（一）- 能量有限}
+
+  \begin{itemize}
+  \item<+-> 能量受限的影响：
+  \item<+-> 电池容量有限（通常几千mAh）
+  \item<+-> 部署后难以更换电池
+  \item<+-> 决定网络生存时间
+  \item<+-> 后果：
+  \item<+-> 节点可能因能量耗尽而失效
+  \item<+-> 网络拓扑动态变化
+  \item<+-> 网络性能逐渐下降
+  \item<+-> 设计考虑：
+  \item<+-> 协议设计要以节能为首要目标
+  \item<+-> 需要能量管理机制
+  \item<+-> 负载均衡，避免部分节点过早失效
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{节点约束条件（二）- 计算与通信能力有限}
+
+  \begin{itemize}
+  \item<+-> 计算能力有限：
+  \item<+-> 处理器主频低（几MHz到几十MHz）
+  \item<+-> 内存小（几KB到几百KB）
+  \item<+-> 无法运行复杂算法
+  \item<+-> 存储能力有限：
+  \item<+-> ROM/Flash: 几十到几百KB
+  \item<+-> RAM: 几KB到几十KB
+  \item<+-> 数据存储受限
+  \item<+-> 通信能力有限：
+  \item<+-> 通信半径小（几十米）
+  \item<+-> 带宽低（1-250 kbps）
+  \item<+-> 需要多跳传输
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的特点（一）}
+
+  \begin{itemize}
+  \item<+-> 传感器节点体积小：
+  \item<+-> 电源能量有限
+  \item<+-> 各部分集成度高
+  \item<+-> 便于大量部署
+  \item<+-> 设计目标：
+  \item<+-> 节能是首要考虑
+  \item<+-> 延长网络生存时间
+  \item<+-> 能量高效的协议设计
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的特点（二）}
+
+  \begin{itemize}
+  \item<+-> 价格低、功耗小：
+  \item<+-> 单节点成本低（几美元）
+  \item<+-> 利于大规模部署
+  \item<+-> 处理能力弱：
+  \item<+-> 运行简单的嵌入式程序
+  \item<+-> 分布式处理
+  \item<+-> 存储容量小：
+  \item<+-> 存储感知数据和路由信息
+  \item<+-> 数据需要及时传输
+  \item<+-> 通信覆盖范围小、带宽低：
+  \item<+-> 通信距离几十米
+  \item<+-> 数据率1-100kbps
+  \item<+-> 需要多跳路由
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的特点（三）}
+
+  \begin{itemize}
+  \item<+-> 无中心：
+  \item<+-> 节点地位平等
+  \item<+-> 无预先指定的控制中心
+  \item<+-> 分布式控制
+  \item<+-> 自组织：
+  \item<+-> 分布式算法
+  \item<+-> 节点协调配合
+  \item<+-> 自动组织网络
+  \item<+-> 优势：
+  \item<+-> 健壮性强
+  \item<+-> 抗毁性好
+  \item<+-> 适应动态环境
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN的特点（四）}
+
+  \begin{itemize}
+  \item<+-> 网络动态性强：
+  \item<+-> 节点可能失效（能量耗尽、故障）
+  \item<+-> 新节点可能加入
+  \item<+-> 拓扑结构变化快
+  \item<+-> 需要可重构和自适应
+  \item<+-> 以数据为中心：
+  \item<+-> 核心是感知数据
+  \item<+-> 查询方式：关心"什么数据"而非"哪个节点"
+  \item<+-> 示例：查询"温度>30℃的区域"而非"节点A的数据"
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN特点总结}
+
+  \begin{itemize}
+  \item<+-> 节点特点：
+  \item<+-> 体积小、能量有限、计算存储通信能力受限
+  \item<+-> 网络特点：
+  \item<+-> 无中心、自组织、动态性强
+  \item<+-> 节点数量大、密集部署
+  \item<+-> 以数据为中心
+  \item<+-> 设计挑战：
+  \item<+-> 节能设计
+  \item<+-> 可扩展性
+  \item<+-> 健壮性和容错性
+  \item<+-> 数据融合
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{无线传感器网络拓扑结构}
+
+  \begin{itemize}
+  \item<+-> 常见拓扑类型：
+  \item<+-> 拓扑选择考虑因素：
+  \item<+-> 应用需求
+  \item<+-> 覆盖范围
+  \item<+-> 节点密度
+  \item<+-> 能耗要求
+  \item<+-> 可靠性要求
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{星型拓扑（Star Topology）}
+
+  \begin{itemize}
+  \item<+-> 结构：
+  \item<+-> 所有节点直接连接到汇聚节点
+  \item<+-> 单跳通信
+  \item<+-> 优点：
+  \item<+-> 结构简单、易于实现
+  \item<+-> 节点能耗低（单跳）
+  \item<+-> 时延小
+  \item<+-> 缺点：
+  \item<+-> 汇聚节点成为瓶颈
+  \item<+-> 覆盖范围受限（通信半径内）
+  \item<+-> 可扩展性差
+  \item<+-> 汇聚节点失效则网络瘫痪
+  \item<+-> 适用场景：
+  \item<+-> 小规模网络
+  \item<+-> 覆盖范围小（如智能家居）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{树型拓扑（Tree Topology）}
+
+  \begin{itemize}
+  \item<+-> 结构：
+  \item<+-> 分层结构
+  \item<+-> 根节点（汇聚节点）、中间节点、叶子节点
+  \item<+-> 多跳通信
+  \item<+-> 优点：
+  \item<+-> 层次清晰、便于管理
+  \item<+-> 覆盖范围大（多跳）
+  \item<+-> 扩展性好
+  \item<+-> 缺点：
+  \item<+-> 上层节点能耗大（转发数据多）
+  \item<+-> 上层节点失效影响子树
+  \item<+-> 可靠性一般
+  \item<+-> 适用场景：
+  \item<+-> 中大规模网络
+  \item<+-> 具有层级关系的应用（如建筑物监测）
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{网状拓扑（Mesh Topology）}
+
+  \begin{itemize}
+  \item<+-> 结构：
+  \item<+-> 节点间充分互联
+  \item<+-> 多条路径可达汇聚节点
+  \item<+-> 自组织、自愈合
+  \item<+-> 优点：
+  \item<+-> 健壮性强（多路径）
+  \item<+-> 抗毁性好（节点失效影响小）
+  \item<+-> 负载均衡
+  \item<+-> 覆盖范围大
+  \item<+-> 缺点：
+  \item<+-> 路由复杂度高
+  \item<+-> 控制开销大
+  \item<+-> 能耗较高
+  \item<+-> 适用场景：
+  \item<+-> 大规模网络
+  \item<+-> 高可靠性要求（军事、紧急救援）
+  \item<+-> 恶劣环境部署
+  \end{itemize}
+\end{frame}
+
+\begin{frame}[allowframebreaks]
+  \frametitle{混合拓扑与拓扑对比}
+
+  \begin{itemize}
+  \item<+-> 混合拓扑：
+  \item<+-> 结合多种拓扑优势
+  \item<+-> 示例：分簇网络（簇内星型，簇间网状）
+  \item<+-> 拓扑对比：
+  \end{itemize}
+
+  \vspace{0.3cm}
+
+  \begin{table}
+    \centering
+    \small
+    \begin{tabular}{llllll}
+      \toprule
+      拓扑类型 & 复杂度 & 能耗 & 可靠性 & 扩展性 & 适用场景 \\
+      \midrule
+      \onslide<1->{星型 & 低 & 低 & 低 & 差 & 小规模 \\}
+      \onslide<2->{树型 & 中 & 中 & 中 & 好 & 中大规模 \\}
+      \onslide<3->{网状 & 高 & 高 & 高 & 好 & 大规模、高可靠 \\}
+      \bottomrule
+    \end{tabular}
+  \end{table}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN性能指标}
+
+  \begin{itemize}
+  \item<+-> 覆盖率（Coverage）：
+  \item<+-> 监测区域被有效覆盖的比例
+  \item<+-> 连通性（Connectivity）：
+  \item<+-> 节点间能否通信、到达汇聚节点
+  \item<+-> 能量效率（Energy Efficiency）：
+  \item<+-> 单位能量传输的数据量
+  \item<+-> 网络生存时间（Network Lifetime）：
+  \item<+-> 网络保持功能的时间
+  \item<+-> 延迟（Latency）：
+  \item<+-> 数据从源节点到汇聚节点的时间
+  \item<+-> 吞吐量（Throughput）：
+  \item<+-> 单位时间内成功传输的数据量
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{网络结构：扁平结构 vs 分层结构}
+
+  \begin{itemize}
+  \item<+-> 扁平结构（Flat Structure）：
+  \item<+-> 所有节点地位平等
+  \item<+-> 节点直接或多跳到汇聚节点
+  \item<+-> 无特殊节点
+  \item<+-> 适合小规模网络
+  \item<+-> 分层结构（Hierarchical Structure）：
+  \item<+-> 节点分为不同层级
+  \item<+-> 簇头节点（Cluster Head）+ 普通节点
+  \item<+-> 簇头负责数据汇聚和转发
+  \item<+-> 适合大规模网络
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{网络结构：单Sink vs 多Sink}
+
+  \begin{itemize}
+  \item<+-> 单Sink结构：
+  \item<+-> 只有一个汇聚节点
+  \item<+-> 结构简单
+  \item<+-> 可能成为瓶颈
+  \item<+-> 汇聚节点周围节点能耗大
+  \item<+-> 多Sink结构：
+  \item<+-> 多个汇聚节点
+  \item<+-> 负载均衡
+  \item<+-> 可靠性高
+  \item<+-> 但协调复杂
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{如何选择网络结构？}
+
+  \begin{itemize}
+  \item<+-> 选择扁平结构：
+  \item<+-> 网络规模小（几十个节点）
+  \item<+-> 节点密度低
+  \item<+-> 应用简单
+  \item<+-> 选择分层结构：
+  \item<+-> 网络规模大（上百上千节点）
+  \item<+-> 需要数据融合
+  \item<+-> 能耗要求高（簇头轮换）
+  \item<+-> 选择多Sink：
+  \item<+-> 覆盖范围大
+  \item<+-> 可靠性要求高
+  \item<+-> 能够部署多个汇聚节点
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{传统OSI网络协议参考模型}
+
+  \begin{itemize}
+  \item<+-> OSI七层模型（简要）：
+  \item<+-> 应用层
+  \item<+-> 表示层
+  \item<+-> 会话层
+  \item<+-> 传输层
+  \item<+-> 网络层
+  \item<+-> 数据链路层
+  \item<+-> 物理层
+  \item<+-> TCP/IP四层模型：
+  \item<+-> 应用层
+  \item<+-> 传输层
+  \item<+-> 网络层
+  \item<+-> 网络接口层
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN协议栈结构}
+
+  \begin{itemize}
+  \item<+-> 分层结构：
+  \item<+-> 应用层
+  \item<+-> 传输层
+  \item<+-> 网络层
+  \item<+-> 数据链路层（MAC层）
+  \item<+-> 物理层
+  \item<+-> 管理平面（跨层）：
+  \item<+-> 能量管理
+  \item<+-> 移动管理
+  \item<+-> 任务管理
+  \item<+-> 协同平面：
+  \item<+-> 节点协作
+  \item<+-> 数据融合
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN协议栈各层功能}
+
+  \begin{itemize}
+  \item<+-> 物理层：
+  \item<+-> 频率选择、调制方式
+  \item<+-> 常用频段：2.4GHz ISM频段
+  \item<+-> MAC层（数据链路层）：
+  \item<+-> 介质访问控制
+  \item<+-> 主要协议：CSMA/CA、TDMA
+  \item<+-> 网络层：
+  \item<+-> 路由协议（如LEACH、PEGASIS等）
+  \item<+-> 数据转发
+  \item<+-> 传输层：
+  \item<+-> 端到端可靠传输（可选）
+  \item<+-> 应用层：
+  \item<+-> 数据查询、任务分配
+  \item<+-> 用户接口
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN关键技术（概览）}
+
+  \begin{itemize}
+  \item<+-> 组网技术：自组织、拓扑控制
+  \item<+-> 路由协议：能量高效的路由
+  \item<+-> MAC协议：避免冲突、节能
+  \item<+-> 数据融合：减少数据传输量
+  \item<+-> 时间同步：节点间时钟同步
+  \item<+-> 定位技术：节点位置确定
+  \item<+-> 安全技术：数据加密、认证
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN标准化（概览）}
+
+  \begin{itemize}
+  \item<+-> IEEE 802.15系列：
+  \item<+-> IEEE 802.15.1（蓝牙）
+  \item<+-> IEEE 802.15.4（Zigbee物理层和MAC层）
+  \item<+-> Zigbee联盟：
+  \item<+-> 基于IEEE 802.15.4
+  \item<+-> 定义网络层和应用层
+  \item<+-> 6LoWPAN：
+  \item<+-> IPv6 over Low-Power WPAN
+  \item<+-> WSN接入互联网
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN应用领域概览}
+
+  \begin{itemize}
+  \item<+-> 军事应用：战场监测、目标跟踪
+  \item<+-> 环境监测：森林防火、水质监测、气象监测
+  \item<+-> 智能家居：家电控制、安防监控
+  \item<+-> 医疗健康：健康监测、远程医疗
+  \item<+-> 工业控制：设备监测、生产过程监控
+  \item<+-> 智能农业：土壤监测、灌溉控制
+  \item<+-> 智能交通：交通流量监测、停车管理
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{WSN应用案例}
+
+  \begin{itemize}
+  \item<+-> 森林防火监测：
+  \item<+-> 传感器监测温度、湿度、烟雾
+  \item<+-> 及时发现火情，定位起火点
+  \item<+-> 智能农业：
+  \item<+-> 监测土壤温湿度、光照
+  \item<+-> 自动控制灌溉系统
+  \item<+-> 医疗健康：
+  \item<+-> 可穿戴传感器监测心率、血压
+  \item<+-> 实时传输到医疗中心
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第一章总结}
+
+  \begin{itemize}
+  \item<+-> WSN基本概念：
+  \item<+-> 定义、三要素、三大技术
+  \item<+-> WSN发展历程：
+  \item<+-> 军事起源→工商业应用→全面发展
+  \item<+-> WSN vs Ad Hoc：
+  \item<+-> 多对一、以数据为中心
+  \item<+-> WSN体系结构：
+  \item<+-> 系统结构：传感器节点、汇聚节点、管理节点
+  \item<+-> 节点结构：感知、处理、通信、电源四大模块
+  \item<+-> WSN特点：
+  \item<+-> 能量有限、无中心、自组织、以数据为中心
+  \item<+-> 拓扑结构：
+  \item<+-> 星型、树型、网状、混合
+  \item<+-> 网络结构：
+  \item<+-> 扁平/分层、单sink/多sink
+  \end{itemize}
+\end{frame}
+
+\begin{frame}
+  \frametitle{第一章知识体系}
+
+\end{frame}
+
+\begin{frame}
+  \frametitle{课后作业}
+
+  \begin{itemize}
+  \item<+-> 必做题：
+  \item<+-> 选做题：
+  \item<+-> 提交要求：
+  \item<+-> 下周一上课前提交
+  \item<+-> 格式：Word或PDF
+  \item<+-> 要求独立完成，严禁抄袭
+  \end{itemize}
+\end{frame}
+
+
+\end{document}
