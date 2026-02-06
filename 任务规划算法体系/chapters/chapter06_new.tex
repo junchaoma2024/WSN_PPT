@@ -107,7 +107,7 @@ Stackelberg博弈是一种序贯博弈：
 
 \subsection{极大极小搜索}
 
-\begin{algbox}[title={\textbf{极大极小算法}}]
+\begin{algbox}[极大极小算法]
 \begin{lstlisting}[language=Python,basicstyle=\ttfamily\small]
 def minimax(state, depth, is_max_player):
     if depth == 0 or is_terminal(state):
@@ -141,7 +141,7 @@ Alpha-Beta剪枝通过维护搜索窗口 $[\alpha, \beta]$ 减少不必要的搜
 \section{\caseA{v5}对抗性观测任务}
 % =============================================
 
-\begin{caseboxA}[title={\textbf{案例A-v5：对抗性卫星观测}}]
+\begin{caseboxA}[案例A-v5：对抗性卫星观测]
 \textbf{场景演进}：v4是合作性多星系统，v5引入对抗性敌方。
 
 \textbf{对抗要素}：
@@ -189,7 +189,7 @@ Alpha-Beta剪枝通过维护搜索窗口 $[\alpha, \beta]$ 减少不必要的搜
 \section{\caseB{v5}欺骗与隐蔽规划}
 % =============================================
 
-\begin{caseboxB}[title={\textbf{案例B-v5：欺骗与隐蔽战术}}]
+\begin{caseboxB}[案例B-v5：欺骗与隐蔽战术]
 \textbf{场景演进}：v4是对称信息下的协同，v5引入欺骗与隐蔽。
 
 \textbf{新增要素}：
