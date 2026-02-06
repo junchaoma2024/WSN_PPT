@@ -43,8 +43,8 @@
 \newcommand{\self}{\texorpdfstring{\textcolor{selfcolor}{\textbf{[拓]}}}{[拓]}}
 
 % ============ 案例标记命令 ============
-\newcommand{\caseA}[1]{\textcolor{caseAcolor}{\textbf{【案例A-#1】}}}
-\newcommand{\caseB}[1]{\textcolor{caseBcolor}{\textbf{【案例B-#1】}}}
+\newcommand{\caseA}[1]{\texorpdfstring{\textcolor{caseAcolor}{\textbf{【案例A-#1】}}}{【案例A-#1】}}
+\newcommand{\caseB}[1]{\texorpdfstring{\textcolor{caseBcolor}{\textbf{【案例B-#1】}}}{【案例B-#1】}}
 
 % ============ 定理环境 ============
 \theoremstyle{definition}
@@ -57,70 +57,63 @@
 \newtheorem{lemma}{引理}[chapter]
 
 % ============ tcolorbox 环境 ============
-\newtcolorbox{keypoint}[1][]{
+\newtcolorbox{keypoint}[1][要点]{
   colback=blue!5!white,
   colframe=blue!60!black,
-  title={\textbf{要点}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
-\newtcolorbox{algbox}[1][]{
+\newtcolorbox{algbox}[1][算法概要]{
   colback=gray!5!white,
   colframe=gray!60!black,
-  title={\textbf{算法概要}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
-\newtcolorbox{appbox}[1][]{
+\newtcolorbox{appbox}[1][应用案例]{
   colback=green!5!white,
   colframe=green!60!black,
-  title={\textbf{应用案例}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
-\newtcolorbox{levelbox}[1][]{
+\newtcolorbox{levelbox}[1][学习建议]{
   colback=orange!5!white,
   colframe=orange!60!black,
-  title={\textbf{学习建议}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
 % 案例A环境（多星观测）
-\newtcolorbox{caseboxA}[1][]{
+\newtcolorbox{caseboxA}[1][案例A：多星协同对地观测]{
   colback=blue!3!white,
   colframe=caseAcolor,
-  title={\textbf{案例A：多星协同对地观测}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
 % 案例B环境（军事战术）
-\newtcolorbox{caseboxB}[1][]{
+\newtcolorbox{caseboxB}[1][案例B：军事战术任务规划]{
   colback=orange!3!white,
   colframe=caseBcolor,
-  title={\textbf{案例B：军事战术任务规划}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
 % 讨论题环境
-\newtcolorbox{discussbox}[1][]{
+\newtcolorbox{discussbox}[1][讨论与思考]{
   colback=yellow!5!white,
   colframe=yellow!60!black,
-  title={\textbf{讨论与思考}},
+  title={\textbf{#1}},
   fonttitle=\bfseries,
-  breakable,
-  #1
+  breakable
 }
 
 % ============ 代码环境 ============
