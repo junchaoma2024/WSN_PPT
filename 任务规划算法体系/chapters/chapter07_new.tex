@@ -1,0 +1,316 @@
+% 第7章：前沿方法与系统集成
+\chapter{前沿方法与系统集成}
+
+\begin{levelbox}
+本章介绍任务规划的前沿方法（大语言模型、神经符号方法）和系统集成实践，通过综合案例展示完整的任务规划系统设计。建议学时：6学时。
+\end{levelbox}
+
+% =============================================
+\section{大语言模型与规划}
+% =============================================
+
+\subsection{LLM的规划能力与局限}
+
+大语言模型（LLM）在自然语言理解和生成方面表现出色，近年来也被用于任务规划。
+
+\begin{keypoint}[LLM规划的优势与局限]
+\textbf{优势}：
+\begin{itemize}
+  \item 自然语言接口，易于交互
+  \item 丰富的世界知识
+  \item 能够理解复杂的任务描述
+  \item 具有一定的常识推理能力
+\end{itemize}
+
+\textbf{局限}：
+\begin{itemize}
+  \item 规划正确性难以保证（可能产生不可执行的计划）
+  \item 复杂约束处理能力有限
+  \item 长程规划容易出错
+  \item 缺乏形式化验证能力
+\end{itemize}
+\end{keypoint}
+
+\subsection{LLM+P：结合LLM与规划器}
+
+\begin{definition}[LLM+P框架]
+LLM+P利用LLM的语言理解能力和传统规划器的规划能力：
+\begin{enumerate}
+  \item LLM将自然语言任务描述转换为PDDL问题
+  \item 调用Fast Downward等规划器求解
+  \item LLM将规划结果转换回自然语言
+\end{enumerate}
+\end{definition}
+
+\begin{lstlisting}[caption=LLM+P流程示例]
+输入：自然语言任务描述
+"卫星需要先观测北京区域，然后观测上海区域，最后返回待机状态"
+
+LLM转换为PDDL：
+(:goal (and
+  (observed beijing)
+  (observed shanghai)
+  (standby satellite1)
+  (before (observed beijing) (observed shanghai))
+))
+
+规划器求解，返回动作序列：
+1. move(satellite1, pos1, beijing_orbit)
+2. observe(satellite1, beijing)
+3. move(satellite1, beijing_orbit, shanghai_orbit)
+4. observe(satellite1, shanghai)
+5. enter_standby(satellite1)
+
+LLM转换回自然语言：
+"首先将卫星移动到北京上空轨道位置，执行北京区域观测，
+然后转移到上海上空，完成上海区域观测，最后进入待机模式。"
+\end{lstlisting}
+
+\subsection{思维链与推理增强}
+
+\textbf{思维链}（Chain-of-Thought, CoT）：让LLM逐步推理，显式展示思考过程。
+
+\textbf{思维树}（Tree of Thoughts, ToT）：扩展CoT，允许分支探索和回溯。
+
+\textbf{ReAct}：结合推理（Reasoning）和行动（Acting），LLM可以调用外部工具获取信息。
+
+\begin{example}[ReAct在任务规划中的应用]
+\begin{verbatim}
+思考：需要规划卫星观测任务，首先查询目标区域的云量
+动作：调用气象API获取北京区域未来24小时云量预报
+观测：北京区域预计14:00-16:00云量最低(20%)
+思考：应该安排在14:00-16:00窗口观测北京
+动作：检查卫星在该时段是否经过北京上空
+观测：卫星在14:30-15:00经过北京上空
+思考：时间窗口匹配，可以安排观测
+动作：生成观测指令...
+\end{verbatim}
+\end{example}
+
+\subsection{国内研究进展}
+
+\begin{appbox}[title={\textbf{国内LLM规划研究}}]
+\begin{itemize}
+  \item \textbf{AutoPlan}（秦龙等, 自动化学报2024）：面向复杂任务的自主规划框架，结合LLM与规划引擎
+  \item \textbf{MetaGPT}（深度求索DeepWisdom团队）：多智能体软件开发框架
+  \item \textbf{ChatDev}（清华NLP实验室）：基于对话的软件开发智能体
+  \item 国内大模型（文心一言、通义千问、ChatGLM、DeepSeek）在规划任务上持续优化
+\end{itemize}
+\end{appbox}
+
+% =============================================
+\section{神经符号规划与图神经网络}
+% =============================================
+
+\subsection{神经符号方法}
+
+\begin{definition}[神经符号AI]
+神经符号AI结合神经网络的学习能力和符号AI的推理能力：
+\begin{itemize}
+  \item 神经网络：感知、特征提取、模式识别
+  \item 符号系统：逻辑推理、规划、可解释性
+\end{itemize}
+\end{definition}
+
+\textbf{在规划中的应用}：
+\begin{itemize}[leftmargin=2em]
+  \item 神经网络学习启发式函数
+  \item 神经网络生成动作候选
+  \item 符号规划器保证解的正确性
+\end{itemize}
+
+\subsection{图神经网络在规划中的应用}
+
+规划问题天然具有图结构（状态转移图、任务依赖图），图神经网络（GNN）可以有效捕获这些结构信息。
+
+\textbf{应用场景}：
+\begin{itemize}[leftmargin=2em]
+  \item 学习PDDL问题的表示
+  \item 预测动作的效用
+  \item 生成规划启发式
+\end{itemize}
+
+% =============================================
+\section{【综合案例】完整任务规划系统设计}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{综合案例：卫星观测任务规划系统}}]
+\textbf{系统目标}：设计一个完整的卫星观测任务规划系统，集成前6章的方法。
+
+\textbf{系统需求}：
+\begin{enumerate}
+  \item 支持自然语言任务输入
+  \item 处理多星协同调度
+  \item 考虑不确定性（云层）
+  \item 支持对抗性场景分析
+  \item 提供可解释的规划结果
+\end{enumerate}
+\end{caseboxA}
+
+\subsection{系统架构设计}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+  box/.style={rectangle, draw, rounded corners, minimum width=3cm, minimum height=0.8cm, align=center},
+  arrow/.style={->, thick}
+]
+  % 输入层
+  \node[box, fill=blue!10] (input) at (0,4) {自然语言输入\\LLM解析};
+
+  % 建模层
+  \node[box, fill=green!10] (model) at (0,2.5) {PDDL建模\\约束生成};
+
+  % 规划层
+  \node[box, fill=yellow!10] (plan1) at (-3,1) {经典规划器\\(Fast Downward)};
+  \node[box, fill=yellow!10] (plan2) at (0,1) {HTN规划器\\(SHOP2)};
+  \node[box, fill=yellow!10] (plan3) at (3,1) {约束求解器\\(SMT)};
+
+  % 优化层
+  \node[box, fill=orange!10] (opt) at (0,-0.5) {多智能体协调\\博弈分析};
+
+  % 输出层
+  \node[box, fill=red!10] (output) at (0,-2) {规划结果\\可视化与解释};
+
+  % 箭头
+  \draw[arrow] (input) -- (model);
+  \draw[arrow] (model) -- (plan1);
+  \draw[arrow] (model) -- (plan2);
+  \draw[arrow] (model) -- (plan3);
+  \draw[arrow] (plan1) -- (opt);
+  \draw[arrow] (plan2) -- (opt);
+  \draw[arrow] (plan3) -- (opt);
+  \draw[arrow] (opt) -- (output);
+\end{tikzpicture}
+\caption{卫星观测任务规划系统架构}
+\end{figure}
+
+\subsection{各模块说明}
+
+\textbf{1. 输入解析模块}
+\begin{itemize}[leftmargin=2em]
+  \item 使用LLM理解自然语言任务描述
+  \item 提取目标、约束、优先级等信息
+  \item 生成结构化的任务规格
+\end{itemize}
+
+\textbf{2. 问题建模模块}
+\begin{itemize}[leftmargin=2em]
+  \item 根据任务规格生成PDDL/HDDL模型
+  \item 编码时间窗口、资源约束
+  \item 考虑不确定性因素的概率模型
+\end{itemize}
+
+\textbf{3. 规划求解模块}
+\begin{itemize}[leftmargin=2em]
+  \item 根据问题特性选择合适的规划器
+  \item 简单问题：经典规划器
+  \item 层次任务：HTN规划器
+  \item 复杂约束：SMT求解器
+\end{itemize}
+
+\textbf{4. 多智能体协调模块}
+\begin{itemize}[leftmargin=2em]
+  \item 协调多星任务分配
+  \item 解决资源冲突
+  \item 对抗场景下的博弈分析
+\end{itemize}
+
+\textbf{5. 输出与解释模块}
+\begin{itemize}[leftmargin=2em]
+  \item 生成可执行的任务指令
+  \item 提供规划结果的可视化
+  \item 解释规划决策的理由
+\end{itemize}
+
+% =============================================
+\section{可解释性与人机协同}
+% =============================================
+
+\subsection{可解释规划}
+
+规划结果的可解释性对用户信任和人机协同至关重要。
+
+\textbf{解释类型}：
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{为什么}：为什么选择这个动作？
+  \item \textbf{为什么不}：为什么不选择另一个动作？
+  \item \textbf{假设}：如果条件变化，规划会如何改变？
+\end{enumerate}
+
+\subsection{人机协同规划}
+
+\begin{keypoint}[人机协同模式]
+\begin{itemize}
+  \item \textbf{人在环路}（Human-in-the-Loop）：人类审核和批准规划结果
+  \item \textbf{混合主动性}：人和机器根据情况动态分配决策权
+  \item \textbf{可调自主性}：根据任务关键程度调整自动化水平
+\end{itemize}
+\end{keypoint}
+
+% =============================================
+\section{规划系统的安全性}
+% =============================================
+
+\subsection{安全关键规划}
+
+在安全关键应用中（航空、军事、医疗），规划系统必须满足严格的安全要求。
+
+\textbf{安全性保障方法}：
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{形式化验证}：使用模型检测验证规划的正确性
+  \item \textbf{安全约束}：硬编码安全边界，不允许违反
+  \item \textbf{监控与回退}：运行时监控，异常时回退到安全状态
+  \item \textbf{冗余设计}：多个独立规划器交叉验证
+\end{enumerate}
+
+\subsection{对抗鲁棒性}
+
+在对抗环境中，需要考虑攻击者可能利用规划系统的漏洞。
+
+\textbf{潜在攻击}：
+\begin{itemize}[leftmargin=2em]
+  \item 输入扰动：修改任务描述误导规划器
+  \item 模型污染：污染学习数据影响学习型规划器
+  \item 对抗样本：针对神经网络组件的对抗攻击
+\end{itemize}
+
+% =============================================
+\section{本章小结与展望}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item LLM为任务规划提供了自然语言接口
+  \item LLM+P等混合方法结合了LLM和传统规划器的优势
+  \item 神经符号方法是未来规划研究的重要方向
+  \item 完整的规划系统需要集成多种方法
+  \item 可解释性和安全性是实际部署的关键考量
+\end{itemize}
+
+\subsection*{未来展望}
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{更强的LLM规划能力}：随着LLM的发展，直接规划能力将增强
+  \item \textbf{更紧密的神经-符号融合}：端到端可微的规划系统
+  \item \textbf{更广泛的多模态规划}：结合视觉、语言、物理的规划
+  \item \textbf{更可靠的安全保障}：形式化验证与AI的结合
+\end{enumerate}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item LLM直接生成规划与LLM+P方法各有什么优缺点？未来会如何发展？
+  \item 如果你要设计一个实际的卫星观测规划系统，会如何权衡自动化程度和人工干预？
+  \item 规划系统的可解释性和性能之间是否存在权衡？如何平衡？
+  \item 任务规划技术在军事应用中应该遵循什么伦理准则？
+\end{enumerate}
+
+\textbf{课程项目}：
+\begin{enumerate}
+  \item 选择案例A或案例B，设计并实现一个简化版的任务规划系统
+  \item 系统应至少包含：问题建模、规划求解、结果展示三个模块
+  \item 撰写项目报告，说明设计思路、实现方法和测试结果
+\end{enumerate}
+\end{discussbox}

@@ -1,0 +1,332 @@
+% !TEX program = xelatex
+% 任务规划算法体系 - 案例式教学版
+% 编译方式: xelatex main_casebased.tex (运行两次以生成目录)
+
+\documentclass[a4paper,12pt,openany]{ctexbook}
+
+% ============ 基础宏包 ============
+\usepackage[top=2.5cm,bottom=2.5cm,left=2.5cm,right=2.5cm]{geometry}
+\usepackage{amsmath,amssymb,amsthm}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{tabularx}
+\usepackage{multirow}
+\usepackage{enumitem}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds,decorations.pathreplacing}
+\usepackage{algorithm}
+\usepackage{algpseudocode}
+\usepackage{listings}
+\usepackage{xcolor}
+\usepackage{tcolorbox}
+\tcbuselibrary{skins,breakable,theorems}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+
+% hyperref 放在最后加载
+\usepackage[colorlinks=true,linkcolor=blue!70!black,citecolor=green!50!black,urlcolor=blue!60!black,bookmarks=true,bookmarksnumbered=true]{hyperref}
+
+% ============ 颜色定义 ============
+\definecolor{ugcolor}{RGB}{0,102,204}       % 本科生 - 蓝色
+\definecolor{gradcolor}{RGB}{204,51,0}      % 研究生 - 红色
+\definecolor{selfcolor}{RGB}{0,153,76}      % 自学拓展 - 绿色
+\definecolor{codebg}{RGB}{245,245,245}
+\definecolor{codeframe}{RGB}{200,200,200}
+\definecolor{partcolor}{RGB}{0,51,102}
+\definecolor{caseAcolor}{RGB}{0,100,180}    % 案例A - 深蓝
+\definecolor{caseBcolor}{RGB}{180,60,0}     % 案例B - 深橙
+
+% ============ 受众标记命令 ============
+\newcommand{\ug}{\texorpdfstring{\textcolor{ugcolor}{\textbf{[本]}}}{[本]}}
+\newcommand{\grad}{\texorpdfstring{\textcolor{gradcolor}{\textbf{[研]}}}{[研]}}
+\newcommand{\self}{\texorpdfstring{\textcolor{selfcolor}{\textbf{[拓]}}}{[拓]}}
+
+% ============ 案例标记命令 ============
+\newcommand{\caseA}[1]{\textcolor{caseAcolor}{\textbf{【案例A-#1】}}}
+\newcommand{\caseB}[1]{\textcolor{caseBcolor}{\textbf{【案例B-#1】}}}
+
+% ============ 定理环境 ============
+\theoremstyle{definition}
+\newtheorem{definition}{定义}[chapter]
+\newtheorem{example}{例}[chapter]
+\newtheorem{remark}{注}[chapter]
+\theoremstyle{plain}
+\newtheorem{theorem}{定理}[chapter]
+\newtheorem{proposition}{命题}[chapter]
+\newtheorem{lemma}{引理}[chapter]
+
+% ============ tcolorbox 环境 ============
+\newtcolorbox{keypoint}[1][]{
+  colback=blue!5!white,
+  colframe=blue!60!black,
+  title={\textbf{要点}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{algbox}[1][]{
+  colback=gray!5!white,
+  colframe=gray!60!black,
+  title={\textbf{算法概要}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{appbox}[1][]{
+  colback=green!5!white,
+  colframe=green!60!black,
+  title={\textbf{应用案例}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+\newtcolorbox{levelbox}[1][]{
+  colback=orange!5!white,
+  colframe=orange!60!black,
+  title={\textbf{学习建议}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+% 案例A环境（多星观测）
+\newtcolorbox{caseboxA}[1][]{
+  colback=blue!3!white,
+  colframe=caseAcolor,
+  title={\textbf{案例A：多星协同对地观测}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+% 案例B环境（军事战术）
+\newtcolorbox{caseboxB}[1][]{
+  colback=orange!3!white,
+  colframe=caseBcolor,
+  title={\textbf{案例B：军事战术任务规划}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+% 讨论题环境
+\newtcolorbox{discussbox}[1][]{
+  colback=yellow!5!white,
+  colframe=yellow!60!black,
+  title={\textbf{讨论与思考}},
+  fonttitle=\bfseries,
+  breakable,
+  #1
+}
+
+% ============ 代码环境 ============
+\lstset{
+  basicstyle=\ttfamily\small,
+  backgroundcolor=\color{codebg},
+  frame=single,
+  rulecolor=\color{codeframe},
+  breaklines=true,
+  numbers=left,
+  numberstyle=\tiny\color{gray},
+  keywordstyle=\color{blue!70!black}\bfseries,
+  commentstyle=\color{green!50!black},
+  stringstyle=\color{red!60!black},
+  showstringspaces=false
+}
+
+% ============ 页眉页脚 ============
+\pagestyle{fancy}
+\fancyhf{}
+\fancyhead[LE]{\leftmark}
+\fancyhead[RO]{\rightmark}
+\fancyfoot[C]{\thepage}
+\renewcommand{\headrulewidth}{0.4pt}
+
+% ============ 章节标题格式 ============
+\ctexset{
+  chapter/format = \LARGE\bfseries\color{blue!70!black},
+  section/format = \Large\bfseries,
+  subsection/format = \large\bfseries
+}
+
+% ============ 算法环境中文化 ============
+\floatname{algorithm}{算法}
+\renewcommand{\algorithmicrequire}{\textbf{输入:}}
+\renewcommand{\algorithmicensure}{\textbf{输出:}}
+
+% ============ 文档信息 ============
+\title{{\Huge\bfseries 任务规划算法体系}\\[0.8em]
+{\Large 案例式教学版}\\[0.5em]
+{\large 从经典方法到智能规划}\\[2em]
+{\normalsize\color{gray} 本科生教学参考教材}}
+\author{}
+\date{\today}
+
+\begin{document}
+
+% ============ 封面 ============
+\maketitle
+
+% ============ 教学说明 ============
+\thispagestyle{empty}
+\vspace*{2cm}
+\begin{center}
+{\Large\bfseries 案例式教学说明}
+\end{center}
+\vspace{1cm}
+
+\noindent 本书采用\textbf{案例式教学}方法，以两个核心案例贯穿全书：
+
+\vspace{1em}
+
+\begin{center}
+\begin{tabular}{cp{10cm}}
+\toprule
+\textbf{案例线} & \textbf{内容描述} \\
+\midrule
+\textcolor{caseAcolor}{\textbf{案例A}} & \textbf{多星协同对地观测任务规划}：从单星确定性观测开始，逐步引入约束、不确定性、多星协同、对抗博弈等要素。 \\[0.8em]
+\textcolor{caseBcolor}{\textbf{案例B}} & \textbf{军事战术任务规划}：从单平台侦察任务开始，逐步演化为多阶段任务分解、不完全信息决策、多平台协同、欺骗与隐蔽规划。 \\
+\bottomrule
+\end{tabular}
+\end{center}
+
+\vspace{1.5em}
+
+\noindent\textbf{案例演进逻辑：}
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{v1$\rightarrow$v2}：从"能做什么"到"在约束下做什么"——引入HTN分解与约束求解
+  \item \textbf{v2$\rightarrow$v3}：从"确定世界"到"不确定世界"——引入概率规划与POMDP
+  \item \textbf{v3$\rightarrow$v4}：从"单体决策"到"群体协同"——引入分布式规划与MARL
+  \item \textbf{v4$\rightarrow$v5}：从"合作环境"到"对抗环境"——引入博弈规划与对抗规划
+\end{itemize}
+
+\vspace{1.5em}
+
+\noindent\textbf{建议学习方式：}
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{课前}：阅读案例描述，思考预习问题（约30分钟）
+  \item \textbf{课中}：参与案例讨论，学习算法原理，分析案例求解过程
+  \item \textbf{课后}：完成编程练习，尝试改进算法，撰写案例分析报告
+\end{enumerate}
+
+\clearpage
+
+% ============ 目录 ============
+\tableofcontents
+
+% ============ 前言 ============
+\chapter*{前言}
+\addcontentsline{toc}{chapter}{前言}
+
+任务规划（Task Planning）是人工智能领域的核心研究方向之一，其目标是让智能体能够自主地制定行动方案以达成预设目标。本书采用\textbf{案例式教学}方法，以两个核心案例——"多星协同对地观测"和"军事战术任务规划"——贯穿全书七章内容，帮助学生在解决实际问题的过程中掌握任务规划的核心算法与方法。
+
+\textbf{案例式教学的理念}：
+\begin{itemize}[leftmargin=2em]
+  \item 以真实问题为驱动，激发学习兴趣
+  \item 通过案例演进揭示方法演化的内在逻辑
+  \item 在讨论中深化理解，在实践中巩固知识
+\end{itemize}
+
+本书内容组织如下：
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{第1章}：绪论与背景知识——介绍任务规划基本概念，回顾搜索方法，引入核心案例
+  \item \textbf{第2章}：任务建模与经典规划——STRIPS/PDDL建模，前向搜索
+  \item \textbf{第3章}：层次任务网络与约束规划——HTN分解，CSP/SAT/SMT约束求解
+  \item \textbf{第4章}：不确定性与概率规划——MDP/POMDP，强化学习基础
+  \item \textbf{第5章}：分布式与多智能体规划——MA-STRIPS，MAPF，MARL
+  \item \textbf{第6章}：博弈规划与对抗规划——Stackelberg博弈，欺骗与隐蔽规划
+  \item \textbf{第7章}：前沿方法与系统集成——LLM规划，神经符号方法，系统设计
+\end{itemize}
+
+\vspace{2em}
+\hfill 编者
+
+\hfill \today
+
+% =============================================
+% 第1章：绪论与背景知识
+% =============================================
+\include{chapters/chapter01_new}
+
+% =============================================
+% 第2章：任务建模与经典规划
+% =============================================
+\include{chapters/chapter02_new}
+
+% =============================================
+% 第3章：层次任务网络与约束规划
+% =============================================
+\include{chapters/chapter03_new}
+
+% =============================================
+% 第4章：不确定性与概率规划
+% =============================================
+\include{chapters/chapter04_new}
+
+% =============================================
+% 第5章：分布式与多智能体规划
+% =============================================
+\include{chapters/chapter05_new}
+
+% =============================================
+% 第6章：博弈规划与对抗规划
+% =============================================
+\include{chapters/chapter06_new}
+
+% =============================================
+% 第7章：前沿方法与系统集成
+% =============================================
+\include{chapters/chapter07_new}
+
+% =============================================
+% 附录
+% =============================================
+\appendix
+\include{appendices/appendixA}
+
+% ============ 参考文献 ============
+\begin{thebibliography}{99}
+\addcontentsline{toc}{chapter}{参考文献}
+
+% 经典教材
+\bibitem{ghallab2004} Ghallab M, Nau D, Traverso P. Automated Planning: Theory and Practice[M]. Morgan Kaufmann, 2004.
+\bibitem{russell2020} Russell S, Norvig P. Artificial Intelligence: A Modern Approach (4th ed)[M]. Pearson, 2020.
+\bibitem{sutton2018} Sutton R S, Barto A G. Reinforcement Learning: An Introduction (2nd ed)[M]. MIT Press, 2018.
+\bibitem{shoham2009} Shoham Y, Leyton-Brown K. Multiagent Systems[M]. Cambridge University Press, 2009.
+
+% 经典规划
+\bibitem{hoffmann2001} Hoffmann J, Nebel B. The FF Planning System[J]. JAIR, 2001, 14:253--302.
+\bibitem{helmert2006} Helmert M. The Fast Downward Planning System[J]. JAIR, 2006, 26:191--246.
+\bibitem{erol1994} Erol K, Hendler J, Nau D S. HTN Planning: Complexity and Expressivity[C]. AAAI, 1994.
+
+% 强化学习与规划
+\bibitem{silver2017} Silver D, et al. Mastering the Game of Go without Human Knowledge[J]. Nature, 2017.
+\bibitem{schrittwieser2020} Schrittwieser J, et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model[J]. Nature, 2020.
+\bibitem{hafner2023} Hafner D, et al. Mastering Diverse Domains through World Models[J]. arXiv:2301.04104, 2023.
+
+% LLM与规划
+\bibitem{yao2023} Yao S, et al. ReAct: Synergizing Reasoning and Acting in Language Models[C]. ICLR, 2023.
+\bibitem{liu2023llmp} Liu B, et al. LLM+P: Empowering Large Language Models with Optimal Planning Proficiency[J]. arXiv:2304.11477, 2023.
+
+% 多智能体
+\bibitem{sharon2015} Sharon G, et al. Conflict-Based Search for Optimal Multi-Agent Pathfinding[J]. AI, 2015.
+\bibitem{rashid2018} Rashid T, et al. QMIX: Monotonic Value Function Factorisation for Deep Multi-Agent RL[C]. ICML, 2018.
+
+% 博弈规划
+\bibitem{tambe2011} Tambe M. Security and Game Theory: Algorithms, Deployed Systems, Lessons Learned[M]. Cambridge, 2011.
+\bibitem{basilico2017} Basilico N, et al. Adversarial Patrolling Games[J]. AI, 2017.
+
+% 中文文献
+\bibitem{cai2024} 蔡自兴, 等. 人工智能及其应用（第7版）[M]. 清华大学出版社, 2024.
+\bibitem{yin2008} Ghallab等著, 殷建平等译. 自动规划：理论和实践[M]. 清华大学出版社, 2008.
+\bibitem{qin2024} 秦龙, 等. 基于大语言模型的复杂任务自主规划处理框架[J]. 自动化学报, 2024.
+\bibitem{liang2020} 梁星星, 等. 多Agent深度强化学习综述[J]. 自动化学报, 2020.
+\bibitem{du2020} 杜永浩, 邢立宁, 等. 无人飞行器集群智能调度技术综述[J]. 自动化学报, 2020.
+
+\end{thebibliography}
+
+\end{document}

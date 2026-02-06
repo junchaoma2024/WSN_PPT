@@ -1,0 +1,315 @@
+% 第6章：博弈规划与对抗规划
+\chapter{博弈规划与对抗规划}
+
+\begin{levelbox}
+本章介绍在对抗环境下的规划方法，包括博弈论基础、Stackelberg博弈、零和博弈以及欺骗与隐蔽规划。通过案例v5版本学习如何处理对抗性场景。建议学时：8学时。
+\end{levelbox}
+
+% =============================================
+\section{博弈论基础}
+% =============================================
+
+\subsection{博弈的基本概念}
+
+\begin{definition}[标准式博弈]
+一个$n$人标准式博弈由以下要素定义：
+\begin{itemize}
+  \item 参与者集合 $N = \{1, 2, \ldots, n\}$
+  \item 每个参与者的策略集合 $S_i$
+  \item 每个参与者的收益函数 $u_i: S_1 \times \cdots \times S_n \rightarrow \mathbb{R}$
+\end{itemize}
+\end{definition}
+
+\subsection{纳什均衡}
+
+\begin{definition}[纳什均衡]
+策略组合 $(s_1^*, \ldots, s_n^*)$ 是纳什均衡，当且仅当对每个参与者 $i$：
+\[ u_i(s_i^*, s_{-i}^*) \geq u_i(s_i, s_{-i}^*), \quad \forall s_i \in S_i \]
+即没有任何参与者有动机单方面偏离。
+\end{definition}
+
+\subsection{博弈类型}
+
+\begin{table}[htbp]
+\centering
+\caption{常见博弈类型}
+\begin{tabular}{p{3cm}p{4cm}p{5cm}}
+\toprule
+\textbf{类型} & \textbf{特点} & \textbf{应用场景} \\
+\midrule
+零和博弈 & 一方所得即另一方所失 & 军事对抗、竞技游戏 \\
+Stackelberg博弈 & 领导者先行动，跟随者响应 & 安全资源部署、定价策略 \\
+贝叶斯博弈 & 存在不完全信息 & 信息不对称的对抗 \\
+重复博弈 & 同一博弈重复进行 & 长期关系、声誉建立 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================
+\section{Stackelberg博弈规划}
+% =============================================
+
+\subsection{Stackelberg博弈模型}
+
+\begin{definition}[Stackelberg博弈]
+Stackelberg博弈是一种序贯博弈：
+\begin{enumerate}
+  \item \textbf{领导者}先选择策略 $x$（可以是混合策略）
+  \item \textbf{跟随者}观察到领导者策略后，选择最优响应 $y^*(x)$
+  \item 领导者需要预测跟随者的响应来优化自己的策略
+\end{enumerate}
+\end{definition}
+
+\textbf{Stackelberg均衡}：领导者选择使自己收益最大化的策略，同时考虑跟随者的最优响应。
+
+\subsection{安全博弈}
+
+\begin{keypoint}[安全博弈（Security Games）]
+安全博弈是Stackelberg博弈的重要应用：
+\begin{itemize}
+  \item \textbf{防守方}（领导者）：部署有限的安全资源
+  \item \textbf{攻击方}（跟随者）：观察防守部署后选择攻击目标
+  \item 应用：机场安检、海岸巡逻、野生动物保护
+\end{itemize}
+\end{keypoint}
+
+\begin{example}[案例A-v5的安全博弈建模]
+\textbf{场景}：敌方可能对我方卫星实施电子干扰。
+
+\textbf{防守方}（我方）：
+\begin{itemize}
+  \item 资源：有限的抗干扰设备和轨道机动能力
+  \item 策略：为哪些卫星配置抗干扰？机动规避策略？
+\end{itemize}
+
+\textbf{攻击方}（敌方）：
+\begin{itemize}
+  \item 观察我方卫星轨道和配置
+  \item 选择干扰目标和时机
+\end{itemize}
+
+\textbf{目标}：设计鲁棒的观测调度策略，即使面对最优攻击者也能保证最低观测收益。
+\end{example}
+
+% =============================================
+\section{零和博弈与极大极小搜索}
+% =============================================
+
+\subsection{零和博弈}
+
+\begin{definition}[零和博弈]
+两人零和博弈中，双方收益之和恒为零：
+\[ u_1(s_1, s_2) + u_2(s_1, s_2) = 0 \]
+\end{definition}
+
+零和博弈的最优策略可通过极大极小原则求解：
+\[ v^* = \max_{s_1} \min_{s_2} u_1(s_1, s_2) = \min_{s_2} \max_{s_1} u_1(s_1, s_2) \]
+
+\subsection{极大极小搜索}
+
+\begin{algbox}[title={\textbf{极大极小算法}}]
+\begin{lstlisting}[language=Python,basicstyle=\ttfamily\small]
+def minimax(state, depth, is_max_player):
+    if depth == 0 or is_terminal(state):
+        return evaluate(state)
+
+    if is_max_player:
+        value = -infinity
+        for action in get_actions(state):
+            child = apply(state, action)
+            value = max(value, minimax(child, depth-1, False))
+        return value
+    else:
+        value = +infinity
+        for action in get_actions(state):
+            child = apply(state, action)
+            value = min(value, minimax(child, depth-1, True))
+        return value
+\end{lstlisting}
+\end{algbox}
+
+\subsection{Alpha-Beta剪枝}
+
+Alpha-Beta剪枝通过维护搜索窗口 $[\alpha, \beta]$ 减少不必要的搜索：
+\begin{itemize}[leftmargin=2em]
+  \item $\alpha$：Max玩家已知的最优下界
+  \item $\beta$：Min玩家已知的最优上界
+  \item 当 $\alpha \geq \beta$ 时剪枝
+\end{itemize}
+
+% =============================================
+\section{\caseA{v5}对抗性观测任务}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{案例A-v5：对抗性卫星观测}}]
+\textbf{场景演进}：v4是合作性多星系统，v5引入对抗性敌方。
+
+\textbf{对抗要素}：
+\begin{itemize}
+  \item \textbf{电子干扰}：敌方可干扰我方卫星的成像和通信
+  \item \textbf{目标隐蔽}：敌方高价值目标可能采取伪装措施
+  \item \textbf{轨道威胁}：敌方可能对我方卫星实施接近操作
+\end{itemize}
+
+\textbf{博弈建模}：
+\begin{itemize}
+  \item 我方选择观测调度策略（可以是随机策略）
+  \item 敌方选择干扰策略
+  \item 求解Stackelberg均衡或零和博弈均衡
+\end{itemize}
+\end{caseboxA}
+
+% =============================================
+\section{贝叶斯博弈与不完全信息}
+% =============================================
+
+\subsection{贝叶斯博弈}
+
+\begin{definition}[贝叶斯博弈]
+贝叶斯博弈在标准博弈基础上增加：
+\begin{itemize}
+  \item \textbf{类型空间} $\Theta_i$：参与者 $i$ 的可能类型
+  \item \textbf{先验分布} $p(\theta)$：类型的先验概率分布
+  \item 每个参与者知道自己的类型，但只知道其他参与者类型的分布
+\end{itemize}
+\end{definition}
+
+\textbf{贝叶斯纳什均衡}：每个参与者在给定自己类型和对他人类型的信念下，选择最优策略。
+
+\subsection{信息不对称下的规划}
+
+在对抗性规划中，信息不对称是常态：
+\begin{itemize}[leftmargin=2em]
+  \item 我方不完全了解敌方的能力和意图（敌方类型）
+  \item 需要基于敌方类型的先验分布进行规划
+  \item 可以通过观测更新对敌方类型的信念
+\end{itemize}
+
+% =============================================
+\section{\caseB{v5}欺骗与隐蔽规划}
+% =============================================
+
+\begin{caseboxB}[title={\textbf{案例B-v5：欺骗与隐蔽战术}}]
+\textbf{场景演进}：v4是对称信息下的协同，v5引入欺骗与隐蔽。
+
+\textbf{新增要素}：
+\begin{itemize}
+  \item \textbf{欺骗机动}：通过虚假行动误导敌方
+  \item \textbf{意图隐蔽}：隐藏真实攻击意图
+  \item \textbf{佯攻}：分散敌方注意力
+\end{itemize}
+
+\textbf{核心问题}：
+\begin{itemize}
+  \item 如何设计欺骗策略使敌方形成错误判断？
+  \item 如何在隐蔽行动的同时达成作战目标？
+  \item 欺骗是否违反伦理？军事领域的欺骗合法性？
+\end{itemize}
+\end{caseboxB}
+
+\subsection{欺骗规划}
+
+\begin{definition}[欺骗规划]
+\textbf{欺骗规划}（Deceptive Planning）旨在使对手对规划者的目标或能力形成错误信念。
+\end{definition}
+
+\textbf{欺骗策略类型}：
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{目标欺骗}：隐藏真实目标，展示虚假目标
+  \item \textbf{能力欺骗}：隐藏或夸大自身能力
+  \item \textbf{意图欺骗}：展示与真实意图不同的行动计划
+\end{enumerate}
+
+\begin{keypoint}[欺骗规划的形式化]
+给定观察者模型，欺骗规划寻找：
+\begin{itemize}
+  \item 使观察者对真实目标 $G^*$ 的置信度降低
+  \item 使观察者对虚假目标 $G'$ 的置信度升高
+  \item 同时仍能达成真实目标 $G^*$
+\end{itemize}
+\end{keypoint}
+
+\subsection{隐蔽规划}
+
+\begin{definition}[隐蔽规划]
+\textbf{隐蔽规划}（Covert Planning）旨在达成目标的同时，使对手难以推断规划者的真实目标。
+\end{definition}
+
+与欺骗规划不同，隐蔽规划不主动展示虚假信息，而是最小化信息泄露。
+
+\textbf{隐蔽性度量}：
+\begin{itemize}[leftmargin=2em]
+  \item 目标概率分布的熵：熵越高，目标越难推断
+  \item 观察者预测与真实目标的差异
+\end{itemize}
+
+\subsection{案例B-v5示例}
+
+\begin{example}[佯攻与主攻]
+\textbf{场景}：需要攻击高价值目标T1，但T1防御严密。
+
+\textbf{欺骗策略}：
+\begin{enumerate}
+  \item 派遣无人机对次要目标T2实施明显的侦察行动
+  \item 使敌方认为T2是主攻目标，调动防御资源
+  \item 趁机对T1实施突然打击
+\end{enumerate}
+
+\textbf{隐蔽策略}：
+\begin{enumerate}
+  \item 对多个目标（T1、T2、T3）同时进行低强度侦察
+  \item 使敌方无法判断真实攻击目标
+  \item 在最后时刻才暴露真实意图
+\end{enumerate}
+\end{example}
+
+% =============================================
+\section{对抗多智能体系统}
+% =============================================
+
+\subsection{混合合作-竞争环境}
+
+现实中很多场景既有合作又有竞争：
+\begin{itemize}[leftmargin=2em]
+  \item 队内合作、队间竞争（如足球比赛）
+  \item 部分目标一致、部分目标冲突
+  \item 可能存在背叛和策略转换
+\end{itemize}
+
+\subsection{对抗性MARL}
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{自我对弈}（Self-Play）：通过与自己的历史版本对弈学习
+  \item \textbf{虚拟自我对弈}（Fictitious Self-Play）：对历史策略分布采样
+  \item \textbf{Policy-Space Response Oracles（PSRO）}：在策略空间中迭代求解
+\end{itemize}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item 博弈论为对抗性规划提供数学框架
+  \item Stackelberg博弈适用于领导者-跟随者场景
+  \item 零和博弈通过极大极小搜索求解
+  \item 欺骗规划和隐蔽规划是对抗性规划的重要分支
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 案例A-v5中，如果我方的观测调度是确定性的，敌方是否更容易干扰？随机策略有什么优势？
+  \item 欺骗规划在民用领域有哪些应用？是否存在伦理问题？
+  \item 案例B-v5的佯攻策略，如果敌方也是智能的会如何应对？会形成什么样的博弈？
+  \item 如何评估欺骗规划的有效性？需要什么样的指标？
+\end{enumerate}
+
+\textbf{编程练习}：
+\begin{enumerate}
+  \item 实现极大极小搜索和Alpha-Beta剪枝，在井字棋上测试
+  \item 使用GAMUT或Gambit工具求解案例A-v5的安全博弈
+  \item 设计一个简单的欺骗规划算法，在路径规划场景中测试
+\end{enumerate}
+\end{discussbox}

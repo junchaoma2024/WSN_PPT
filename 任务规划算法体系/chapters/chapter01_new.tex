@@ -1,0 +1,254 @@
+% 第1章：绪论与背景知识
+\chapter{绪论与背景知识}
+
+\begin{levelbox}
+本章为全书的基础，介绍任务规划的基本概念、应用领域、搜索方法回顾，并引入贯穿全书的两个核心案例。建议学时：4学时。
+\end{levelbox}
+
+% =============================================
+\section{任务规划的基本概念与应用领域}
+% =============================================
+
+\subsection{什么是任务规划}
+
+\begin{definition}[任务规划]
+\textbf{任务规划}（Task Planning）是指智能体根据当前状态、目标状态和可用动作，自动生成一个能够达成目标的动作序列或策略的过程。
+\end{definition}
+
+任务规划是人工智能的核心问题之一。早在1959年，Newell和Simon就提出了通用问题求解器（GPS），开创了自动规划研究的先河。经过数十年发展，任务规划已形成完整的理论体系和丰富的应用实践。
+
+\subsection{任务规划的核心要素}
+
+一个任务规划问题通常包含以下要素：
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{状态空间} $\mathcal{S}$：所有可能状态的集合
+  \item \textbf{初始状态} $s_0 \in \mathcal{S}$：问题的起始状态
+  \item \textbf{目标} $G$：需要达成的条件，可以是目标状态 $s_g$ 或目标条件集合
+  \item \textbf{动作集合} $\mathcal{A}$：智能体可执行的所有动作
+  \item \textbf{状态转移函数} $\delta: \mathcal{S} \times \mathcal{A} \rightarrow \mathcal{S}$：描述动作对状态的影响
+  \item \textbf{规划} $\pi$：一个动作序列 $\langle a_1, a_2, \ldots, a_n \rangle$，使得从 $s_0$ 出发依次执行后可达成目标
+\end{itemize}
+
+\subsection{任务规划的主要应用领域}
+
+\begin{table}[htbp]
+\centering
+\caption{任务规划的典型应用领域}
+\begin{tabular}{p{3cm}p{4cm}p{5cm}}
+\toprule
+\textbf{领域} & \textbf{典型问题} & \textbf{特点} \\
+\midrule
+航天航空 & 卫星观测调度、航迹规划 & 时间窗口约束、资源有限 \\
+军事国防 & 作战任务规划、无人机协同 & 对抗性、不确定性高 \\
+物流运输 & 车辆路径规划、仓储调度 & 大规模、实时性要求 \\
+机器人 & 运动规划、任务分配 & 连续空间、多约束 \\
+智能制造 & 生产调度、工艺规划 & 资源冲突、时序约束 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================
+\section{搜索方法回顾}
+% =============================================
+
+\begin{levelbox}
+本节回顾搜索算法的基础知识，作为后续章节的预备知识。已熟悉搜索算法的读者可快速浏览。
+\end{levelbox}
+
+\subsection{状态空间搜索框架}
+
+任务规划可以抽象为状态空间中的搜索问题。从初始状态出发，通过执行动作在状态空间中探索，直到找到满足目标的状态。
+
+\begin{algbox}[title={\textbf{通用状态空间搜索框架}}]
+\begin{enumerate}
+  \item 初始化：将初始状态 $s_0$ 放入开放列表（Open List）
+  \item 循环：
+  \begin{enumerate}
+    \item 如果开放列表为空，返回失败
+    \item 从开放列表中选择一个状态 $s$（选择策略决定搜索方式）
+    \item 如果 $s$ 满足目标条件，返回解路径
+    \item 将 $s$ 移入关闭列表（Closed List）
+    \item 扩展 $s$：对每个可执行动作 $a$，计算后继状态 $s' = \delta(s, a)$
+    \item 将新的后继状态加入开放列表
+  \end{enumerate}
+\end{enumerate}
+\end{algbox}
+
+\subsection{盲目搜索策略}
+
+\textbf{广度优先搜索（BFS）}：按层次扩展，保证找到最短路径（动作数最少），但空间复杂度高。
+
+\textbf{深度优先搜索（DFS）}：沿一条路径深入探索，空间复杂度低，但不保证最优性。
+
+\textbf{迭代加深搜索（IDS）}：结合BFS的完备性和DFS的低空间复杂度。
+
+\subsection{启发式搜索与A*算法}
+
+\begin{keypoint}[A*算法核心思想]
+A*算法使用评价函数 $f(n) = g(n) + h(n)$ 指导搜索：
+\begin{itemize}
+  \item $g(n)$：从初始状态到节点 $n$ 的实际代价
+  \item $h(n)$：从节点 $n$ 到目标的估计代价（启发式函数）
+  \item 当 $h(n)$ 满足\textbf{可纳性}（不高估实际代价）时，A*保证找到最优解
+\end{itemize}
+\end{keypoint}
+
+\begin{definition}[可纳启发式]
+启发式函数 $h$ 是\textbf{可纳的}（admissible），当且仅当对所有状态 $n$：
+\[ h(n) \leq h^*(n) \]
+其中 $h^*(n)$ 是从 $n$ 到目标的真实最优代价。
+\end{definition}
+
+\subsection{启发式函数设计}
+
+好的启发式函数应该：
+\begin{enumerate}[leftmargin=2em]
+  \item 提供有效的搜索引导（接近真实代价）
+  \item 计算代价低
+  \item 满足可纳性（保证最优性）
+\end{enumerate}
+
+常见的启发式设计方法：
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{松弛问题}：忽略部分约束，求解简化问题的最优解作为启发值
+  \item \textbf{模式数据库}：预计算子问题的最优解，存储为查找表
+  \item \textbf{地标启发式}：识别必须达成的子目标（地标），统计未完成数量
+\end{itemize}
+
+% =============================================
+\section{核心案例介绍}
+% =============================================
+
+本书采用两个核心案例贯穿全部章节，通过案例的逐步演化展示不同规划方法的适用场景和演化逻辑。
+
+\subsection{案例A：多星协同对地观测任务规划}
+
+\begin{caseboxA}[title={\textbf{案例A：多星协同对地观测任务规划}}]
+\textbf{背景}：某国拥有由多颗遥感卫星组成的对地观测系统，需要对地面多个目标区域进行成像观测。
+
+\textbf{问题}：如何调度各卫星的观测任务，在满足各种约束的条件下，最大化观测收益？
+
+\textbf{案例版本演进}：
+\begin{itemize}
+  \item \textbf{v1}（第2章）：单星、确定性、无复杂约束 → PDDL建模
+  \item \textbf{v2}（第3章）：增加时间窗口、能量、存储约束 → HTN + CSP
+  \item \textbf{v3}（第4章）：引入云层遮挡不确定性 → MDP/POMDP
+  \item \textbf{v4}（第5章）：多星协同覆盖、资源竞争 → 分布式规划
+  \item \textbf{v5}（第6章）：敌方电子干扰、轨道机动对抗 → 博弈规划
+\end{itemize}
+\end{caseboxA}
+
+\textbf{案例A数据}（简化版）：
+\begin{itemize}[leftmargin=2em]
+  \item 卫星数量：1颗（v1-v3），3颗（v4-v5）
+  \item 目标区域：10个待观测点，各有优先级和观测收益
+  \item 轨道周期：约90分钟，每轨可观测3-5个目标
+  \item 主要约束：观测窗口、存储容量、能量、下传能力
+\end{itemize}
+
+\subsection{案例B：军事战术任务规划}
+
+\begin{caseboxB}[title={\textbf{案例B：军事战术任务规划}}]
+\textbf{背景}：某战术分队需要执行侦察-打击-评估任务链，涉及无人机、地面平台等多种作战单元。
+
+\textbf{问题}：如何规划各平台的任务序列，在不确定的战场环境中完成作战目标？
+
+\textbf{案例版本演进}：
+\begin{itemize}
+  \item \textbf{v1}（第2章）：单无人机侦察任务 → 基本建模
+  \item \textbf{v2}（第3章）：侦察-打击-评估任务链分解 → HTN分解
+  \item \textbf{v3}（第4章）：战场迷雾、敌情不明 → POMDP
+  \item \textbf{v4}（第5章）：有人-无人协同编队 → 多智能体规划
+  \item \textbf{v5}（第6章）：欺骗机动、意图隐蔽 → 欺骗/隐蔽规划
+\end{itemize}
+\end{caseboxB}
+
+\textbf{案例B数据}（简化版）：
+\begin{itemize}[leftmargin=2em]
+  \item 作战单元：1架无人机（v1-v3），1架有人机+2架无人机（v4-v5）
+  \item 目标：3个高价值目标，需要侦察确认后实施打击
+  \item 威胁：防空火力点、电子干扰
+  \item 主要约束：航程、载弹量、通信链路、生存概率
+\end{itemize}
+
+\subsection{案例演进的逻辑说明}
+
+\begin{table}[htbp]
+\centering
+\caption{案例版本演进的逻辑}
+\begin{tabular}{ccp{8cm}}
+\toprule
+\textbf{演进} & \textbf{引入要素} & \textbf{为什么需要新方法？} \\
+\midrule
+v1→v2 & 复杂约束 & 前一方法难以处理时间、资源等硬约束 \\
+v2→v3 & 不确定性 & 现实中观测/感知存在不确定性，需要概率建模 \\
+v3→v4 & 多智能体 & 单体能力有限，需要多个智能体协同完成任务 \\
+v4→v5 & 对抗博弈 & 存在敌方对手，需要考虑博弈和对抗策略 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% =============================================
+\section{本书结构与学习方法}
+% =============================================
+
+\subsection{全书章节结构}
+
+\begin{table}[htbp]
+\centering
+\caption{全书章节与案例对应关系}
+\begin{tabular}{clcc}
+\toprule
+\textbf{章} & \textbf{内容} & \textbf{案例A} & \textbf{案例B} \\
+\midrule
+1 & 绪论与背景知识 & 介绍 & 介绍 \\
+2 & 任务建模与经典规划 & v1 & v1 \\
+3 & 层次任务网络与约束规划 & v2 & v2 \\
+4 & 不确定性与概率规划 & v3 & v3 \\
+5 & 分布式与多智能体规划 & v4 & v4 \\
+6 & 博弈规划与对抗规划 & v5 & v5 \\
+7 & 前沿方法与系统集成 & 综合 & 综合 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{建议学习方式}
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{课前预习}：阅读案例描述，思考如何解决案例中的问题
+  \item \textbf{课堂学习}：
+  \begin{itemize}
+    \item 讨论案例问题的抽象和建模
+    \item 学习相关算法的原理
+    \item 分析算法在案例上的应用
+  \end{itemize}
+  \item \textbf{课后巩固}：
+  \begin{itemize}
+    \item 完成编程练习，实现核心算法
+    \item 在案例数据上运行和调试
+    \item 撰写案例分析报告
+  \end{itemize}
+\end{enumerate}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item 任务规划是让智能体自主生成行动方案的核心AI问题
+  \item 状态空间搜索是任务规划的基础框架
+  \item A*算法通过启发式函数有效引导搜索
+  \item 本书以"多星观测"和"军事战术"两个案例贯穿全书
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 除了本章提到的应用领域，你还能想到哪些任务规划的应用场景？
+  \item 对于案例A（卫星观测），你认为最大的挑战是什么？如果只用A*搜索能解决吗？
+  \item 案例B涉及军事应用，你认为任务规划在军事领域应用需要注意哪些伦理问题？
+\end{enumerate}
+\end{discussbox}

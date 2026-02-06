@@ -1,0 +1,241 @@
+% 第4章：不确定性与概率规划
+\chapter{不确定性与概率规划}
+
+\begin{levelbox}
+本章介绍在不确定环境下的规划方法，包括条件规划、MDP/POMDP和强化学习基础。通过案例v3版本学习如何处理观测和状态不确定性。建议学时：8学时。
+\end{levelbox}
+
+% =============================================
+\section{\caseA{v3}云层遮挡下的观测规划}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{案例A-v3：不确定性观测环境}}]
+\textbf{场景演进}：v2假设观测必定成功，v3引入不确定性。
+
+\textbf{新增不确定因素}：
+\begin{itemize}
+  \item \textbf{云层遮挡}：观测成功与否取决于云量，概率可预测但不确定
+  \item \textbf{设备故障}：成像设备有一定故障概率
+  \item \textbf{目标移动}：部分目标可能在观测窗口内移动
+\end{itemize}
+
+\textbf{为什么v2方法不够？}
+\begin{itemize}
+  \item 确定性规划假设动作效果完全可预测
+  \item 无法处理"观测失败后重新规划"的场景
+  \item 需要概率建模和期望收益优化
+\end{itemize}
+
+\textbf{预习思考}：
+\begin{enumerate}
+  \item 如何建模"观测可能失败"这一不确定性？
+  \item 是否应该为每个目标安排备选观测窗口？
+  \item 如何在不确定性下最大化期望观测收益？
+\end{enumerate}
+\end{caseboxA}
+
+% =============================================
+\section{条件规划与一致性规划}
+% =============================================
+
+\subsection{非确定性动作}
+
+\begin{definition}[非确定性动作]
+非确定性动作的效果不唯一，执行后可能到达多个可能状态之一：
+\[ \text{Effects}(a) = \{e_1, e_2, \ldots, e_k\} \]
+具体到达哪个状态在执行前未知。
+\end{definition}
+
+\subsection{条件规划}
+
+\textbf{条件规划}（Contingent Planning）允许在执行过程中进行观测和分支。
+
+\begin{keypoint}[条件规划的输出]
+条件规划的输出不是线性动作序列，而是一棵\textbf{条件规划树}：
+\begin{itemize}
+  \item 内部节点：感知动作，根据观测结果分支
+  \item 叶节点：目标状态或失败
+  \item 执行时根据实际观测选择分支
+\end{itemize}
+\end{keypoint}
+
+\begin{example}[案例A的条件规划]
+\begin{verbatim}
+1. 尝试观测目标T1
+2. 感知：观测是否成功？
+   - 如果成功：继续观测T2
+   - 如果失败（云层遮挡）：
+     - 等待下一观测窗口
+     - 或转向备选目标T1'
+\end{verbatim}
+\end{example}
+
+\subsection{一致性规划}
+
+\textbf{一致性规划}（Conformant Planning）：在不确定初始状态下，寻找一个在所有可能初始状态下都能达成目标的动作序列。
+
+\begin{itemize}[leftmargin=2em]
+  \item 不依赖执行时观测
+  \item 在信念空间（Belief Space）中搜索
+  \item 计算复杂度高（EXPSPACE-完全）
+\end{itemize}
+
+% =============================================
+\section{MDP/POMDP框架}
+% =============================================
+
+\subsection{马尔可夫决策过程（MDP）}
+
+\begin{definition}[MDP]
+MDP由五元组 $\langle S, A, T, R, \gamma \rangle$ 定义：
+\begin{itemize}
+  \item $S$：状态空间
+  \item $A$：动作空间
+  \item $T(s'|s,a)$：状态转移概率
+  \item $R(s,a)$：即时奖励函数
+  \item $\gamma \in [0,1)$：折扣因子
+\end{itemize}
+\end{definition}
+
+\textbf{目标}：找到策略 $\pi: S \rightarrow A$，最大化期望累积奖励：
+\[ V^\pi(s) = \mathbb{E}\left[\sum_{t=0}^{\infty} \gamma^t R(s_t, \pi(s_t)) \mid s_0 = s\right] \]
+
+\subsection{值迭代与策略迭代}
+
+\begin{algbox}[title={\textbf{值迭代算法}}]
+\begin{enumerate}
+  \item 初始化 $V(s) = 0$ 对所有 $s$
+  \item 重复直到收敛：
+  \[ V(s) \leftarrow \max_{a \in A} \left[ R(s,a) + \gamma \sum_{s'} T(s'|s,a) V(s') \right] \]
+  \item 提取最优策略：
+  \[ \pi^*(s) = \arg\max_{a} \left[ R(s,a) + \gamma \sum_{s'} T(s'|s,a) V(s') \right] \]
+\end{enumerate}
+\end{algbox}
+
+\subsection{部分可观测MDP（POMDP）}
+
+\begin{definition}[POMDP]
+POMDP扩展MDP，增加观测模型：
+\begin{itemize}
+  \item $\Omega$：观测空间
+  \item $O(o|s',a)$：在执行动作 $a$ 到达状态 $s'$ 后观测到 $o$ 的概率
+\end{itemize}
+\end{definition}
+
+POMDP中智能体不能直接观测状态，而是维护一个\textbf{信念状态}（Belief State）$b$——关于当前状态的概率分布。
+
+\subsection{案例A-v3的POMDP建模}
+
+\begin{example}[云层遮挡的POMDP模型]
+\textbf{状态}：$s = (\text{已观测目标集合}, \text{各目标云量状态})$
+
+\textbf{动作}：$a = \text{observe}(t)$ 或 $\text{wait}$
+
+\textbf{转移}：
+\begin{itemize}
+  \item 云量状态随时间演化（马尔可夫过程）
+  \item 观测成功概率取决于云量
+\end{itemize}
+
+\textbf{观测}：
+\begin{itemize}
+  \item 执行observe后观测到"成功"或"失败"
+  \item 云量状态不直接可观测，需通过气象预报推断
+\end{itemize}
+
+\textbf{奖励}：成功观测目标获得奖励，与目标优先级成正比
+\end{example}
+
+% =============================================
+\section{\caseB{v3}战场迷雾下的决策}
+% =============================================
+
+\begin{caseboxB}[title={\textbf{案例B-v3：不完全信息作战}}]
+\textbf{场景演进}：v2假设敌情完全已知，v3引入"战场迷雾"。
+
+\textbf{新增不确定性}：
+\begin{itemize}
+  \item \textbf{敌方位置不确定}：只知道敌方可能在某些区域
+  \item \textbf{敌方意图不明}：不知道敌方是否会机动
+  \item \textbf{侦察结果不完全}：侦察可能漏报或误报
+\end{itemize}
+
+\textbf{POMDP建模}：
+\begin{itemize}
+  \item 状态包含敌方真实位置和状态（不可直接观测）
+  \item 侦察动作提供关于敌情的噪声观测
+  \item 需要在信念空间中规划
+\end{itemize}
+\end{caseboxB}
+
+% =============================================
+\section{强化学习与世界模型}
+% =============================================
+
+\subsection{强化学习基础}
+
+当转移概率 $T$ 和奖励函数 $R$ 未知时，可以通过\textbf{强化学习}（RL）从交互经验中学习策略。
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{基于值的方法}：学习值函数 $Q(s,a)$，如Q-learning、DQN
+  \item \textbf{基于策略的方法}：直接学习策略参数，如REINFORCE、PPO
+  \item \textbf{Actor-Critic}：同时学习策略和值函数
+\end{itemize}
+
+\subsection{基于模型的强化学习}
+
+\begin{keypoint}[基于模型的RL与规划]
+基于模型的强化学习先学习环境模型（世界模型），再基于模型进行规划：
+\begin{enumerate}
+  \item 从经验中学习转移模型 $\hat{T}$ 和奖励模型 $\hat{R}$
+  \item 在学习的模型中进行规划（如值迭代、蒙特卡洛树搜索）
+  \item 执行规划结果，收集新经验
+\end{enumerate}
+\end{keypoint}
+
+\subsection{MuZero与Dreamer}
+
+\textbf{MuZero}（DeepMind, 2020）：
+\begin{itemize}[leftmargin=2em]
+  \item 学习隐状态表示和动态模型
+  \item 在隐空间中进行蒙特卡洛树搜索
+  \item 不需要环境的完整规则
+  \item 在围棋、Atari等任务上达到超人水平
+\end{itemize}
+
+\textbf{Dreamer系列}（Hafner et al.）：
+\begin{itemize}[leftmargin=2em]
+  \item 学习世界模型（编码器+动态模型+解码器）
+  \item 在"想象"（世界模型中的模拟）中训练策略
+  \item DreamerV3在多种任务上表现优异
+\end{itemize}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item 条件规划通过感知和分支处理不确定性
+  \item MDP/POMDP是不确定性规划的数学框架
+  \item 强化学习可以在未知环境中学习策略
+  \item 世界模型（MuZero、Dreamer）结合了学习和规划
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 案例A-v3中，如果云量预报完全准确，问题是否退化为确定性规划？
+  \item POMDP的精确求解是PSPACE-完全的，实际中如何处理大规模POMDP？
+  \item 案例B-v3中，侦察误报（将非目标判为目标）和漏报（未发现目标）哪个更危险？如何在建模中体现？
+  \item MuZero和传统规划器有什么本质区别？各有什么优缺点？
+\end{enumerate}
+
+\textbf{编程练习}：
+\begin{enumerate}
+  \item 将案例A-v3简化为小规模MDP，使用值迭代求解
+  \item 使用POMDP-solve或SARSOP求解案例A-v3的POMDP
+  \item 比较MDP策略和条件规划在模拟环境中的表现
+\end{enumerate}
+\end{discussbox}

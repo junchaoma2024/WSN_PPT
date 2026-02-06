@@ -1,0 +1,773 @@
+% 案例式教学方法研究综述
+% 编译命令: xelatex main.tex
+
+\documentclass[12pt,a4paper]{ctexart}
+
+% ==================== 宏包导入 ====================
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+
+% ==================== 页面设置 ====================
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+
+% ==================== 超链接设置 ====================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=blue!80!black
+}
+
+% ==================== tcolorbox环境 ====================
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{keypoint}[1][]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{casebox}[1][]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+\newtcolorbox{methodbox}[1][]{
+    colback=orange!5!white,
+    colframe=orange!70!black,
+    fonttitle=\bfseries,
+    title=#1,
+    breakable
+}
+
+% ==================== 文档信息 ====================
+\title{\textbf{案例式教学方法研究综述}\\[0.5em]
+\large 面向任务规划课程的教学设计参考}
+\author{教学研究资料}
+\date{2026年2月}
+
+% ==================== 正文开始 ====================
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+案例式教学（Case-Based Teaching）是一种以真实或模拟案例为载体，以学生为中心，通过分析、讨论和反思来培养学生解决实际问题能力的教学方法。本文系统综述了案例式教学的起源与发展、国内典型实践、案例资源建设、教学设计方法，并针对任务规划课程提出了案例式教学的设计建议。
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ================================================================
+\section{案例式教学概述}
+% ================================================================
+
+\subsection{案例式教学的起源}
+
+案例式教学法（Case Method）起源于19世纪末的哈佛大学法学院，由院长Christopher Columbus Langdell首创。1920年代，哈佛商学院将其发展为管理教育的核心方法，形成了著名的"哈佛案例教学法"。
+
+\begin{keypoint}[哈佛案例教学法的核心特征]
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{真实性}：案例来源于真实的商业情境
+    \item \textbf{复杂性}：案例包含多维度的决策因素
+    \item \textbf{开放性}：没有标准答案，鼓励多元思考
+    \item \textbf{参与性}：学生是课堂讨论的主体
+\end{itemize}
+\end{keypoint}
+
+哈佛商学院至今已开发超过10,000个教学案例，每年产出约350个新案例，被全球超过80个国家的商学院采用。
+
+\subsection{案例式教学的核心理念}
+
+案例式教学建立在建构主义学习理论基础上，其核心理念包括：
+
+\subsubsection{以学生为中心}
+
+传统教学以教师讲授为主，学生被动接受知识。案例式教学将学生置于决策者的位置，主动参与问题分析和解决方案的制定。教师的角色从"知识传授者"转变为"学习引导者"。
+
+\subsubsection{问题导向学习}
+
+案例式教学以真实问题为驱动，学生需要：
+\begin{enumerate}[leftmargin=2em]
+    \item 识别案例中的关键问题
+    \item 分析问题产生的原因
+    \item 收集和评估相关信息
+    \item 提出并评价可能的解决方案
+    \item 制定实施计划
+\end{enumerate}
+
+\subsubsection{经验反思与知识建构}
+
+根据Kolb的经验学习循环理论，有效学习包括四个阶段：具体经验$\rightarrow$反思观察$\rightarrow$抽象概念化$\rightarrow$主动实验。案例式教学通过模拟真实情境，使学生在"安全"的环境中积累经验，并通过讨论和反思将经验转化为可迁移的知识。
+
+\subsection{案例式教学与传统教学的对比}
+
+\begin{table}[htbp]
+\centering
+\caption{案例式教学与传统教学的对比}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\toprule
+\textbf{维度} & \textbf{传统教学} & \textbf{案例式教学} \\
+\midrule
+教学中心 & 以教师为中心 & 以学生为中心 \\
+知识来源 & 教材、教师讲授 & 案例分析、讨论交流 \\
+学生角色 & 被动接受者 & 主动参与者、决策者 \\
+教师角色 & 知识传授者 & 学习引导者、讨论促进者 \\
+学习内容 & 抽象理论、概念 & 具体情境、实践问题 \\
+评价方式 & 标准化考试 & 参与度、分析能力、方案质量 \\
+能力培养 & 记忆、理解 & 分析、综合、评价、创造 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{案例式教学在中国的发展历程}
+
+中国引进案例式教学始于1980年代改革开放时期。发展历程可分为三个阶段：
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{引进探索期（1980-2000）}：以翻译、引进国外案例为主，清华大学经管学院、中欧国际工商学院等率先开展案例教学实践。
+
+    \item \textbf{本土化发展期（2000-2015）}：开始大规模开发本土案例，中国管理案例共享中心（CMCC）成立，"全国百篇优秀案例"评选启动。
+
+    \item \textbf{深化创新期（2015至今）}：案例教学向多学科扩展（法学、医学、工程等），数字化案例、虚拟仿真案例兴起，教育部推进新形态教材建设。
+\end{enumerate}
+
+% ================================================================
+\section{国内典型案例式教学实践}
+% ================================================================
+
+\subsection{清华大学经管学院MBA案例教学}
+
+清华大学经济管理学院是中国最早系统开展案例教学的商学院之一。
+
+\subsubsection{中国工商管理案例中心}
+
+清华经管学院于1999年成立中国工商管理案例中心，主要职能包括：
+\begin{itemize}[leftmargin=2em]
+    \item 开发高质量的本土商业案例
+    \item 组织案例教学师资培训
+    \item 促进国内外案例资源交流
+    \item 推动案例研究方法论发展
+\end{itemize}
+
+截至2024年，该中心已开发案例超过600个，涵盖战略管理、组织行为、市场营销、财务管理等领域。
+
+\subsubsection{本土化案例开发经验}
+
+清华经管学院在案例本土化方面积累了丰富经验：
+
+\begin{casebox}[清华经管本土化案例开发原则]
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{时代性}：反映中国经济转型、数字化转型等时代特征
+    \item \textbf{典型性}：选择具有代表性的中国企业和管理实践
+    \item \textbf{理论性}：案例能够承载和验证管理理论
+    \item \textbf{教学性}：设计清晰的教学目标和讨论要点
+\end{enumerate}
+\end{casebox}
+
+\subsection{北京大学法学院诊所式法律教育}
+
+北京大学法学院于2000年引入诊所式法律教育（Clinical Legal Education），这是案例教学在法学领域的重要变体。
+
+\begin{keypoint}[诊所式法律教育的特点]
+\begin{itemize}[leftmargin=2em]
+    \item 学生在教师指导下代理真实法律案件
+    \item 直接接触当事人，了解真实法律需求
+    \item 在实践中学习法律技能和职业伦理
+    \item 同时提供法律援助服务，具有社会价值
+\end{itemize}
+\end{keypoint}
+
+北大法学院开设的诊所课程包括：民事法律诊所、刑事法律诊所、劳动法律诊所、妇女权益保护诊所等。这种教学模式培养了学生的实践能力和职业素养。
+
+\subsection{复旦大学医学院PBL教学模式}
+
+复旦大学上海医学院是国内较早引入PBL（Problem-Based Learning，问题导向学习）教学模式的医学院校。
+
+PBL教学的典型流程：
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{呈现病例}：教师提供真实或模拟的临床病例
+    \item \textbf{界定问题}：学生小组讨论，识别需要解决的医学问题
+    \item \textbf{自主学习}：学生根据问题查阅资料，学习相关知识
+    \item \textbf{小组讨论}：分享学习成果，整合知识
+    \item \textbf{总结评价}：教师引导总结，评估学习效果
+\end{enumerate}
+
+\subsection{中国政法大学案例教学体系}
+
+中国政法大学建立了系统的法学案例教学体系，包括：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{案例教材}：编写系列法学案例教材
+    \item \textbf{案例库}：建设法学案例数据库
+    \item \textbf{模拟法庭}：定期组织模拟法庭活动
+    \item \textbf{实习基地}：与法院、检察院、律所合作建立实习基地
+\end{itemize}
+
+\subsection{中欧国际工商学院案例研究中心}
+
+中欧国际工商学院（CEIBS）案例研究中心是中国领先的商业案例开发机构之一。
+
+\begin{table}[htbp]
+\centering
+\caption{中欧案例中心主要成果}
+\begin{tabular}{ll}
+\toprule
+\textbf{指标} & \textbf{数据} \\
+\midrule
+累计开发案例数 & 1000+ \\
+年均新增案例 & 50-80个 \\
+国际发行案例 & 300+（通过Harvard Publishing等平台）\\
+获奖案例 & 多次获得毅伟（Ivey）案例奖 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+中欧案例的特色在于：关注中国企业的国际化进程、数字化转型、创新创业等前沿议题。
+
+\subsection{工程教育领域案例教学}
+
+\subsubsection{西安交通大学}
+
+西安交通大学在工程教育中推行案例教学，特别是在机械工程、能源动力等专业。主要做法包括：
+\begin{itemize}[leftmargin=2em]
+    \item 开发工程案例库，涵盖设计、制造、运维等环节
+    \item 结合企业实际项目开展案例教学
+    \item 将案例教学与课程设计、毕业设计结合
+\end{itemize}
+
+\subsubsection{浙江大学}
+
+浙江大学在计算机、软件工程等专业开展案例教学实践：
+\begin{itemize}[leftmargin=2em]
+    \item 软件工程课程采用真实项目案例
+    \item 人工智能课程使用Kaggle竞赛案例
+    \item 建设虚拟仿真实验平台，支持案例教学
+\end{itemize}
+
+% ================================================================
+\section{案例教学资源建设}
+% ================================================================
+
+\subsection{中国管理案例共享中心（CMCC）}
+
+中国管理案例共享中心（China Management Case-sharing Center, CMCC）由全国MBA教育指导委员会牵头，于2007年正式成立，是中国最大的管理案例资源平台。
+
+\subsubsection{案例库建设}
+
+CMCC案例库的建设采用"征集-评审-入库-共享"的模式：
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{案例征集}：面向全国商学院征集优秀案例
+    \item \textbf{双盲评审}：邀请专家进行匿名评审
+    \item \textbf{入库管理}：通过评审的案例统一入库
+    \item \textbf{共享使用}：成员单位可免费使用库中案例
+\end{enumerate}
+
+截至2024年，CMCC案例库收录案例超过5000个。
+
+\subsubsection{案例入库标准}
+
+\begin{methodbox}[CMCC案例入库评审标准]
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{真实性}（20\%）：基于真实企业和事件
+    \item \textbf{教学性}（25\%）：明确的教学目标，丰富的讨论空间
+    \item \textbf{理论性}（20\%）：能够承载相关管理理论
+    \item \textbf{写作质量}（20\%）：结构清晰，叙述流畅
+    \item \textbf{配套材料}（15\%）：教学笔记、课件、数据附件等
+\end{enumerate}
+\end{methodbox}
+
+\subsection{教育部新形态教材建设要求}
+
+教育部近年来大力推进新形态教材建设，对案例式教材提出了明确要求。
+
+\subsubsection{数字化资源融合}
+
+新形态教材强调纸质教材与数字资源的深度融合：
+\begin{itemize}[leftmargin=2em]
+    \item 二维码链接扩展资源（视频、数据、仿真）
+    \item 在线案例讨论平台
+    \item 虚拟仿真实验
+    \item 智能题库与自适应学习
+\end{itemize}
+
+\subsubsection{案例式教材编写规范}
+
+\begin{keypoint}[案例式教材编写要点]
+\begin{enumerate}[leftmargin=2em]
+    \item 每章以案例导入，激发学习兴趣
+    \item 理论讲解与案例分析交叉进行
+    \item 设置渐进式案例，由浅入深
+    \item 配套讨论题和延伸阅读
+    \item 提供教师版教学笔记
+\end{enumerate}
+\end{keypoint}
+
+\subsection{优秀案例的评选标准}
+
+\subsubsection{全国百篇优秀案例}
+
+全国MBA教育指导委员会每年评选"全国百篇优秀管理案例"，这是中国管理案例领域的最高荣誉。评选标准包括：
+
+\begin{table}[htbp]
+\centering
+\caption{全国百篇优秀案例评选维度}
+\begin{tabular}{p{3cm}p{8cm}}
+\toprule
+\textbf{评选维度} & \textbf{具体要求} \\
+\midrule
+案例质量 & 真实性、典型性、时效性、深度 \\
+教学适用性 & 教学目标明确、讨论空间充分、难度适中 \\
+理论贡献 & 能够验证或发展管理理论 \\
+写作规范 & 结构完整、语言流畅、数据翔实 \\
+实际使用 & 已在教学中使用并取得良好效果 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsubsection{毅伟案例奖}
+
+毅伟案例奖（Ivey/CEIBS Case Award）由加拿大毅伟商学院与中欧国际工商学院联合设立，旨在表彰亚洲地区的优秀商业案例。获奖案例通常具有以下特点：
+\begin{itemize}[leftmargin=2em]
+    \item 聚焦亚洲（特别是中国）商业实践
+    \item 具有国际视野和普适性教学价值
+    \item 写作质量达到国际出版标准
+\end{itemize}
+
+\subsection{案例开发流程}
+
+\subsubsection{选题与调研}
+
+案例选题是开发的第一步，需要考虑：
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{教学需求}：课程需要什么样的案例？
+    \item \textbf{理论承载}：案例能够说明什么理论？
+    \item \textbf{可获取性}：能否获得足够的信息和数据？
+    \item \textbf{时效性}：案例是否反映当前商业环境？
+\end{enumerate}
+
+调研方式包括：企业访谈、公开资料收集、行业报告分析等。
+
+\subsubsection{案例撰写}
+
+\begin{methodbox}[案例文本结构]
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{开篇}：设置悬念，引出核心问题
+    \item \textbf{背景}：企业/行业/人物背景介绍
+    \item \textbf{正文}：按时间或逻辑顺序叙述事件经过
+    \item \textbf{决策点}：明确决策者面临的选择
+    \item \textbf{附录}：财务数据、组织架构、补充材料
+\end{enumerate}
+\end{methodbox}
+
+\subsubsection{教学笔记编写}
+
+教学笔记（Teaching Note）是供教师使用的配套文档，通常包括：
+\begin{itemize}[leftmargin=2em]
+    \item 案例概要与教学目标
+    \item 建议的课程安排（时间分配）
+    \item 讨论题及参考答案
+    \item 板书设计建议
+    \item 可能的学生反应及应对策略
+    \item 后续发展（Epilogue）
+\end{itemize}
+
+\subsubsection{案例测试与修订}
+
+案例在正式发布前应进行测试：
+\begin{enumerate}[leftmargin=2em]
+    \item 小范围试用：在一两个班级试用
+    \item 收集反馈：学生反馈、教师反馈
+    \item 修订完善：根据反馈修改案例和教学笔记
+    \item 同行评审：邀请同行专家评审
+\end{enumerate}
+
+% ================================================================
+\section{案例式教学设计方法}
+% ================================================================
+
+\subsection{三阶段教学模式}
+
+基于国内成熟实践，案例式教学通常采用"三阶段"模式：
+
+\subsubsection{个人学习阶段}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{课前阅读}：学生独立阅读案例材料（通常需要1-2小时）
+    \item \textbf{问题思考}：完成教师布置的预习思考题
+    \item \textbf{资料查阅}：根据需要查阅相关背景资料
+    \item \textbf{形成观点}：对案例问题形成初步判断
+\end{itemize}
+
+\subsubsection{小组讨论阶段}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{组内分享}：每位成员分享自己的分析和观点
+    \item \textbf{观点碰撞}：讨论不同观点的合理性
+    \item \textbf{达成共识}：形成小组的主要结论
+    \item \textbf{准备汇报}：准备课堂汇报材料
+\end{itemize}
+
+小组通常由4-6人组成，讨论时间30-60分钟。
+
+\subsubsection{课堂讨论阶段}
+
+\begin{methodbox}[课堂讨论教师引导技巧]
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{开场提问}：用开放性问题启动讨论
+    \item \textbf{追问深化}："为什么这样认为？""还有其他可能吗？"
+    \item \textbf{对比分析}：引导不同观点的对比
+    \item \textbf{联系理论}：适时引入相关理论框架
+    \item \textbf{总结升华}：提炼讨论要点，升华到一般性结论
+\end{enumerate}
+\end{methodbox}
+
+\subsection{案例难度阶梯设计}
+
+为适应不同学习阶段，同一主题的案例可设计多个难度版本：
+
+\begin{table}[htbp]
+\centering
+\caption{案例难度阶梯设计}
+\begin{tabular}{p{2cm}p{4cm}p{6cm}}
+\toprule
+\textbf{版本} & \textbf{特点} & \textbf{适用场景} \\
+\midrule
+简化版 & 问题明确，信息充分，干扰少 & 初学者入门，概念理解 \\
+标准版 & 信息适度复杂，有一定干扰 & 正常教学，能力训练 \\
+进阶版 & 信息不完整，多目标冲突 & 高年级学生，综合应用 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{讨论题设计原则}
+
+好的讨论题应满足以下原则：
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{开放性}：没有唯一正确答案
+    \item \textbf{挑战性}：需要深入思考才能回答
+    \item \textbf{关联性}：与教学目标紧密相关
+    \item \textbf{渐进性}：由浅入深，逐步深化
+    \item \textbf{可讨论性}：能够引发不同观点的碰撞
+\end{enumerate}
+
+\begin{casebox}[讨论题设计示例]
+\textbf{描述性问题}：案例中的主要问题是什么？\\
+\textbf{分析性问题}：造成这个问题的根本原因是什么？\\
+\textbf{评价性问题}：你如何评价决策者的做法？\\
+\textbf{创造性问题}：如果你是决策者，你会怎么做？
+\end{casebox}
+
+\subsection{案例教学效果评估}
+
+案例教学的评估应关注过程和能力，而非仅仅是知识记忆：
+
+\begin{table}[htbp]
+\centering
+\caption{案例教学评估维度}
+\begin{tabular}{p{3cm}p{3cm}p{5cm}}
+\toprule
+\textbf{评估维度} & \textbf{权重建议} & \textbf{评估方式} \\
+\midrule
+课堂参与 & 20-30\% & 发言质量、讨论贡献 \\
+书面分析 & 30-40\% & 案例分析报告 \\
+小组表现 & 15-25\% & 小组讨论、汇报 \\
+期末考核 & 20-30\% & 案例分析考试 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{常见问题与应对策略}
+
+\begin{table}[htbp]
+\centering
+\caption{案例教学常见问题及应对}
+\begin{tabular}{p{4cm}p{7cm}}
+\toprule
+\textbf{问题} & \textbf{应对策略} \\
+\midrule
+学生准备不充分 & 设置预习检查，将预习纳入成绩 \\
+讨论冷场 & 使用点名提问、小组轮流发言 \\
+讨论跑题 & 教师适时引导，回归核心问题 \\
+少数人主导 & 鼓励安静学生发言，控制活跃学生 \\
+时间控制困难 & 提前规划，设置时间节点 \\
+理论联系不足 & 讨论后专门环节进行理论总结 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ================================================================
+\section{面向任务规划课程的案例教学设计}
+% ================================================================
+
+\subsection{任务规划案例的特点}
+
+任务规划课程的案例具有以下特殊性：
+
+\subsubsection{问题复杂性}
+
+任务规划问题通常涉及：
+\begin{itemize}[leftmargin=2em]
+    \item 多目标优化（效率、成本、安全等）
+    \item 复杂约束（时间、资源、物理）
+    \item 不确定性因素（环境、敌情、设备故障）
+    \item 多智能体协调（分布式决策、信息共享）
+\end{itemize}
+
+\subsubsection{算法多样性}
+
+同一问题可能适用多种算法方法：
+\begin{itemize}[leftmargin=2em]
+    \item 经典规划方法（STRIPS/PDDL、HTN）
+    \item 约束求解方法（CSP、SAT、SMT）
+    \item 优化方法（启发式搜索、元启发式）
+    \item 学习方法（强化学习、模仿学习）
+    \item 博弈方法（博弈规划、对抗规划）
+\end{itemize}
+
+这种多样性为案例教学提供了丰富的讨论空间。
+
+\subsubsection{应用场景真实性}
+
+任务规划案例来源于真实应用场景：
+\begin{itemize}[leftmargin=2em]
+    \item 航天领域：卫星观测调度、星座部署
+    \item 军事领域：作战任务规划、无人机协同
+    \item 物流领域：车辆路径规划、仓储调度
+    \item 机器人领域：运动规划、任务分配
+\end{itemize}
+
+\subsection{案例选取原则}
+
+\subsubsection{代表性与典型性}
+
+选择能够代表任务规划核心问题的案例：
+\begin{itemize}[leftmargin=2em]
+    \item 覆盖主要问题类型（调度、路径、分配）
+    \item 涉及关键技术难点（约束处理、不确定性、协调）
+    \item 反映实际应用需求
+\end{itemize}
+
+\subsubsection{可拓展性}
+
+案例应具有可拓展性，便于设计不同难度版本：
+\begin{itemize}[leftmargin=2em]
+    \item 从简单到复杂的问题递进
+    \item 从确定到不确定的环境变化
+    \item 从单体到多体的规模扩展
+    \item 从合作到对抗的关系演变
+\end{itemize}
+
+\subsubsection{教学适切性}
+
+案例应适合本科生的知识水平和学习能力：
+\begin{itemize}[leftmargin=2em]
+    \item 问题规模适中，便于分析
+    \item 数据完整，支持算法实现
+    \item 有标准解或已知上界，便于评估
+\end{itemize}
+
+\subsection{贯穿式案例设计}
+
+\subsubsection{案例版本递进}
+
+通过同一案例的不同版本贯穿多个章节，形成知识体系的连贯性：
+
+\begin{casebox}[案例版本递进示例：多星观测任务]
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{v1（第2章）}：单星观测，确定性环境 $\rightarrow$ PDDL建模
+    \item \textbf{v2（第3章）}：增加时间窗口、能量约束 $\rightarrow$ HTN分解、约束求解
+    \item \textbf{v3（第4章）}：引入云层遮挡不确定性 $\rightarrow$ MDP/POMDP
+    \item \textbf{v4（第5章）}：多星协同覆盖 $\rightarrow$ 分布式规划、MARL
+    \item \textbf{v5（第6章）}：对抗性观测（敌方干扰）$\rightarrow$ 博弈规划
+\end{itemize}
+\end{casebox}
+
+\subsubsection{章节间逻辑衔接}
+
+每个新版本引入时，需要说明：
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{为什么需要新方法}：前一版本的方法在新场景下的局限性
+    \item \textbf{新方法解决什么问题}：新方法的针对性和优势
+    \item \textbf{方法之间的关系}：是替代还是补充？能否组合使用？
+\end{enumerate}
+
+\subsection{本课程案例教学实施建议}
+
+\begin{methodbox}[任务规划课程案例教学实施建议]
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{案例导入}：每章以案例场景开始，提出待解决的规划问题
+    \item \textbf{算法讲解}：介绍解决该问题的算法原理
+    \item \textbf{案例分析}：用算法分析案例，展示建模和求解过程
+    \item \textbf{编程实践}：学生动手实现算法，在案例数据上运行
+    \item \textbf{讨论比较}：讨论不同方法的优劣，分析适用场景
+    \item \textbf{案例演化}：引出案例的下一版本，为后续章节做铺垫
+\end{enumerate}
+\end{methodbox}
+
+% ================================================================
+\section{结论与展望}
+% ================================================================
+
+\subsection{案例式教学的优势与挑战}
+
+\subsubsection{主要优势}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{提升学习动机}：真实案例激发学习兴趣
+    \item \textbf{培养实践能力}：在模拟情境中锻炼决策能力
+    \item \textbf{促进深度学习}：讨论和反思促进知识内化
+    \item \textbf{发展综合素质}：沟通、协作、批判性思维
+\end{enumerate}
+
+\subsubsection{主要挑战}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{案例开发}：高质量案例开发耗时耗力
+    \item \textbf{教师能力}：需要教师具备引导讨论的能力
+    \item \textbf{学生适应}：部分学生不适应主动学习方式
+    \item \textbf{评估困难}：能力评估比知识测试更复杂
+\end{enumerate}
+
+\subsection{数字化转型中的案例教学}
+
+数字化技术为案例教学带来新机遇：
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{虚拟仿真}：构建可交互的案例环境
+    \item \textbf{数据驱动}：使用真实数据增强案例真实性
+    \item \textbf{在线协作}：支持异步和远程的案例讨论
+    \item \textbf{智能辅助}：AI辅助案例分析和评估
+\end{itemize}
+
+\subsection{未来发展趋势}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{跨学科案例}：打破学科边界，开发综合性案例
+    \item \textbf{动态案例}：案例随时间演化，反映最新发展
+    \item \textbf{个性化学习}：根据学生水平推荐适合的案例版本
+    \item \textbf{国际化合作}：中外案例资源共享与联合开发
+\end{enumerate}
+
+% ================================================================
+% 参考文献
+% ================================================================
+\newpage
+\section*{参考文献}
+\addcontentsline{toc}{section}{参考文献}
+
+\begin{enumerate}[leftmargin=2em, label={[\arabic*]}]
+    \item 苏敬勤, 崔淼. 案例研究方法：理论与实践[M]. 北京: 清华大学出版社, 2019.
+    \item 毛基业, 李晓燕. 案例研究的"术"与"道"的反思[J]. 管理世界, 2021(3): 248-261.
+    \item 全国MBA教育指导委员会. 中国管理案例共享中心案例入库标准[S]. 2020.
+    \item 教育部. 新形态教材建设指南[Z]. 2021.
+    \item Barnes, L.B., Christensen, C.R., Hansen, A.J. Teaching and the Case Method[M]. Harvard Business School Press, 1994.
+    \item Kolb, D.A. Experiential Learning: Experience as the Source of Learning and Development[M]. Prentice Hall, 1984.
+    \item Erskine, J.A., Leenders, M.R., Mauffette-Leenders, L.A. Teaching with Cases[M]. Ivey Publishing, 2003.
+    \item 清华大学经济管理学院中国工商管理案例中心. 案例开发与教学指南[M]. 北京: 清华大学出版社, 2018.
+    \item 王玉, 徐淑英. 管理学研究中的案例研究方法[J]. 管理世界, 2007(4): 146-155.
+    \item 陈春花, 刘祯. 中国情境下的管理研究[J]. 管理学报, 2017(1): 1-10.
+    \item 杨斌. MBA案例教学的本土化实践[J]. 学位与研究生教育, 2015(6): 1-6.
+    \item 梁正, 陈劲. 工程教育中的案例教学[J]. 高等工程教育研究, 2019(2): 78-84.
+\end{enumerate}
+
+% ================================================================
+% 附录
+% ================================================================
+\newpage
+\appendix
+
+\section{国内主要案例资源平台}
+
+\begin{table}[htbp]
+\centering
+\caption{国内主要案例资源平台}
+\begin{tabular}{p{4cm}p{4cm}p{4cm}}
+\toprule
+\textbf{平台名称} & \textbf{主办单位} & \textbf{网址} \\
+\midrule
+中国管理案例共享中心 & 全国MBA教指委 & cmcc.shufe.edu.cn \\
+清华案例中心 & 清华大学经管学院 & case.sem.tsinghua.edu.cn \\
+中欧案例中心 & 中欧国际工商学院 & casecenter.ceibs.edu \\
+北大案例研究中心 & 北京大学光华管理学院 & case.gsm.pku.edu.cn \\
+毅伟案例库 & Ivey商学院 & iveycases.com \\
+哈佛案例库 & Harvard Business Publishing & hbsp.harvard.edu \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\section{案例模板}
+
+\subsection{案例正文模板}
+
+\begin{verbatim}
+案例标题
+
+【导言】
+设置场景，引出核心问题（100-200字）
+
+【背景】
+1. 行业背景
+2. 企业/组织背景
+3. 关键人物介绍
+
+【正文】
+按时间或逻辑顺序叙述事件发展
+- 事件一
+- 事件二
+- ...
+- 决策点
+
+【附录】
+- 财务数据/技术参数
+- 组织架构图
+- 时间线
+- 其他补充材料
+\end{verbatim}
+
+\subsection{教学笔记模板}
+
+\begin{verbatim}
+教学笔记
+
+【案例概要】（200字以内）
+
+【教学目标】
+1. 知识目标
+2. 能力目标
+3. 态度目标
+
+【适用课程与学时】
+
+【讨论题】
+1. 基础问题
+2. 分析问题
+3. 综合问题
+
+【建议板书】
+
+【讨论要点与参考答案】
+
+【后续发展】（如有）
+
+【延伸阅读】
+\end{verbatim}
+
+\end{document}

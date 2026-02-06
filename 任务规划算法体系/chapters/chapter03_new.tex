@@ -1,0 +1,287 @@
+% 第3章：层次任务网络与约束规划
+\chapter{层次任务网络与约束规划}
+
+\begin{levelbox}
+本章介绍层次任务网络（HTN）规划和基于约束的规划方法。通过案例v2版本学习如何处理任务分解和复杂约束。建议学时：8学时。
+\end{levelbox}
+
+% =============================================
+\section{\caseB{v2}多阶段战术任务分解}
+% =============================================
+
+\begin{caseboxB}[title={\textbf{案例B-v2：侦察-打击-评估任务链}}]
+\textbf{场景演进}：v1只考虑单一侦察任务，v2引入完整的任务链——"侦察-打击-评估"（ISR-Strike-BDA）。
+
+\textbf{新增要素}：
+\begin{itemize}
+  \item 任务必须按照"先侦察、后打击、再评估"的顺序执行
+  \item 打击需要基于侦察结果选择武器和攻击方式
+  \item 打击后需要进行战斗损伤评估（BDA）
+\end{itemize}
+
+\textbf{为什么v1方法不够？}
+\begin{itemize}
+  \item 经典PDDL难以自然表达任务的层次结构
+  \item 复杂任务序列的建模变得困难
+  \item 领域专家知识（如任务分解规则）难以融入
+\end{itemize}
+
+\textbf{预习思考}：
+\begin{enumerate}
+  \item "侦察-打击-评估"可以如何分解为子任务？
+  \item 子任务之间有什么依赖关系？
+  \item 如何利用领域知识指导规划？
+\end{enumerate}
+\end{caseboxB}
+
+% =============================================
+\section{HTN规划：SHOP/SHOP2/HDDL}
+% =============================================
+
+\subsection{HTN基本概念}
+
+\begin{definition}[层次任务网络（HTN）]
+HTN规划采用自顶向下的任务分解策略：
+\begin{itemize}
+  \item \textbf{原子任务}（Primitive Tasks）：可直接执行的动作
+  \item \textbf{复合任务}（Compound Tasks）：需要分解的高层任务
+  \item \textbf{方法}（Methods）：定义复合任务如何分解为子任务
+\end{itemize}
+\end{definition}
+
+\begin{keypoint}[HTN vs 经典规划]
+\begin{itemize}
+  \item 经典规划：搜索达成目标的动作序列
+  \item HTN规划：搜索将初始任务分解为原子任务的方法序列
+  \item HTN天然支持领域知识的编码（通过方法定义）
+\end{itemize}
+\end{keypoint}
+
+\subsection{SHOP/SHOP2系统}
+
+SHOP（Simple Hierarchical Ordered Planner）是最著名的HTN规划器：
+
+\begin{itemize}[leftmargin=2em]
+  \item 使用\textbf{全序分解}：子任务有严格的线性顺序
+  \item 支持在前置条件中使用任意Lisp表达式
+  \item 在实际应用中表现优异（军事规划、Web服务组合等）
+\end{itemize}
+
+\subsection{案例B-v2的HTN建模}
+
+\begin{lstlisting}[caption=案例B-v2的HTN方法定义（SHOP风格伪代码）]
+; 复合任务：执行完整的打击任务链
+(:method (attack-mission ?target)
+  ; 方法1：标准流程
+  :precondition (enemy-target ?target)
+  :subtasks (
+    (recon ?target)           ; 先侦察
+    (strike ?target)          ; 后打击
+    (damage-assess ?target)   ; 再评估
+  )
+)
+
+; 复合任务：侦察
+(:method (recon ?target)
+  ; 方法1：使用无人机侦察
+  :precondition (uav-available)
+  :subtasks (
+    (fly-to ?target)
+    (take-images ?target)
+    (transmit-data ?target)
+  )
+)
+
+; 复合任务：打击
+(:method (strike ?target)
+  ; 方法1：精确制导打击（侦察已确认高价值目标）
+  :precondition (and (reconned ?target) (high-value ?target))
+  :subtasks (
+    (select-weapon precision-guided)
+    (fly-to-attack-position ?target)
+    (launch-weapon ?target)
+  )
+  ; 方法2：区域压制（目标位置不精确）
+  :precondition (and (reconned ?target) (not (precise-location ?target)))
+  :subtasks (
+    (select-weapon area-suppression)
+    (fly-to-attack-position ?target)
+    (launch-weapon ?target)
+  )
+)
+\end{lstlisting}
+
+\subsection{HDDL表示语言}
+
+HDDL（Hierarchical Domain Definition Language）是HTN的标准化语言，扩展了PDDL以支持层次任务。
+
+\begin{lstlisting}[language=Lisp,caption=HDDL任务定义示例]
+(:task attack-mission
+  :parameters (?target - location)
+)
+
+(:method m-attack-standard
+  :parameters (?target - location)
+  :task (attack-mission ?target)
+  :precondition (enemy-target ?target)
+  :ordered-subtasks (and
+    (recon ?target)
+    (strike ?target)
+    (damage-assess ?target)
+  )
+)
+\end{lstlisting}
+
+% =============================================
+\section{\caseA{v2}观测窗口约束下的任务分解}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{案例A-v2：带约束的卫星观测调度}}]
+\textbf{场景演进}：v1忽略了所有约束，v2引入现实约束。
+
+\textbf{新增约束}：
+\begin{itemize}
+  \item \textbf{时间窗口}：每个目标只在特定时段内可见
+  \item \textbf{能量约束}：成像和数传消耗电能，需考虑能量平衡
+  \item \textbf{存储约束}：星上存储有限，需及时下传数据
+  \item \textbf{姿态约束}：相邻观测需要足够的姿态机动时间
+\end{itemize}
+
+\textbf{为什么需要约束求解？}
+\begin{itemize}
+  \item 时间窗口约束使问题成为时序约束满足问题
+  \item 资源约束（能量、存储）需要累积计算
+  \item 纯搜索方法难以高效处理这些约束
+\end{itemize}
+\end{caseboxA}
+
+\subsection{HTN分解策略}
+
+卫星观测调度可以分解为层次结构：
+
+\begin{enumerate}[leftmargin=2em]
+  \item \textbf{顶层任务}：完成观测任务集
+  \item \textbf{轨道级分解}：为每个轨道周期安排观测
+  \item \textbf{目标级分解}：为每个目标安排具体观测动作
+  \item \textbf{原子动作}：姿态机动、成像、数据下传
+\end{enumerate}
+
+% =============================================
+\section{约束满足规划（CSP/SAT/SMT）}
+% =============================================
+
+\subsection{CSP规划}
+
+\begin{definition}[约束满足问题（CSP）]
+CSP由三元组 $\langle X, D, C \rangle$ 定义：
+\begin{itemize}
+  \item $X = \{x_1, \ldots, x_n\}$：变量集合
+  \item $D = \{D_1, \ldots, D_n\}$：每个变量的值域
+  \item $C$：约束集合，定义变量间的合法组合
+\end{itemize}
+\end{definition}
+
+将规划问题编码为CSP：
+\begin{itemize}[leftmargin=2em]
+  \item 变量：每个时间步的状态和动作
+  \item 约束：初始状态约束、目标约束、动作前置条件和效果约束
+\end{itemize}
+
+\subsection{SAT规划}
+
+\textbf{SAT规划}将规划问题编码为命题逻辑公式：
+
+\begin{algbox}[title={\textbf{SAT规划框架}}]
+\begin{enumerate}
+  \item 设定时间步上限 $T$
+  \item 编码：
+    \begin{itemize}
+      \item 状态变量：$\text{holds}(p, t)$ 表示命题 $p$ 在时刻 $t$ 为真
+      \item 动作变量：$\text{do}(a, t)$ 表示在时刻 $t$ 执行动作 $a$
+      \item 初始/目标约束、因果约束、帧公理、互斥约束
+    \end{itemize}
+  \item 调用SAT求解器
+  \item 若可满足，提取规划；否则增大 $T$ 重试
+\end{enumerate}
+\end{algbox}
+
+\subsection{SMT规划}
+
+SMT（Satisfiability Modulo Theories）扩展了SAT，支持：
+\begin{itemize}[leftmargin=2em]
+  \item 整数/实数算术约束
+  \item 数组和位向量理论
+  \item 适合处理数值变量（时间、资源）
+\end{itemize}
+
+\begin{example}[案例A-v2的SMT编码]
+\begin{align*}
+& \text{变量：} t_i \in \mathbb{R} \text{（目标}i\text{的观测时间）} \\
+& \text{时间窗口约束：} w_i^{\text{start}} \leq t_i \leq w_i^{\text{end}} \\
+& \text{姿态机动约束：} |t_i - t_j| \geq \tau_{\text{slew}} \text{ 或 } i,j\text{不相邻观测} \\
+& \text{能量约束：} \sum_{i \text{ 被选中}} e_i \leq E_{\text{max}}
+\end{align*}
+\end{example}
+
+% =============================================
+\section{时态规划与资源约束}
+% =============================================
+
+\subsection{PDDL 2.1时态扩展}
+
+PDDL 2.1引入\textbf{持续性动作}（Durative Actions）：
+
+\begin{lstlisting}[language=Lisp,caption=持续性动作示例]
+(:durative-action observe
+  :parameters (?sat ?target)
+  :duration (= ?duration 10)  ; 观测持续10个时间单位
+  :condition (and
+    (at start (visible ?target))
+    (over all (has-power ?sat))
+  )
+  :effect (and
+    (at end (observed ?target))
+    (at start (decrease (energy ?sat) 5))
+  )
+)
+\end{lstlisting}
+
+\subsection{资源约束处理}
+
+\begin{keypoint}[资源约束的处理方法]
+\begin{enumerate}
+  \item \textbf{PDDL数值扩展}：使用 \texttt{:numeric-fluents} 定义资源变量
+  \item \textbf{约束传播}：在搜索过程中动态检查资源约束
+  \item \textbf{LP松弛}：用线性规划检查资源可行性
+\end{enumerate}
+\end{keypoint}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item HTN通过任务分解捕获领域的层次结构
+  \item SHOP/SHOP2是实际应用中最成功的HTN系统
+  \item CSP/SAT/SMT将规划转化为约束求解问题
+  \item 时态规划和资源约束扩展了经典规划的表达能力
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 案例B的"侦察-打击-评估"任务链是否必须严格顺序执行？有没有可以并行的部分？
+  \item HTN方法需要领域专家定义，这是优点还是缺点？与机器学习自动获取知识相比呢？
+  \item 案例A-v2中，如果时间窗口相互冲突（同时只能观测一个目标），应该如何处理？
+  \item SAT规划和CSP规划各有什么优缺点？什么情况下选择哪种方法？
+\end{enumerate}
+
+\textbf{编程练习}：
+\begin{enumerate}
+  \item 使用PANDA或其他HTN规划器求解案例B-v2
+  \item 将案例A-v2编码为SMT问题，使用Z3求解器求解
+  \item 比较HTN规划和SAT规划在案例A-v2上的求解效率
+\end{enumerate}
+\end{discussbox}

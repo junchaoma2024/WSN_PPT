@@ -1,0 +1,302 @@
+% 第2章：任务建模与经典规划
+\chapter{任务建模与经典规划}
+
+\begin{levelbox}
+本章介绍任务规划的形式化建模方法（STRIPS/PDDL）和基于前向搜索的经典规划算法。通过案例A-v1和案例B-v1学习如何将实际问题抽象为规划问题。建议学时：6学时。
+\end{levelbox}
+
+% =============================================
+\section{\caseA{v1}单星观测任务：问题抽象}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{案例A-v1：单星确定性观测任务}}]
+\textbf{场景设定}：
+\begin{itemize}
+  \item 1颗遥感卫星，需观测地面5个目标点
+  \item 每个目标有观测收益值
+  \item 卫星按固定轨道运行，每轨可观测若干目标
+  \item 目标：选择观测序列，最大化总收益
+\end{itemize}
+
+\textbf{简化假设}（v1版本）：
+\begin{itemize}
+  \item 忽略时间窗口约束（假设所有目标均可观测）
+  \item 忽略存储和能量约束
+  \item 确定性环境（观测必定成功）
+\end{itemize}
+
+\textbf{预习思考}：
+\begin{enumerate}
+  \item 如何定义卫星观测问题的状态？
+  \item 需要哪些动作？动作的前置条件和效果是什么？
+  \item 如何表示目标条件？
+\end{enumerate}
+\end{caseboxA}
+
+\subsection{问题抽象}
+
+将卫星观测问题抽象为规划问题：
+
+\textbf{状态表示}：
+\begin{itemize}[leftmargin=2em]
+  \item 每个目标点的观测状态：已观测/未观测
+  \item 卫星的当前位置（可离散化为轨道位置编号）
+\end{itemize}
+
+\textbf{动作定义}：
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{observe(target)}：观测目标target
+  \item \texttt{move(pos1, pos2)}：卫星从位置pos1移动到pos2
+\end{itemize}
+
+\textbf{目标}：所有高优先级目标均被观测
+
+% =============================================
+\section{STRIPS/PDDL建模语言}
+% =============================================
+
+\subsection{STRIPS表示}
+
+STRIPS（Stanford Research Institute Problem Solver）是最经典的规划问题表示语言。
+
+\begin{definition}[STRIPS规划问题]
+一个STRIPS规划问题由四元组 $\langle P, O, I, G \rangle$ 定义：
+\begin{itemize}
+  \item $P$：命题（谓词）集合
+  \item $O$：操作（动作）集合，每个操作 $o$ 包含：
+    \begin{itemize}
+      \item $\text{Precond}(o)$：前置条件（命题集合）
+      \item $\text{Add}(o)$：添加效果（动作后为真的命题）
+      \item $\text{Del}(o)$：删除效果（动作后为假的命题）
+    \end{itemize}
+  \item $I \subseteq P$：初始状态
+  \item $G \subseteq P$：目标条件
+\end{itemize}
+\end{definition}
+
+\subsection{PDDL建模}
+
+PDDL（Planning Domain Definition Language）是STRIPS的标准化扩展，是国际规划竞赛（IPC）的标准语言。
+
+\begin{keypoint}[PDDL的两个文件]
+\begin{itemize}
+  \item \textbf{领域文件}（Domain File）：定义谓词和动作模式，与具体问题实例无关
+  \item \textbf{问题文件}（Problem File）：定义具体的对象、初始状态和目标
+\end{itemize}
+\end{keypoint}
+
+\subsection{案例A-v1的PDDL建模}
+
+\textbf{领域文件}（satellite-domain.pddl）：
+
+\begin{lstlisting}[language=Lisp,caption=卫星观测领域定义]
+(define (domain satellite-observe)
+  (:requirements :strips)
+
+  (:predicates
+    (satellite ?s)           ; s是卫星
+    (target ?t)              ; t是目标
+    (position ?p)            ; p是位置
+    (at ?s ?p)               ; 卫星s在位置p
+    (visible ?t ?p)          ; 目标t在位置p可见
+    (observed ?t)            ; 目标t已被观测
+  )
+
+  (:action observe
+    :parameters (?s ?t ?p)
+    :precondition (and (satellite ?s) (target ?t) (position ?p)
+                       (at ?s ?p) (visible ?t ?p) (not (observed ?t)))
+    :effect (observed ?t)
+  )
+
+  (:action move
+    :parameters (?s ?from ?to)
+    :precondition (and (satellite ?s) (position ?from) (position ?to)
+                       (at ?s ?from))
+    :effect (and (at ?s ?to) (not (at ?s ?from)))
+  )
+)
+\end{lstlisting}
+
+\textbf{问题文件}（satellite-problem.pddl）：
+
+\begin{lstlisting}[language=Lisp,caption=卫星观测问题实例]
+(define (problem observe-5targets)
+  (:domain satellite-observe)
+
+  (:objects
+    sat1 - satellite
+    t1 t2 t3 t4 t5 - target
+    p1 p2 p3 p4 p5 - position
+  )
+
+  (:init
+    (satellite sat1)
+    (target t1) (target t2) (target t3) (target t4) (target t5)
+    (position p1) (position p2) (position p3) (position p4) (position p5)
+    (at sat1 p1)
+    (visible t1 p1) (visible t2 p2) (visible t3 p3)
+    (visible t4 p4) (visible t5 p5)
+  )
+
+  (:goal (and (observed t1) (observed t2) (observed t3)))
+)
+\end{lstlisting}
+
+% =============================================
+\section{前向搜索与启发式规划}
+% =============================================
+
+\subsection{前向状态空间搜索}
+
+前向搜索从初始状态出发，逐步应用动作，直到达到目标状态。
+
+\begin{algorithm}[htbp]
+\caption{前向状态空间搜索}
+\begin{algorithmic}[1]
+\Require 规划问题 $\langle P, O, I, G \rangle$
+\Ensure 动作序列或失败
+\State $\text{Open} \gets \{I\}$，$\text{Closed} \gets \emptyset$
+\While{$\text{Open} \neq \emptyset$}
+  \State $s \gets$ 从Open中选择状态（按启发式值）
+  \If{$G \subseteq s$}
+    \State \Return 从$I$到$s$的动作序列
+  \EndIf
+  \State $\text{Closed} \gets \text{Closed} \cup \{s\}$
+  \For{每个可应用的动作 $a \in O$}
+    \State $s' \gets \text{apply}(s, a)$
+    \If{$s' \notin \text{Closed}$}
+      \State 将 $s'$ 加入 Open
+    \EndIf
+  \EndFor
+\EndWhile
+\State \Return 失败
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{规划启发式}
+
+\subsubsection{删除松弛启发式}
+
+\textbf{删除松弛}（Delete Relaxation）：忽略动作的删除效果，只保留添加效果。松弛问题更容易求解，其最优解代价是原问题的下界。
+
+\begin{itemize}[leftmargin=2em]
+  \item $h^{\text{add}}$：松弛问题中所有子目标代价之和
+  \item $h^{\text{max}}$：松弛问题中代价最大的子目标
+  \item $h^{\text{FF}}$：基于规划图的松弛启发式，FF规划器使用
+\end{itemize}
+
+\subsubsection{Fast Downward与LAMA}
+
+\textbf{Fast Downward}是现代最成功的规划器之一，采用：
+\begin{itemize}[leftmargin=2em]
+  \item SAS+表示：多值变量替代命题
+  \item 因果图分析：识别变量间的依赖关系
+  \item 多种启发式：$h^{\text{FF}}$、因果图启发式、地标启发式
+\end{itemize}
+
+\textbf{LAMA}基于地标启发式，多次获得IPC冠军。
+
+% =============================================
+\section{\caseB{v1}单平台侦察任务建模}
+% =============================================
+
+\begin{caseboxB}[title={\textbf{案例B-v1：单无人机侦察任务}}]
+\textbf{场景设定}：
+\begin{itemize}
+  \item 1架无人机，需侦察3个目标区域
+  \item 无人机从基地起飞，完成侦察后返回
+  \item 每个目标区域有侦察价值
+  \item 目标：规划飞行路线，完成所有侦察任务
+\end{itemize}
+
+\textbf{简化假设}（v1版本）：
+\begin{itemize}
+  \item 忽略航程约束
+  \item 忽略敌方威胁
+  \item 确定性环境
+\end{itemize}
+\end{caseboxB}
+
+\subsection{问题建模}
+
+\textbf{状态表示}：
+\begin{itemize}[leftmargin=2em]
+  \item 无人机位置
+  \item 各目标的侦察状态（已侦察/未侦察）
+\end{itemize}
+
+\textbf{动作}：
+\begin{itemize}[leftmargin=2em]
+  \item \texttt{fly(from, to)}：飞行
+  \item \texttt{recon(target)}：侦察目标
+  \item \texttt{return\_base()}：返回基地
+\end{itemize}
+
+\subsection{PDDL建模}
+
+\begin{lstlisting}[language=Lisp,caption=无人机侦察领域定义]
+(define (domain uav-recon)
+  (:requirements :strips)
+
+  (:predicates
+    (uav ?u)
+    (location ?l)
+    (target ?t)
+    (at ?u ?l)
+    (target-at ?t ?l)
+    (reconned ?t)
+    (at-base ?u)
+  )
+
+  (:action fly
+    :parameters (?u ?from ?to)
+    :precondition (and (uav ?u) (location ?from) (location ?to)
+                       (at ?u ?from))
+    :effect (and (at ?u ?to) (not (at ?u ?from)) (not (at-base ?u)))
+  )
+
+  (:action recon
+    :parameters (?u ?t ?l)
+    :precondition (and (uav ?u) (target ?t) (location ?l)
+                       (at ?u ?l) (target-at ?t ?l) (not (reconned ?t)))
+    :effect (reconned ?t)
+  )
+
+  (:action return-base
+    :parameters (?u ?l)
+    :precondition (and (uav ?u) (location ?l) (at ?u ?l))
+    :effect (at-base ?u)
+  )
+)
+\end{lstlisting}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item STRIPS/PDDL是任务规划的标准建模语言
+  \item 前向状态空间搜索配合启发式函数是经典规划的主流方法
+  \item 删除松弛是设计可纳启发式的有效技术
+  \item Fast Downward和LAMA是现代高效规划器的代表
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 案例A-v1的PDDL建模忽略了哪些实际约束？这些约束能用基本PDDL表达吗？
+  \item 如果目标数量从5个增加到100个，搜索效率会如何变化？有什么改进方法？
+  \item 案例B的"返回基地"是否必须作为显式目标？如果不返回会怎样？
+  \item 尝试为案例A或案例B设计一个简单的启发式函数，分析其可纳性。
+\end{enumerate}
+
+\textbf{编程练习}：
+\begin{enumerate}
+  \item 使用Fast Downward求解案例A-v1的PDDL问题
+  \item 增加目标数量，测试求解时间的变化趋势
+  \item 修改目标条件（部分观测即可），比较规划结果的差异
+\end{enumerate}
+\end{discussbox}

@@ -1,0 +1,260 @@
+% 第5章：分布式与多智能体规划
+\chapter{分布式与多智能体规划}
+
+\begin{levelbox}
+本章介绍多智能体环境下的分布式规划方法，包括MA-STRIPS、多智能体路径规划（MAPF）和多智能体强化学习（MARL）。通过案例v4版本学习如何处理多智能体协同。建议学时：8学时。
+\end{levelbox}
+
+% =============================================
+\section{\caseA{v4}多星协同覆盖观测}
+% =============================================
+
+\begin{caseboxA}[title={\textbf{案例A-v4：多星协同任务规划}}]
+\textbf{场景演进}：v3是单星决策，v4扩展为多星协同。
+
+\textbf{新增要素}：
+\begin{itemize}
+  \item \textbf{多卫星系统}：3颗遥感卫星（不同轨道）
+  \item \textbf{协同覆盖}：某些大面积目标需要多星协同
+  \item \textbf{资源竞争}：多星共享地面站下传资源
+  \item \textbf{通信约束}：星间通信有延迟和带宽限制
+\end{itemize}
+
+\textbf{为什么v3方法不够？}
+\begin{itemize}
+  \item 单智能体规划无法处理智能体间的协调
+  \item 需要考虑资源分配和任务分工
+  \item 集中式规划可能不可行（通信限制）
+\end{itemize}
+
+\textbf{预习思考}：
+\begin{enumerate}
+  \item 3颗卫星如何分配10个目标？
+  \item 如果某颗卫星观测失败，其他卫星能否补救？
+  \item 集中式规划和分布式规划各有什么优缺点？
+\end{enumerate}
+\end{caseboxA}
+
+% =============================================
+\section{分布式规划（MA-STRIPS, 计划合并）}
+% =============================================
+
+\subsection{多智能体规划问题}
+
+\begin{definition}[MA-STRIPS]
+多智能体STRIPS问题扩展经典STRIPS：
+\begin{itemize}
+  \item 多个智能体 $\mathcal{AG} = \{ag_1, \ldots, ag_n\}$
+  \item 每个智能体有自己的动作集合 $A_i$
+  \item 某些谓词是公共的，某些是私有的
+  \item 目标可能涉及多个智能体的状态
+\end{itemize}
+\end{definition}
+
+\subsection{集中式 vs 分布式规划}
+
+\begin{table}[htbp]
+\centering
+\caption{集中式与分布式规划对比}
+\begin{tabular}{p{3cm}p{5cm}p{5cm}}
+\toprule
+\textbf{方面} & \textbf{集中式规划} & \textbf{分布式规划} \\
+\midrule
+决策方式 & 中央规划器统一决策 & 各智能体独立决策 \\
+通信需求 & 需要全局信息 & 只需局部通信 \\
+计算复杂度 & 指数增长于智能体数 & 可分解计算 \\
+最优性 & 可保证全局最优 & 通常次优 \\
+鲁棒性 & 单点故障风险 & 更鲁棒 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{计划合并方法}
+
+\textbf{计划合并}（Plan Merging）策略：
+\begin{enumerate}[leftmargin=2em]
+  \item 各智能体独立生成局部规划
+  \item 检测规划间的冲突（资源冲突、目标冲突）
+  \item 通过协商或约束传播解决冲突
+  \item 合并为一致的联合规划
+\end{enumerate}
+
+% =============================================
+\section{多智能体路径规划（MAPF, CBS）}
+% =============================================
+
+\subsection{MAPF问题定义}
+
+\begin{definition}[多智能体路径规划（MAPF）]
+在图 $G=(V,E)$ 上，$n$ 个智能体各有起点和终点，需要找到无冲突的路径使所有智能体从起点到达终点。
+
+\textbf{冲突类型}：
+\begin{itemize}
+  \item \textbf{顶点冲突}：两个智能体同时占据同一顶点
+  \item \textbf{边冲突}：两个智能体同时穿越同一条边（相向）
+\end{itemize}
+\end{definition}
+
+\subsection{冲突搜索（CBS）}
+
+\begin{keypoint}[CBS算法核心思想]
+CBS（Conflict-Based Search）是求解最优MAPF的经典算法：
+\begin{enumerate}
+  \item \textbf{高层搜索}：在约束树中搜索，每个节点是一组约束集
+  \item \textbf{低层搜索}：在给定约束下为每个智能体独立规划路径
+  \item \textbf{冲突检测}：检查当前解中的冲突
+  \item \textbf{分支}：对每个冲突生成两个子节点（分别约束两个智能体）
+\end{enumerate}
+\end{keypoint}
+
+\begin{algorithm}[htbp]
+\caption{CBS算法框架}
+\begin{algorithmic}[1]
+\Require MAPF问题实例
+\Ensure 最优无冲突路径集
+\State 初始化根节点：无约束，为每个智能体计算最短路径
+\State 将根节点加入OPEN列表
+\While{OPEN非空}
+  \State 取出代价最小的节点 $N$
+  \State 检测 $N$ 中的路径冲突
+  \If{无冲突}
+    \State \Return $N$ 中的路径集
+  \EndIf
+  \State 选择一个冲突 $(ag_i, ag_j, v, t)$
+  \State 创建两个子节点：
+  \State \quad $N_1$：增加约束"$ag_i$在时刻$t$不能在$v$"
+  \State \quad $N_2$：增加约束"$ag_j$在时刻$t$不能在$v$"
+  \State 为子节点重新规划受影响智能体的路径
+  \State 将子节点加入OPEN
+\EndWhile
+\end{algorithmic}
+\end{algorithm}
+
+\subsection{优先级规划}
+
+\textbf{优先级规划}是一种高效的次优方法：
+\begin{enumerate}[leftmargin=2em]
+  \item 为智能体分配优先级顺序
+  \item 按优先级依次规划，高优先级智能体的路径作为低优先级的障碍
+  \item 计算高效但不保证最优
+\end{enumerate}
+
+% =============================================
+\section{\caseB{v4}多平台协同打击}
+% =============================================
+
+\begin{caseboxB}[title={\textbf{案例B-v4：有人-无人协同作战}}]
+\textbf{场景演进}：v3是单平台决策，v4扩展为多平台协同。
+
+\textbf{新增要素}：
+\begin{itemize}
+  \item \textbf{异构平台}：1架有人机（指挥）+ 2架无人机（执行）
+  \item \textbf{任务分工}：有人机负责决策，无人机负责侦察和打击
+  \item \textbf{协同约束}：编队保持、通信链路、火力协调
+\end{itemize}
+
+\textbf{多智能体协调挑战}：
+\begin{itemize}
+  \item 如何分配侦察和打击任务给不同平台？
+  \item 如何协调多个平台的时序配合？
+  \item 通信中断时如何保持协同？
+\end{itemize}
+\end{caseboxB}
+
+\subsection{任务分配问题}
+
+多平台任务分配可建模为分配问题：
+
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{集中式拍卖}：中央节点收集出价，分配任务
+  \item \textbf{分布式拍卖}：智能体间直接协商
+  \item \textbf{CBBA}（Consensus-Based Bundle Algorithm）：分布式任务分配算法
+\end{itemize}
+
+% =============================================
+\section{多智能体强化学习（QMIX, MAPPO, CTDE）}
+% =============================================
+
+\subsection{MARL挑战}
+
+多智能体强化学习面临特殊挑战：
+\begin{itemize}[leftmargin=2em]
+  \item \textbf{非平稳性}：其他智能体的策略在变化
+  \item \textbf{信用分配}：团队奖励如何分配给个体？
+  \item \textbf{可扩展性}：联合动作空间指数增长
+  \item \textbf{通信}：是否需要智能体间通信？
+\end{itemize}
+
+\subsection{CTDE范式}
+
+\begin{keypoint}[集中训练分布执行（CTDE）]
+CTDE（Centralized Training Decentralized Execution）是MARL的主流范式：
+\begin{itemize}
+  \item \textbf{训练阶段}：可以访问全局信息（所有智能体的观测和动作）
+  \item \textbf{执行阶段}：每个智能体只基于局部观测决策
+  \item 兼顾学习效率和部署灵活性
+\end{itemize}
+\end{keypoint}
+
+\subsection{QMIX}
+
+QMIX是值分解方法的代表：
+
+\begin{itemize}[leftmargin=2em]
+  \item 每个智能体学习局部Q函数 $Q_i(o_i, a_i)$
+  \item 全局Q函数是局部Q函数的单调混合：
+  \[ Q_{\text{tot}} = f_{\text{mix}}(Q_1, \ldots, Q_n; s) \]
+  \item 混合网络保证：$\frac{\partial Q_{\text{tot}}}{\partial Q_i} \geq 0$
+  \item 执行时各智能体独立选择使 $Q_i$ 最大的动作
+\end{itemize}
+
+\subsection{MAPPO}
+
+MAPPO将PPO扩展到多智能体设置：
+\begin{itemize}[leftmargin=2em]
+  \item 每个智能体有独立的策略网络
+  \item 使用集中式Critic（输入全局状态）
+  \item 在多个协作任务上表现优异
+\end{itemize}
+
+\subsection{案例应用：无人机蜂群}
+
+\begin{appbox}[title={\textbf{应用：无人机蜂群协同}}]
+无人机蜂群任务规划是MARL的典型应用：
+\begin{itemize}
+  \item 多架无人机协同执行侦察、打击任务
+  \item 需要处理编队控制、避障、任务分配
+  \item MARL可以学习端到端的协同策略
+  \item 国内研究：杜永浩等、贾高伟等的综述系统梳理了该领域进展
+\end{itemize}
+\end{appbox}
+
+% =============================================
+\section{本章小结与讨论}
+% =============================================
+
+\subsection*{本章小结}
+
+\begin{itemize}[leftmargin=2em]
+  \item 多智能体规划需要处理协调、通信和资源竞争
+  \item MA-STRIPS扩展经典规划到多智能体设置
+  \item CBS是求解最优MAPF的有效方法
+  \item MARL通过学习获得协同策略，CTDE是主流范式
+\end{itemize}
+
+\begin{discussbox}
+\textbf{讨论题}：
+\begin{enumerate}
+  \item 案例A-v4中，如果一颗卫星故障，系统应如何重新规划？
+  \item CBS和优先级规划各适用于什么场景？
+  \item 案例B-v4中的有人-无人协同，有人机和无人机的决策权限应如何分配？
+  \item MARL学到的协同策略是否可解释？如何增强可解释性？
+\end{enumerate}
+
+\textbf{编程练习}：
+\begin{enumerate}
+  \item 实现CBS算法，在小规模MAPF实例上测试
+  \item 使用PyMARL框架，在StarCraft微操环境中训练QMIX
+  \item 将案例A-v4建模为多智能体任务分配问题并求解
+\end{enumerate}
+\end{discussbox}
