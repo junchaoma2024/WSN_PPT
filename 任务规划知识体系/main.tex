@@ -1,0 +1,787 @@
+% 任务规划知识体系
+% 编译命令: xelatex main.tex
+
+\documentclass[12pt,a4paper]{ctexart}
+
+% ==================== 宏包导入 ====================
+\usepackage{geometry}
+\usepackage{graphicx}
+\usepackage{booktabs}
+\usepackage{longtable}
+\usepackage{array}
+\usepackage{multirow}
+\usepackage{hyperref}
+\usepackage{xcolor}
+\usepackage{enumitem}
+\usepackage{tcolorbox}
+\usepackage{fancyhdr}
+\usepackage{titlesec}
+\usepackage{caption}
+\usepackage{amsmath,amssymb}
+\usepackage{tikz}
+\usetikzlibrary{shapes,arrows,positioning,calc,fit,backgrounds,decorations.pathreplacing}
+
+% ==================== 页面设置 ====================
+\geometry{left=2.5cm, right=2.5cm, top=3cm, bottom=3cm}
+
+% ==================== 超链接设置 ====================
+\hypersetup{
+    colorlinks=true,
+    linkcolor=blue!70!black,
+    citecolor=green!50!black,
+    urlcolor=blue!80!black
+}
+
+% ==================== tcolorbox环境 ====================
+\tcbuselibrary{skins, breakable}
+
+\newtcolorbox{keypoint}[1][要点]{
+    colback=blue!5!white,
+    colframe=blue!75!black,
+    fonttitle=\bfseries,
+    title=\textbf{#1},
+    breakable
+}
+
+\newtcolorbox{methodbox}[1][方法]{
+    colback=green!5!white,
+    colframe=green!60!black,
+    fonttitle=\bfseries,
+    title=\textbf{#1},
+    breakable
+}
+
+\newtcolorbox{fusionbox}[1][融合]{
+    colback=orange!5!white,
+    colframe=orange!70!black,
+    fonttitle=\bfseries,
+    title=\textbf{#1},
+    breakable
+}
+
+\newtcolorbox{applicationbox}[1][应用]{
+    colback=purple!5!white,
+    colframe=purple!60!black,
+    fonttitle=\bfseries,
+    title=\textbf{#1},
+    breakable
+}
+
+% ==================== 文档信息 ====================
+\title{\textbf{任务规划知识体系}\\[0.5em]
+\large 数据·模型·算法的融合视角}
+\author{教学参考资料}
+\date{2026年2月}
+
+% ==================== 正文开始 ====================
+\begin{document}
+
+\maketitle
+
+\begin{abstract}
+任务规划（Task Planning）是人工智能与运筹优化交叉领域的核心问题，旨在为智能体生成达成目标的行动序列。本文从\textbf{数据}、\textbf{模型}、\textbf{算法}三个维度系统梳理任务规划的知识体系，重点阐述三者的相互融合如何推动任务规划方法的演进。文档参考了华中科技大学祁超教授团队在层次任务网络（HTN）规划方面的研究工作，结合深度强化学习、大语言模型等前沿技术，构建面向复杂管理任务的智能规划方法论框架。
+\end{abstract}
+
+\tableofcontents
+\newpage
+
+% ================================================================
+\section{引言}
+% ================================================================
+
+\subsection{任务规划的定义与内涵}
+
+\begin{keypoint}[任务规划的核心定义]
+\textbf{任务规划}是指在给定初始状态、目标状态和可用动作集合的条件下，自动生成一个动作序列（或策略），使得执行该序列后系统从初始状态转移到满足目标条件的状态。
+\end{keypoint}
+
+任务规划问题可以形式化表示为五元组：
+\[ \mathcal{P} = \langle S, s_0, G, A, \delta \rangle \]
+其中：
+\begin{itemize}[leftmargin=2em]
+    \item $S$：状态空间
+    \item $s_0 \in S$：初始状态
+    \item $G \subseteq S$：目标状态集合
+    \item $A$：动作集合
+    \item $\delta: S \times A \rightarrow S$：状态转移函数
+\end{itemize}
+
+\subsection{任务规划的应用领域}
+
+任务规划技术已广泛应用于：
+\begin{table}[htbp]
+\centering
+\caption{任务规划典型应用领域}
+\begin{tabular}{p{3cm}p{4cm}p{5cm}}
+\toprule
+\textbf{领域} & \textbf{典型场景} & \textbf{关键挑战} \\
+\midrule
+航天测控 & 卫星任务调度、星座协同 & 大规模、多约束、动态环境 \\
+军事指挥 & 作战任务规划、兵力部署 & 对抗性、不确定性、时效性 \\
+智能制造 & 车间调度、AGV调度 & 实时性、资源竞争 \\
+应急管理 & 救援资源调配、疏散规划 & 信息不完全、动态演化 \\
+机器人 & 运动规划、任务分配 & 连续空间、物理约束 \\
+物流交通 & 车辆路径规划、配送调度 & 大规模、时间窗约束 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{数据-模型-算法融合的必要性}
+
+传统任务规划方法面临以下挑战：
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{模型构建困难}：复杂系统的精确建模代价高昂
+    \item \textbf{计算复杂性}：NP-Hard问题难以精确求解
+    \item \textbf{环境不确定性}：动态变化难以预先建模
+    \item \textbf{知识获取瓶颈}：领域知识难以形式化表达
+\end{enumerate}
+
+\begin{fusionbox}[数据-模型-算法融合的核心思想]
+\textbf{数据驱动}与\textbf{模型驱动}的深度融合，通过\textbf{算法创新}实现：
+\begin{itemize}
+    \item 数据弥补模型的不精确性
+    \item 模型指导数据的高效利用
+    \item 算法实现数据与模型的协同优化
+\end{itemize}
+\end{fusionbox}
+
+% ================================================================
+\section{任务规划的理论基础}
+% ================================================================
+
+\subsection{状态空间表示理论}
+
+\subsubsection{命题逻辑表示}
+
+经典规划使用命题逻辑表示状态：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{状态}：命题变量的真值赋值
+    \item \textbf{动作}：前置条件（Precondition）和效果（Effect）
+    \item \textbf{目标}：目标命题的合取
+\end{itemize}
+
+\subsubsection{一阶逻辑表示}
+
+PDDL（Planning Domain Definition Language）采用一阶逻辑：
+\begin{itemize}[leftmargin=2em]
+    \item 支持对象、谓词、函数
+    \item 动作模式可实例化
+    \item 表达能力更强
+\end{itemize}
+
+\subsection{计算复杂性理论}
+
+\begin{table}[htbp]
+\centering
+\caption{任务规划问题的计算复杂性}
+\begin{tabular}{p{4cm}p{3cm}p{4cm}}
+\toprule
+\textbf{问题类型} & \textbf{复杂性} & \textbf{说明} \\
+\midrule
+经典规划（STRIPS） & PSPACE-完全 & 确定性、完全信息 \\
+一致性规划 & EXPSPACE-完全 & 不确定初始状态 \\
+条件规划 & 2-EXPTIME-完全 & 部分可观测 \\
+HTN规划 & 可判定/不可判定 & 取决于递归限制 \\
+时态规划 & PSPACE-完全 & 持续性动作 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\subsection{搜索理论基础}
+
+\subsubsection{状态空间搜索}
+
+前向搜索从初始状态出发，后向搜索从目标状态回溯。
+
+\subsubsection{启发式搜索}
+
+A*算法使用评价函数 $f(n) = g(n) + h(n)$：
+\begin{itemize}[leftmargin=2em]
+    \item $g(n)$：从起点到$n$的实际代价
+    \item $h(n)$：从$n$到目标的估计代价（启发式）
+    \item 可纳启发式保证最优性
+\end{itemize}
+
+% ================================================================
+\section{模型驱动的规划方法}
+% ================================================================
+
+\subsection{经典规划模型}
+
+\subsubsection{STRIPS模型}
+
+STRIPS（Stanford Research Institute Problem Solver）是最基础的规划模型：
+
+\begin{methodbox}[STRIPS动作定义]
+动作 $a$ 由三元组定义：
+\begin{itemize}
+    \item $\text{Pre}(a)$：前置条件（执行前必须为真的命题）
+    \item $\text{Add}(a)$：添加效果（执行后变为真的命题）
+    \item $\text{Del}(a)$：删除效果（执行后变为假的命题）
+\end{itemize}
+\end{methodbox}
+
+\subsubsection{PDDL语言体系}
+
+PDDL是规划领域的标准建模语言，经历多个版本演化：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{PDDL 1.2}：基础版本，支持ADL特性
+    \item \textbf{PDDL 2.1}：时态规划，持续性动作
+    \item \textbf{PDDL 2.2}：派生谓词，定时初始化
+    \item \textbf{PDDL 3.0}：软约束、偏好、轨迹约束
+    \item \textbf{HDDL}：层次任务网络扩展
+\end{itemize}
+
+\subsection{层次任务网络（HTN）模型}
+
+华中科技大学祁超教授团队在HTN规划方面开展了深入研究，提出了面向复杂管理任务的智能规划方法。
+
+\begin{keypoint}[HTN规划的核心思想]
+HTN采用\textbf{自顶向下的任务分解}策略：
+\begin{enumerate}
+    \item 将高层复合任务分解为子任务
+    \item 子任务可以是复合任务或原子任务
+    \item 原子任务对应可直接执行的动作
+    \item 分解过程由\textbf{方法}（Method）定义
+\end{enumerate}
+\end{keypoint}
+
+\subsubsection{HTN形式化定义}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{原子任务}（Primitive Task）：可直接执行的动作
+    \item \textbf{复合任务}（Compound Task）：需要分解的高层任务
+    \item \textbf{方法}（Method）：$(c, \text{pre}, T)$，表示在满足前置条件$\text{pre}$时，复合任务$c$可分解为任务网络$T$
+    \item \textbf{任务网络}：任务集合及其偏序约束
+\end{itemize}
+
+\subsubsection{HTN规划的优势}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{自然表达领域知识}：分解规则编码专家经验
+    \item \textbf{搜索空间缩减}：层次分解减少盲目搜索
+    \item \textbf{可解释性强}：规划过程符合人类思维
+    \item \textbf{灵活性}：支持全序和偏序分解
+\end{enumerate}
+
+\subsubsection{祁超团队的研究贡献}
+
+根据祁超教授团队的研究，HTN规划在以下方面得到扩展：
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{不完全信息处理}：在信息缺失情况下进行任务规划
+    \item \textbf{并发任务支持}：处理可并行执行的子任务
+    \item \textbf{不确定持续时间}：考虑任务执行时间的不确定性
+    \item \textbf{资源约束集成}：将资源限制纳入规划过程
+\end{enumerate}
+
+代表性成果包括：
+\begin{itemize}[leftmargin=2em]
+    \item 《基于层次任务网络规划的应急响应决策理论与方法》（科学出版社，2015）
+    \item "Hierarchical Task Network-based Emergency Task Planning with Incomplete Information, Concurrency and Uncertain Duration"（Knowledge-Based Systems, 2016）
+\end{itemize}
+
+\subsection{约束满足模型}
+
+\subsubsection{CSP模型}
+
+约束满足问题（CSP）将规划建模为变量-值域-约束的框架。
+
+\subsubsection{SAT/SMT编码}
+
+将规划问题编码为命题逻辑或可满足性模理论公式，利用高效求解器求解。
+
+\subsection{马尔可夫决策过程模型}
+
+\subsubsection{MDP}
+
+马尔可夫决策过程（MDP）处理动作效果的不确定性：
+\[ \langle S, A, T, R, \gamma \rangle \]
+
+\subsubsection{POMDP}
+
+部分可观测MDP处理状态观测的不确定性，在信念空间中规划。
+
+% ================================================================
+\section{数据驱动的规划方法}
+% ================================================================
+
+\subsection{强化学习方法}
+
+\subsubsection{基于值函数的方法}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{Q-Learning}：表格型值函数学习
+    \item \textbf{DQN}：深度神经网络逼近Q函数
+    \item \textbf{Double DQN}：解决Q值过估计问题
+    \item \textbf{Dueling DQN}：分离状态值和优势函数
+\end{itemize}
+
+\subsubsection{基于策略的方法}
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{REINFORCE}：蒙特卡洛策略梯度
+    \item \textbf{PPO}：近端策略优化
+    \item \textbf{TRPO}：信任区域策略优化
+\end{itemize}
+
+\subsubsection{Actor-Critic方法}
+
+结合值函数和策略优化的优点：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{A2C/A3C}：异步优势Actor-Critic
+    \item \textbf{SAC}：软Actor-Critic，最大熵强化学习
+\end{itemize}
+
+\subsection{模仿学习方法}
+
+\subsubsection{行为克隆}
+
+从专家示范中直接学习策略映射。
+
+\subsubsection{逆强化学习}
+
+从专家行为中推断奖励函数。
+
+\subsection{深度学习辅助规划}
+
+\subsubsection{学习启发式函数}
+
+使用神经网络学习规划问题的启发式函数，加速搜索过程。
+
+\subsubsection{学习动作选择}
+
+神经网络预测下一步最可能的动作，指导搜索方向。
+
+% ================================================================
+\section{数据-模型-算法的深度融合}
+% ================================================================
+
+本节是全文重点，系统阐述数据、模型、算法三者如何相互融合，推动任务规划方法的创新发展。
+
+\subsection{融合范式概述}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    node distance=2.5cm,
+    box/.style={rectangle, draw, rounded corners, minimum width=2.5cm, minimum height=1.2cm, align=center, font=\small},
+    arrow/.style={->, thick, >=stealth}
+]
+    % 三个核心要素
+    \node[box, fill=blue!20] (data) at (0,0) {\textbf{数据}\\历史案例\\专家经验\\仿真数据};
+    \node[box, fill=green!20] (model) at (5,0) {\textbf{模型}\\领域知识\\动力学模型\\约束结构};
+    \node[box, fill=orange!20] (algo) at (2.5,-3.5) {\textbf{算法}\\搜索优化\\学习推理\\混合求解};
+
+    % 双向箭头和标注
+    \draw[arrow, bend left=20] (data) to node[above, font=\scriptsize] {数据增强模型} (model);
+    \draw[arrow, bend left=20] (model) to node[below, font=\scriptsize] {模型指导数据} (data);
+
+    \draw[arrow, bend left=20] (model) to node[right, font=\scriptsize] {模型嵌入算法} (algo);
+    \draw[arrow, bend left=20] (algo) to node[left, font=\scriptsize] {算法优化模型} (model);
+
+    \draw[arrow, bend left=20] (data) to node[left, font=\scriptsize] {数据训练算法} (algo);
+    \draw[arrow, bend left=20] (algo) to node[right, font=\scriptsize] {算法生成数据} (data);
+
+    % 中心融合
+    \node[box, fill=red!20, minimum width=2cm] (fusion) at (2.5,-1.5) {\textbf{智能规划}};
+
+\end{tikzpicture}
+\caption{数据-模型-算法融合框架}
+\end{figure}
+
+\subsection{数据与模型的融合}
+
+\subsubsection{数据增强模型精度}
+
+\begin{fusionbox}[数据$\rightarrow$模型：学习环境动力学]
+\begin{itemize}
+    \item \textbf{系统辨识}：从观测数据学习状态转移模型
+    \item \textbf{残差学习}：用数据修正物理模型的误差
+    \item \textbf{混合建模}：物理先验 + 数据驱动的组合模型
+\end{itemize}
+典型方法：神经网络动力学模型、高斯过程回归
+\end{fusionbox}
+
+\subsubsection{模型指导数据利用}
+
+\begin{fusionbox}[模型$\rightarrow$数据：提高样本效率]
+\begin{itemize}
+    \item \textbf{模型仿真}：基于模型生成虚拟样本
+    \item \textbf{主动学习}：模型不确定性指导数据采集
+    \item \textbf{迁移学习}：模型结构指导跨域数据利用
+\end{itemize}
+典型方法：Dyna架构、模型预测控制
+\end{fusionbox}
+
+\subsection{模型与算法的融合}
+
+\subsubsection{模型嵌入算法}
+
+\begin{fusionbox}[模型$\rightarrow$算法：知识驱动的搜索]
+\begin{itemize}
+    \item \textbf{领域启发式}：模型知识指导启发函数设计
+    \item \textbf{约束传播}：利用模型结构剪枝搜索空间
+    \item \textbf{分层分解}：HTN方法利用任务结构知识
+\end{itemize}
+典型方法：Fast Downward、SHOP2
+\end{fusionbox}
+
+\subsubsection{算法优化模型}
+
+\begin{fusionbox}[算法$\rightarrow$模型：模型选择与简化]
+\begin{itemize}
+    \item \textbf{模型选择}：算法性能指导模型复杂度选择
+    \item \textbf{抽象化}：通过求解反馈确定合适的抽象粒度
+    \item \textbf{自适应建模}：根据问题特征动态调整模型
+\end{itemize}
+\end{fusionbox}
+
+\subsection{数据与算法的融合}
+
+\subsubsection{数据训练算法}
+
+\begin{fusionbox}[数据$\rightarrow$算法：学习型规划]
+\begin{itemize}
+    \item \textbf{学习启发式}：从历史规划数据学习启发函数
+    \item \textbf{学习动作排序}：预测最有希望的动作
+    \item \textbf{端到端学习}：直接从数据学习规划策略
+\end{itemize}
+典型方法：神经规划器、图神经网络辅助规划
+\end{fusionbox}
+
+\subsubsection{算法生成数据}
+
+\begin{fusionbox}[算法$\rightarrow$数据：自我博弈与仿真]
+\begin{itemize}
+    \item \textbf{自我博弈}：算法对弈生成高质量数据
+    \item \textbf{蒙特卡洛搜索}：搜索过程生成训练样本
+    \item \textbf{课程学习}：算法控制数据难度递进
+\end{itemize}
+典型方法：AlphaGo/AlphaZero、MuZero
+\end{fusionbox}
+
+\subsection{三元深度融合：代表性方法}
+
+\subsubsection{基于世界模型的规划}
+
+\textbf{MuZero}（DeepMind, 2020）是数据-模型-算法深度融合的典范：
+
+\begin{table}[htbp]
+\centering
+\caption{MuZero中的三元融合}
+\begin{tabular}{p{2cm}p{4cm}p{5cm}}
+\toprule
+\textbf{要素} & \textbf{实现方式} & \textbf{融合作用} \\
+\midrule
+数据 & 自我博弈生成轨迹数据 & 提供训练信号 \\
+模型 & 神经网络学习隐状态动力学 & 支持内部模拟规划 \\
+算法 & MCTS搜索 + 策略/值网络 & 利用模型进行前瞻搜索 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\textbf{Dreamer}系列（Hafner等, 2020-2023）：
+\begin{itemize}[leftmargin=2em]
+    \item 学习世界模型（状态表示 + 动力学模型）
+    \item 在想象轨迹上训练策略
+    \item 实现高样本效率的强化学习
+\end{itemize}
+
+\subsubsection{LLM增强的规划系统}
+
+大语言模型与传统规划的融合：
+
+\begin{table}[htbp]
+\centering
+\caption{LLM+规划器中的三元融合}
+\begin{tabular}{p{2cm}p{4cm}p{5cm}}
+\toprule
+\textbf{要素} & \textbf{实现方式} & \textbf{融合作用} \\
+\midrule
+数据 & 大规模文本预训练数据 & 提供世界知识和常识 \\
+模型 & PDDL领域/问题描述 & 形式化任务结构 \\
+算法 & LLM翻译 + 规划器求解 & 结合理解能力和规划保证 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+代表性工作：
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{LLM+P}：LLM生成PDDL，规划器求解
+    \item \textbf{SayCan}：LLM常识 + 价值函数可行性
+    \item \textbf{AutoPlan}（秦龙等, 2024）：面向复杂任务的自主规划框架
+\end{itemize}
+
+\subsubsection{神经符号规划}
+
+神经网络与符号推理的深度融合：
+
+\begin{itemize}[leftmargin=2em]
+    \item \textbf{神经组件}：感知、特征提取、值估计
+    \item \textbf{符号组件}：逻辑推理、约束求解、规划搜索
+    \item \textbf{接口}：神经符号翻译、可微分规划
+\end{itemize}
+
+\subsection{融合方法的设计原则}
+
+\begin{keypoint}[数据-模型-算法融合的设计原则]
+\begin{enumerate}
+    \item \textbf{互补性原则}：利用各要素的互补优势
+    \begin{itemize}
+        \item 数据：适应性、泛化性
+        \item 模型：可解释性、约束保证
+        \item 算法：搜索效率、最优性保证
+    \end{itemize}
+
+    \item \textbf{渐进式融合}：从松耦合到紧耦合
+    \begin{itemize}
+        \item Level 1：独立使用，结果组合
+        \item Level 2：单向增强，一方辅助另一方
+        \item Level 3：双向交互，迭代优化
+        \item Level 4：端到端联合优化
+    \end{itemize}
+
+    \item \textbf{问题驱动}：根据问题特征选择融合方式
+    \begin{itemize}
+        \item 模型精确、数据稀缺：模型主导
+        \item 模型不精确、数据丰富：数据主导
+        \item 实时性要求高：预计算 + 在线微调
+    \end{itemize}
+\end{enumerate}
+\end{keypoint}
+
+% ================================================================
+\section{典型应用场景的融合实践}
+% ================================================================
+
+\subsection{卫星任务调度}
+
+\begin{applicationbox}[卫星任务调度中的三元融合]
+\textbf{数据}：
+\begin{itemize}
+    \item 历史调度方案和执行结果
+    \item 云量、光照等环境数据
+    \item 卫星状态遥测数据
+\end{itemize}
+
+\textbf{模型}：
+\begin{itemize}
+    \item 卫星轨道动力学模型
+    \item 观测窗口计算模型
+    \item 资源消耗（能量、存储）模型
+\end{itemize}
+
+\textbf{算法}：
+\begin{itemize}
+    \item 约束规划/整数规划求解
+    \item 深度强化学习策略
+    \item 启发式搜索
+\end{itemize}
+
+\textbf{融合方式}：
+\begin{itemize}
+    \item 用历史数据学习云量预测模型，增强调度决策
+    \item 用轨道模型生成可行时间窗口，约束学习空间
+    \item 用RL学习启发式，加速组合优化求解
+\end{itemize}
+\end{applicationbox}
+
+\subsection{应急任务规划}
+
+祁超教授团队在应急响应决策方面的研究体现了融合思想：
+
+\begin{applicationbox}[应急任务规划中的三元融合]
+\textbf{数据}：
+\begin{itemize}
+    \item 历史应急事件案例库
+    \item 实时监测数据（传感器、视频）
+    \item 资源状态数据
+\end{itemize}
+
+\textbf{模型}：
+\begin{itemize}
+    \item HTN任务分解模型
+    \item 灾害演化模型
+    \item 资源-任务匹配模型
+\end{itemize}
+
+\textbf{算法}：
+\begin{itemize}
+    \item HTN规划搜索（SHOP2）
+    \item 动态重规划
+    \item 多目标优化
+\end{itemize}
+
+\textbf{融合特点}：
+\begin{itemize}
+    \item 案例推理辅助HTN方法选择
+    \item 不完全信息下的鲁棒规划
+    \item 资源约束与任务分解的耦合
+\end{itemize}
+\end{applicationbox}
+
+\subsection{无人系统协同}
+
+\begin{applicationbox}[多无人机协同规划中的三元融合]
+\textbf{数据}：
+\begin{itemize}
+    \item 仿真训练数据
+    \item 实飞测试数据
+    \item 对抗博弈数据
+\end{itemize}
+
+\textbf{模型}：
+\begin{itemize}
+    \item 飞行动力学模型
+    \item 通信模型
+    \item 协同任务模型
+\end{itemize}
+
+\textbf{算法}：
+\begin{itemize}
+    \item 多智能体强化学习（QMIX, MAPPO）
+    \item 分布式规划算法
+    \item 博弈论方法
+\end{itemize}
+
+\textbf{融合方式}：
+\begin{itemize}
+    \item CTDE范式：集中训练分布执行
+    \item 通信模型指导信息共享策略
+    \item 对抗训练提升鲁棒性
+\end{itemize}
+\end{applicationbox}
+
+% ================================================================
+\section{知识体系总结与展望}
+% ================================================================
+
+\subsection{任务规划知识体系图谱}
+
+\begin{figure}[htbp]
+\centering
+\begin{tikzpicture}[
+    level 1/.style={sibling distance=4.5cm, level distance=2cm},
+    level 2/.style={sibling distance=2cm, level distance=1.8cm},
+    edge from parent/.style={draw, -latex},
+    font=\small
+]
+    \node[rectangle, draw, fill=blue!20, rounded corners] {任务规划}
+        child {node[rectangle, draw, fill=green!15, rounded corners] {理论基础}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {状态空间}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {复杂性}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {搜索理论}}
+        }
+        child {node[rectangle, draw, fill=orange!15, rounded corners] {模型方法}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {PDDL/HTN}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {MDP/POMDP}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {CSP/SAT}}
+        }
+        child {node[rectangle, draw, fill=purple!15, rounded corners] {数据方法}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {强化学习}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {模仿学习}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {深度学习}}
+        }
+        child {node[rectangle, draw, fill=red!15, rounded corners] {融合方法}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {世界模型}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {LLM+规划}}
+            child {node[rectangle, draw, rounded corners, font=\scriptsize] {神经符号}}
+        };
+\end{tikzpicture}
+\caption{任务规划知识体系图谱}
+\end{figure}
+
+\subsection{发展趋势}
+
+\begin{enumerate}[leftmargin=2em]
+    \item \textbf{大模型驱动的规划}
+    \begin{itemize}
+        \item LLM作为规划组件（翻译、常识、启发式）
+        \item 多模态大模型支持复杂场景理解
+        \item 具身智能中的语言-动作对齐
+    \end{itemize}
+
+    \item \textbf{端到端可微分规划}
+    \begin{itemize}
+        \item 感知-规划-控制联合优化
+        \item 可微分物理引擎
+        \item 神经符号深度融合
+    \end{itemize}
+
+    \item \textbf{大规模多智能体规划}
+    \begin{itemize}
+        \item 千级以上智能体协同
+        \item 去中心化与层次化混合架构
+        \item 涌现行为与可控性平衡
+    \end{itemize}
+
+    \item \textbf{人机协同规划}
+    \begin{itemize}
+        \item 可解释性与信任建立
+        \item 混合主动性交互
+        \item 价值对齐与安全约束
+    \end{itemize}
+\end{enumerate}
+
+\subsection{核心挑战}
+
+\begin{table}[htbp]
+\centering
+\caption{任务规划领域核心挑战}
+\begin{tabular}{p{3cm}p{4cm}p{4.5cm}}
+\toprule
+\textbf{挑战} & \textbf{问题描述} & \textbf{可能方向} \\
+\midrule
+可扩展性 & 状态/动作空间指数爆炸 & 抽象、分层、近似 \\
+泛化能力 & 跨领域/跨任务迁移 & 元学习、基础模型 \\
+实时性 & 在线规划时间约束 & 预计算、增量更新 \\
+鲁棒性 & 对抗/不确定环境 & 博弈方法、鲁棒优化 \\
+可解释性 & 决策过程透明化 & 符号推理、因果模型 \\
+安全性 & 满足安全约束 & 形式化验证、安全RL \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+% ================================================================
+% 参考文献
+% ================================================================
+\newpage
+\section*{参考文献}
+\addcontentsline{toc}{section}{参考文献}
+
+\begin{enumerate}[leftmargin=2em, label={[\arabic*]}]
+    % 经典教材
+    \item Ghallab M, Nau D, Traverso P. Automated Planning: Theory and Practice[M]. Morgan Kaufmann, 2004.
+    \item Ghallab M, Nau D, Traverso P. Automated Planning and Acting[M]. Cambridge University Press, 2016.
+    \item Russell S, Norvig P. Artificial Intelligence: A Modern Approach (4th ed)[M]. Pearson, 2020.
+    \item Sutton R S, Barto A G. Reinforcement Learning: An Introduction (2nd ed)[M]. MIT Press, 2018.
+
+    % HTN规划
+    \item 王红卫, 祁超. 基于层次任务网络规划的应急响应决策理论与方法[M]. 北京: 科学出版社, 2015.
+    \item Qi C, Wang H, et al. Hierarchical Task Network-based Emergency Task Planning with Incomplete Information, Concurrency and Uncertain Duration[J]. Knowledge-Based Systems, 2016, 112:69-79.
+    \item Nau D, et al. SHOP2: An HTN Planning System[J]. JAIR, 2003, 20:379-404.
+
+    % 深度强化学习
+    \item Schrittwieser J, et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model[J]. Nature, 2020, 584:186-190.
+    \item Hafner D, et al. Mastering Diverse Domains through World Models[J]. arXiv:2301.04104, 2023.
+    \item 梁星星, 冯旸赫, 等. 多Agent深度强化学习综述[J]. 自动化学报, 2020, 46(12):2537-2557.
+
+    % LLM与规划
+    \item Liu B, et al. LLM+P: Empowering Large Language Models with Optimal Planning Proficiency[J]. arXiv:2304.11477, 2023.
+    \item 秦龙, 武万森, 等. 基于大语言模型的复杂任务自主规划处理框架[J]. 自动化学报, 2024, 50(4):862-872.
+    \item Yao S, et al. ReAct: Synergizing Reasoning and Acting in Language Models[C]. ICLR, 2023.
+
+    % 卫星任务规划
+    \item 杜永浩, 邢立宁, 蔡昭权. 无人飞行器集群智能调度技术综述[J]. 自动化学报, 2020, 46(2):222-241.
+    \item 贾高伟, 王建峰. 无人机集群任务规划方法研究综述[J]. 系统工程与电子技术, 2021, 43(1):99-111.
+
+    % 数据驱动优化
+    \item 张梦钰, 豆亚杰, 陈子夷, 等. 深度强化学习及其在军事领域中的应用综述[J]. 系统工程与电子技术, 2024, 46(4):1297-1308.
+
+    % 中文教材
+    \item 蔡自兴, 刘丽珏, 蔡竞峰. 人工智能及其应用（第7版）[M]. 北京: 清华大学出版社, 2024.
+    \item Ghallab等著, 殷建平等译. 自动规划：理论和实践[M]. 北京: 清华大学出版社, 2008.
+\end{enumerate}
+
+\end{document}
