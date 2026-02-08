@@ -99,6 +99,54 @@ LLM转换回自然语言：
 \end{appbox}
 
 % =============================================
+\section{数据-模型-算法融合范式}
+% =============================================
+
+当代任务规划方法正在经历从单一范式向融合范式的转变。\textbf{数据驱动}与\textbf{模型驱动}的深度融合，通过\textbf{算法创新}实现协同优化，是解决复杂任务规划问题的关键思路。
+
+\subsection{融合的必要性}
+
+\begin{keypoint}[为什么需要融合？]
+\begin{itemize}
+  \item \textbf{纯模型方法的局限}：精确建模代价高，难以适应动态环境
+  \item \textbf{纯数据方法的局限}：样本效率低，难以保证约束满足
+  \item \textbf{融合的优势}：数据弥补模型不精确，模型指导数据高效利用，算法实现协同优化
+\end{itemize}
+\end{keypoint}
+
+\subsection{三元融合的典型模式}
+
+\textbf{1. 数据$\leftrightarrow$模型融合}
+\begin{itemize}[leftmargin=2em]
+  \item 从数据学习环境动力学模型（如MuZero的世界模型）
+  \item 基于模型生成仿真数据增强训练集
+  \item 残差学习修正物理模型误差
+\end{itemize}
+
+\textbf{2. 模型$\leftrightarrow$算法融合}
+\begin{itemize}[leftmargin=2em]
+  \item 领域模型（如HTN方法库）指导搜索方向
+  \item 算法反馈优化模型抽象粒度
+  \item 案例：王红卫、祁超团队将HTN方法嵌入应急决策算法
+\end{itemize}
+
+\textbf{3. 数据$\leftrightarrow$算法融合}
+\begin{itemize}[leftmargin=2em]
+  \item 从历史规划数据学习启发式函数
+  \item 自我博弈生成高质量训练数据（AlphaZero范式）
+  \item 端到端学习规划策略
+\end{itemize}
+
+\begin{appbox}[融合实例：卫星任务调度中的三元融合]
+\begin{itemize}
+  \item \textbf{数据}：历史调度方案、云量观测、卫星遥测
+  \item \textbf{模型}：轨道动力学、观测窗口计算、资源消耗模型
+  \item \textbf{算法}：用RL学习的启发式加速约束规划求解
+  \item \textbf{融合}：数据预测云量$\rightarrow$模型计算可行窗口$\rightarrow$算法优化调度序列
+\end{itemize}
+\end{appbox}
+
+% =============================================
 \section{神经符号规划与图神经网络}
 % =============================================
 

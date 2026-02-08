@@ -234,7 +234,7 @@ PDDL是规划领域的标准建模语言，经历多个版本演化：
 
 \subsection{层次任务网络（HTN）模型}
 
-华中科技大学祁超教授团队在HTN规划方面开展了深入研究，提出了面向复杂管理任务的智能规划方法。
+华中科技大学王红卫教授、祁超副教授等在HTN规划方面开展了系统性研究。王红卫教授是华中科技大学自动化学院长江学者特聘教授，祁超副教授是其团队核心成员，研究方向为不确定环境下的HTN规划理论与应急决策方法。
 
 \begin{keypoint}[HTN规划的核心思想]
 HTN采用\textbf{自顶向下的任务分解}策略：
@@ -266,19 +266,19 @@ HTN采用\textbf{自顶向下的任务分解}策略：
 
 \subsubsection{祁超团队的研究贡献}
 
-根据祁超教授团队的研究，HTN规划在以下方面得到扩展：
+根据王红卫、祁超团队在《自动化学报》发表的综述\footnote{王红卫, 刘典, 赵鹏, 祁超, 陈曦. 不确定层次任务网络规划研究综述[J]. 自动化学报, 2016, 42(5):655-667.}，不确定HTN规划从三个维度扩展了经典HTN：
 
 \begin{enumerate}[leftmargin=2em]
-    \item \textbf{不完全信息处理}：在信息缺失情况下进行任务规划
-    \item \textbf{并发任务支持}：处理可并行执行的子任务
-    \item \textbf{不确定持续时间}：考虑任务执行时间的不确定性
-    \item \textbf{资源约束集成}：将资源限制纳入规划过程
+    \item \textbf{状态不确定}：初始状态或中间状态信息不完全
+    \item \textbf{动作效果不确定}：动作执行结果具有随机性
+    \item \textbf{任务分解不确定}：方法选择和分解过程具有不确定性
 \end{enumerate}
 
-代表性成果包括：
+该团队的代表性成果包括：
 \begin{itemize}[leftmargin=2em]
-    \item 《基于层次任务网络规划的应急响应决策理论与方法》（科学出版社，2015）
-    \item "Hierarchical Task Network-based Emergency Task Planning with Incomplete Information, Concurrency and Uncertain Duration"（Knowledge-Based Systems, 2016）
+    \item 王红卫, 刘典, 赵鹏, 祁超, 陈曦. 不确定层次任务网络规划研究综述[J]. 自动化学报, 2016, 42(5):655-667.
+    \item 基于HTN的应急资源协调规划方法，将协调过程嵌入HTN规划中处理分布式规划中的资源冲突
+    \item 面向应急响应决策的层次任务网络规划理论与方法研究
 \end{itemize}
 
 \subsection{约束满足模型}
@@ -589,7 +589,7 @@ HTN采用\textbf{自顶向下的任务分解}策略：
 
 \subsection{应急任务规划}
 
-祁超教授团队在应急响应决策方面的研究体现了融合思想：
+王红卫、祁超团队在应急响应决策方面的研究体现了数据-模型-算法融合思想。该团队将HTN规划与应急管理领域知识相结合，提出了面向不完全信息、并发任务和不确定持续时间的应急任务规划方法：
 
 \begin{applicationbox}[应急任务规划中的三元融合]
 \textbf{数据}：
@@ -757,10 +757,11 @@ HTN采用\textbf{自顶向下的任务分解}策略：
     \item Russell S, Norvig P. Artificial Intelligence: A Modern Approach (4th ed)[M]. Pearson, 2020.
     \item Sutton R S, Barto A G. Reinforcement Learning: An Introduction (2nd ed)[M]. MIT Press, 2018.
 
-    % HTN规划
-    \item 王红卫, 祁超. 基于层次任务网络规划的应急响应决策理论与方法[M]. 北京: 科学出版社, 2015.
-    \item Qi C, Wang H, et al. Hierarchical Task Network-based Emergency Task Planning with Incomplete Information, Concurrency and Uncertain Duration[J]. Knowledge-Based Systems, 2016, 112:69-79.
+    % HTN规划与华中科技大学研究
+    \item 王红卫, 刘典, 赵鹏, 祁超, 陈曦. 不确定层次任务网络规划研究综述[J]. 自动化学报, 2016, 42(5):655-667.
+    \item 王红卫, 祁超等. 基于层次任务网络的应急资源协调规划方法[J]. 系统工程理论与实践, 2015, 35(10):2504-2511.
     \item Nau D, et al. SHOP2: An HTN Planning System[J]. JAIR, 2003, 20:379-404.
+    \item Erol K, Hendler J, Nau D S. HTN Planning: Complexity and Expressivity[C]. AAAI, 1994.
 
     % 深度强化学习
     \item Schrittwieser J, et al. Mastering Atari, Go, Chess and Shogi by Planning with a Learned Model[J]. Nature, 2020, 584:186-190.

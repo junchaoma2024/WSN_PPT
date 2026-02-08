@@ -111,6 +111,19 @@ SHOP（Simple Hierarchical Ordered Planner）是最著名的HTN规划器：
 )
 \end{lstlisting}
 
+\subsection{不确定HTN规划}
+
+实际应用中，规划环境往往具有不确定性。华中科技大学王红卫教授、祁超副教授团队系统研究了不确定层次任务网络规划问题。
+
+\begin{keypoint}[不确定HTN的三类不确定性（王红卫等, 2016）]
+\begin{enumerate}
+  \item \textbf{状态不确定}：初始状态或中间状态信息不完全，需要基于信念状态规划
+  \item \textbf{动作效果不确定}：动作执行结果具有随机性，需要考虑多种可能后果
+  \item \textbf{任务分解不确定}：方法选择本身受到不确定因素影响
+\end{enumerate}
+该研究将HTN规划与概率推理、条件规划等技术相结合，为应急响应等复杂管理任务提供了理论基础。
+\end{keypoint}
+
 \subsection{HDDL表示语言}
 
 HDDL（Hierarchical Domain Definition Language）是HTN的标准化语言，扩展了PDDL以支持层次任务。
